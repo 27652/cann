@@ -87,6 +87,17 @@ default, and every task has its own result directory. The scheduler refuses
 snapshots, and incomplete experiment identity metadata. Commands execute from
 the submitted snapshot, so later worktree edits cannot change a queued task.
 
+Treat each case as one submitted command. `submit --priority N` sets the case
+priority (default `0`); larger values run first and equal priorities remain
+FIFO. Use `--cases-json` to enqueue a list of explicit per-case commands,
+metadata, and optional priorities under separate result directories. When a
+higher-priority case arrives during a lower-priority case, the scheduler sets
+`yield_requested`; the simulator finishes normally, the Worker releases the
+host lease and exits its loop with `yielded=true`, and unclaimed cases remain
+queued. `pause TASK_ID` requests the same case-boundary yield. Neither action
+sends a signal to the simulator. The existing timeout path remains the only
+case-runner termination mechanism.
+
 Submit is non-blocking from the agent's perspective:
 
 ```bash
@@ -99,9 +110,22 @@ python3 optimization/camodel_scheduler.py submit \
   --bind "$WORKTREE/optimization/int32_golden.py" \
   --bind "$WORKTREE/optimization/test_points.json" \
   --metadata /tmp/opencode/task-metadata.json \
+  --priority 10 \
   -- python3 optimization/benchmark.py --case-ids 1 --variants optimized
 python3 optimization/camodel_scheduler.py worker --loop
 python3 optimization/camodel_scheduler.py list
+```
+
+For case-level scheduling, provide `--cases-json /tmp/opencode/cases.json`
+instead of the trailing command. It must contain an array like:
+
+```json
+[
+  {"command": ["python3", "optimization/benchmark.py", "--case-ids", "1", "--variants", "optimized"],
+   "metadata": {"case": 1}, "priority": 10},
+  {"command": ["python3", "optimization/benchmark.py", "--case-ids", "5", "--variants", "optimized"],
+   "metadata": {"case": 5}, "priority": 0}
+]
 ```
 
 Metadata must contain `candidate_id`, `source_sha256`, `binary_sha256`,

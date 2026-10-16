@@ -92,12 +92,14 @@ class Scheduler:
     def submit(self, *, command: list[str], cwd: Path, result_dir: Path,
                binds: list[Path], env: dict[str, str], timeout: float,
                metadata: dict | None = None,
-               allow_duplicate: bool = False) -> dict:
+               allow_duplicate: bool = False, priority: int = 0) -> dict:
         cwd = cwd.resolve()
         if not cwd.is_dir():
             raise ValueError(f"cwd is not a directory: {cwd}")
         if not command or not math.isfinite(timeout) or timeout <= 0:
             raise ValueError('command and a positive finite timeout are required')
+        if isinstance(priority, bool) or not isinstance(priority, int):
+            raise ValueError('priority must be an integer')
         allowed_env = ('PATH', 'LD_LIBRARY_PATH', 'PYTHONPATH', 'HOME', 'LANG',
                        'ASCEND_HOME_PATH', 'ASCEND_TOOLKIT_HOME', 'CAMODEL_HOME',
                        'CAMODEL_PATH', 'CANN_PATH', 'ASCEND_OPP_PATH',
@@ -136,7 +138,7 @@ class Scheduler:
                 raise ValueError(f'command file must be bound: {candidate}')
         identity = {"command": command, "cwd": str(cwd),
                     "binds": bound, "env": env, "timeout": timeout,
-                    "metadata": metadata or {}}
+                    "metadata": metadata or {}, "priority": priority}
         spec_hash = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
         now = time.time()
         with self._locked_queue() as data:
@@ -180,14 +182,43 @@ class Scheduler:
                     "created_at": now, "updated_at": now, "command": command,
                     "cwd": str(cwd), "result_dir": str(result_dir), "binds": copied,
                     "env": env, "timeout": timeout, "metadata": metadata,
+                    "priority": priority, "yield_requested": False,
                     "snapshot_dir": str(snapshot), "frozen_command": frozen_command,
                     "frozen_cwd": str(snapshot / 'candidate')}
             data["tasks"][task_id] = task
+            # A high-value case arriving while a lower-value case is running
+            # does not interrupt the simulator.  It only asks the current
+            # Worker to yield after its case boundary.  The running task owns
+            # the lease until its child exits; the next claim then selects the
+            # higher-priority case and leaves the rest queued.
+            running = [t for t in data["tasks"].values()
+                       if t["status"] == "running" and t.get("priority", 0) < priority]
+            for active in running:
+                active["yield_requested"] = True
+                active["updated_at"] = now
         return task
 
     def list_tasks(self) -> list[dict]:
         with self._locked_queue() as data:
             return list(data["tasks"].values())
+
+    def submit_cases(self, *, cases: list[dict], result_dir: Path, **shared) -> list[dict]:
+        """Enqueue explicit one-case commands; no command-line guessing/splitting.
+
+        Each case supplies command and metadata (overlaid on shared metadata),
+        and optionally priority. Already submitted cases remain recoverable if
+        a later submission fails; this is not an atomic batch operation.
+        """
+        if not cases or not all(isinstance(case, dict) and case.get('command')
+                                for case in cases):
+            raise ValueError('cases must be a nonempty list of case command objects')
+        tasks = []
+        for index, case in enumerate(cases):
+            options = {**shared, **case}
+            options['metadata'] = {**shared.get('metadata', {}), **case.get('metadata', {})}
+            options['result_dir'] = result_dir / f'case-{index:04d}'
+            tasks.append(self.submit(**options))
+        return tasks
 
     def cancel(self, task_id: str) -> dict:
         with self._locked_queue() as data:
@@ -200,6 +231,16 @@ class Scheduler:
             task["updated_at"] = time.time()
             return task
 
+    def pause(self, task_id: str) -> dict:
+        """Ask the owning Worker to stop after this case, without signalling it."""
+        with self._locked_queue() as data:
+            task = data['tasks'].get(task_id)
+            if not task or task['status'] != 'running':
+                raise ValueError('pause requires a running task')
+            task.update(pause_requested=True, yield_requested=True,
+                        updated_at=time.time())
+            return dict(task)
+
     def _claim(self) -> dict | None:
         with self._locked_queue() as data:
             for orphan in data['tasks'].values():
@@ -210,7 +251,8 @@ class Scheduler:
             queued = [t for t in data["tasks"].values() if t["status"] == "queued"]
             if not queued:
                 return None
-            task = min(queued, key=lambda x: (x["created_at"], x["task_id"]))
+            task = min(queued, key=lambda x: (-x.get("priority", 0),
+                                               x["created_at"], x["task_id"]))
             for item in task["binds"]:
                 if (not Path(item['snapshot']).is_file() or
                         sha256(Path(item["snapshot"])) != item["snapshot_sha256"]):
@@ -272,8 +314,16 @@ class Scheduler:
             status, extra = "timeout", {"timeout_seconds": task["timeout"]}
         except Exception as exc:
             status, extra = "failed", {"error": repr(exc)}
-        self._set_status(task["task_id"], status, **extra)
-        return {"task_id": task["task_id"], "status": status, **extra}
+        # Read the request after the child has exited.  This is deliberately a
+        # case-boundary decision: no SIGSTOP/SIGTERM is sent to the simulator.
+        with self._locked_queue() as data:
+            current = data["tasks"][task["task_id"]]
+            should_yield = bool(current.get("yield_requested"))
+            pause_requested = bool(current.get('pause_requested'))
+            current.update(status=status, yielded=should_yield,
+                           updated_at=time.time(), **extra)
+        return {"task_id": task["task_id"], "status": status,
+                "yielded": should_yield, "pause_requested": pause_requested, **extra}
 
 
 def main(argv=None) -> int:
@@ -286,6 +336,10 @@ def main(argv=None) -> int:
     s.add_argument("--bind", type=Path, action="append", default=[])
     s.add_argument("--env", action="append", default=[], metavar="NAME=VALUE")
     s.add_argument("--timeout", type=float, default=1800)
+    s.add_argument("--priority", type=int, default=0,
+                   help="case priority; larger values run first")
+    s.add_argument('--cases-json', type=Path,
+                   help='list of explicit case command/metadata/priority objects; no trailing command')
     s.add_argument("--metadata", type=Path, help="JSON object with case/variant/golden identity")
     s.add_argument("--allow-duplicate", action="store_true")
     s.add_argument("command", nargs=argparse.REMAINDER)
@@ -296,13 +350,15 @@ def main(argv=None) -> int:
     w.add_argument("--poll-interval", type=float, default=1.0)
     c = sub.add_parser("cancel")
     c.add_argument("task_id")
+    pause = sub.add_parser('pause', help='stop Worker after its current case; never signal the child')
+    pause.add_argument('task_id')
     args = p.parse_args(argv)
     scheduler = Scheduler(args.root)
     try:
         if args.action == "submit":
             command = args.command[1:] if args.command[:1] == ["--"] else args.command
-            if not command:
-                raise ValueError("submit requires a command after --")
+            if bool(command) == bool(args.cases_json):
+                raise ValueError("submit requires either a command after -- or --cases-json")
             env = {}
             for item in args.env:
                 if "=" not in item:
@@ -311,21 +367,27 @@ def main(argv=None) -> int:
             metadata = json.loads(args.metadata.read_text()) if args.metadata else {}
             if not isinstance(metadata, dict):
                 raise ValueError("--metadata JSON must contain an object")
-            print(json.dumps(scheduler.submit(command=command, cwd=args.cwd,
-                                               result_dir=args.result_dir, binds=args.bind,
-                                               env=env, timeout=args.timeout, metadata=metadata,
-                                               allow_duplicate=args.allow_duplicate), indent=2))
+            options = dict(cwd=args.cwd, result_dir=args.result_dir, binds=args.bind,
+                           env=env, timeout=args.timeout, metadata=metadata,
+                           allow_duplicate=args.allow_duplicate, priority=args.priority)
+            if args.cases_json:
+                cases = json.loads(args.cases_json.read_text())
+                print(json.dumps(scheduler.submit_cases(cases=cases, **options), indent=2))
+            else:
+                print(json.dumps(scheduler.submit(command=command, **options), indent=2))
         elif args.action == "list":
             print(json.dumps(scheduler.list_tasks(), indent=2))
         elif args.action == "cancel":
             print(json.dumps(scheduler.cancel(args.task_id), indent=2))
+        elif args.action == 'pause':
+            print(json.dumps(scheduler.pause(args.task_id), indent=2))
         else:
             if args.loop and args.once:
                 raise ValueError("worker accepts only one of --once and --loop")
             while True:
                 result = scheduler.worker_once()
                 print(json.dumps(result or {"status": "idle"}), flush=True)
-                if not args.loop:
+                if not args.loop or (result and result.get('yielded')):
                     break
                 time.sleep(args.poll_interval)
         return 0

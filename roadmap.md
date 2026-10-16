@@ -17,7 +17,7 @@
   `/tmp/opencode/cannjudge-ranking-team-file.json`。这些文件不属于仓库版本内容。
 - 本地 `optimization/test_points.json` 是自建回归，不是正式 15 个测试点；CAModel 结果不替代正式 score。
 - `optimization/int32_golden.py` 是严格 INT32 主机参考与边界回归入口，覆盖 K=65536、K=131072、INT32 signed boundary、极值 INT8、scale 下溢/负 scale 和 half-even；它不是设备或正式评分结果。
-- `optimization/camodel_scheduler.py` 与 `camodel_resource.py` 提供非阻塞队列、不可变候选快照、独立结果目录和主机级单 CAModel lease；`optimization/test_camodel_scheduler.py` 覆盖跨队列互斥、状态结束、异常恢复和快照隔离。
+- `optimization/camodel_scheduler.py` 与 `camodel_resource.py` 提供非阻塞队列、不可变候选快照、独立结果目录和主机级单 CAModel lease；现支持显式 case 任务优先级、`--cases-json` 批量拆分、以及只在 case 边界生效的协作式 pause/yield；`optimization/test_camodel_scheduler.py` 覆盖跨队列互斥、状态结束、异常恢复、快照隔离和优先级让出。
 - `optimization/accept_scheduler.py` 是显式 opt-in 的真实 Case 1 调度器验收脚本；最近一次完整验收记录位于 `/tmp/opencode/scheduler-acceptance-ssu3h5ye/acceptance.json`，通过单 Worker、资源竞争、排队快照和 Worker 异常退出场景。
 - `evidence/formal/` 保存不含原始回包的正式结果元数据、提交文件 hash 和历史提交源码恢复副本；离线校验入口为 `evidence/formal_evidence.py`，原始结果仍位于受保护的仓库外路径，详见 `report.md`。
 
@@ -135,7 +135,7 @@ op/kernel_v3.asc  64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e2202
 | `optimization/CMakeLists.txt` | 构建多个对照 variant |
 | `optimization/bench.asc` | 可传入 M/N/K 的统一运行器，通过编译宏选择 kernel |
 | `optimization/benchmark.py` | 固定种子生成输入/golden、串行运行 CAModel、比较输出、记录 cycles 和二进制 hash |
-| `optimization/camodel_scheduler.py` | 多 Agent 实验队列；默认单 Worker、主机级 CAModel 互斥和不可变任务快照 |
+| `optimization/camodel_scheduler.py` | 多 Agent 实验队列；默认单 Worker、主机级 CAModel 互斥、不可变任务快照、case 优先级和协作式边界让出 |
 | `optimization/camodel_resource.py` | 主机级 CAModel lease 及遗留未托管模型进程 fail-closed 检查 |
 | `optimization/test_camodel_scheduler.py` | 调度器轻量并发/生命周期测试，不启动真实 CAModel |
 | `optimization/accept_scheduler.py` | 显式 `--real-camodel` 的真实 Case 1 调度器验收；仅使用已有二进制和新隔离目录 |

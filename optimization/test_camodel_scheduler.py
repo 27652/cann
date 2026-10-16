@@ -134,6 +134,66 @@ class SchedulerTest(unittest.TestCase):
             time.sleep(.05)
         self.assertEqual(self.scheduler.list_tasks()[0]['status'], 'failed')
 
+    def test_priority_and_cooperative_yield_at_case_boundary(self):
+        marker = self.base / 'running'
+        first = self.submit(
+            f'import time\nfrom pathlib import Path\n'
+            f'Path({str(marker)!r}).touch()\ntime.sleep(.6)\n')
+        low = self.submit('print("low")\n')
+        proc = multiprocessing.Process(target=worker,
+                                       args=(str(self.scheduler.root), str(self.lock)))
+        proc.start()
+        self.addCleanup(lambda: proc.is_alive() and proc.kill())
+        deadline = time.monotonic() + 5
+        while not marker.exists() and time.monotonic() < deadline:
+            time.sleep(.01)
+        self.assertTrue(marker.exists())
+        high = self.submit('print("high")\n', priority=10)
+        states = {t['task_id']: t for t in self.scheduler.list_tasks()}
+        self.assertEqual(states[first['task_id']]['status'], 'running')
+        self.assertTrue(states[first['task_id']]['yield_requested'])
+        proc.join(5)
+        self.assertEqual(proc.exitcode, 0)
+        states = {t['task_id']: t for t in self.scheduler.list_tasks()}
+        self.assertEqual(states[first['task_id']]['status'], 'passed')
+        self.assertTrue(states[first['task_id']]['yielded'])
+        self.assertEqual(states[low['task_id']]['status'], 'queued')
+        self.assertEqual(states[high['task_id']]['status'], 'queued')
+        self.assertEqual(self.scheduler.worker_once()['task_id'], high['task_id'])
+        self.assertEqual(self.scheduler.worker_once()['task_id'], low['task_id'])
+
+    def test_priority_fifo_validation_and_legacy_default(self):
+        low = self.submit(priority=-1)
+        first = self.submit(priority=3)
+        second = self.submit(priority=3)
+        self.assertEqual(self.scheduler.worker_once()['task_id'], first['task_id'])
+        self.assertEqual(self.scheduler.worker_once()['task_id'], second['task_id'])
+        self.assertEqual(self.scheduler.worker_once()['task_id'], low['task_id'])
+        for invalid in (True, 1.5, 'high'):
+            with self.assertRaisesRegex(ValueError, 'priority'):
+                self.submit(priority=invalid)
+        legacy = self.submit()
+        with self.scheduler._locked_queue() as data:
+            data['tasks'][legacy['task_id']].pop('priority')
+        self.assertEqual(self.scheduler.worker_once()['status'], 'passed')
+
+    def test_submit_cases_has_independent_priorities_and_snapshots(self):
+        template = self.submit()
+        self.scheduler.cancel(template['task_id'])
+        tasks = self.scheduler.submit_cases(
+            cases=[{'command': ['python3', 'experiment.py'], 'metadata': {'case': 2}},
+                   {'command': ['python3', 'experiment.py'], 'metadata': {'case': 3},
+                    'priority': 5}],
+            result_dir=self.base / 'batch', cwd=self.cwd,
+            binds=[self.source, self.script], env={}, timeout=5,
+            metadata=template['metadata'])
+        self.assertEqual([t['metadata']['case'] for t in tasks], [2, 3])
+        self.script.write_text('raise SystemExit(9)')
+        self.assertEqual(self.scheduler.worker_once()['task_id'], tasks[1]['task_id'])
+        self.assertEqual(self.scheduler.worker_once()['task_id'], tasks[0]['task_id'])
+        self.assertTrue(all(t['status'] in ('passed', 'cancelled')
+                            for t in self.scheduler.list_tasks()))
+
 
 if __name__ == '__main__':
     unittest.main()

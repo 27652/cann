@@ -145,6 +145,12 @@ half-even 输入。它是主机语义回归，不是 CAModel 或正式 score 证
 - Worker 异常退出：只终止本轮创建的 Worker PID `1233994`，观察到其真实模型子进程 PID `1233996` 仍存活；新 Worker 被 lease 拒绝，模型结束并释放 inherited lease 后 successor 成功。孤儿任务标记 `failed`，successor 严格 INT32 通过。没有终止其他任务或模型进程。
 - 验收脚本为 `optimization/accept_scheduler.py`，需要显式 `--real-camodel` 才运行；该脚本不提交 CANNJudge、不清理历史结果。验收结论是：**单实例调度器在已有二进制和 Case 1 上通过真实验收**；并发数仍保持 1，不代表双 CAModel 并发安全。
 
+### Case 粒度优先级与协作式暂停（2026-10-16）
+
+- `optimization/camodel_scheduler.py` 新增整数 `priority`（默认 0），claim 时按优先级降序、同优先级创建时间 FIFO 选择；新增 `submit_cases()` 和 CLI `--cases-json`，将每个 case 固定为独立命令、快照和结果目录。
+- 高优先级 case 到达运行中的低优先级 case 时，仅在队列记录 `yield_requested`；当前 simulator 子进程继续运行并在 case 完成后正常退出，Worker 返回 `yielded=true`，剩余 case 留在 `queued`。CLI `pause TASK_ID` 使用同一路径请求边界让出。
+- 该路径不向 simulator 发送 `SIGSTOP`、`SIGTERM` 或主动终止信号；已有 timeout safety path 仍保留。`PYTHONPATH=optimization python3 -m unittest optimization.test_camodel_scheduler`：9 项通过，包含优先级/FIFO、case 拆分、运行中让出和 legacy 默认优先级验证。
+
 ### 下一轮候选方向（假设，不是已确认瓶颈）
 
 1. **Exact quantization 的认证/修正成本**：历史 `STRUCTURAL_EXPERIMENTS.md` 中 `(16,256,256)` 的 v2/mask/vector task 为 433,160/60,356/46,622 cycles，提示优先研究量化路径。但历史源码身份、宏和 golden 不足以证明这是当前根的单变量差值。最小实验为独立源码快照构建 optimized/vector 配对，先测 case 7，再测半整数密集与非精确倒数；vector 只作非正确消融。成功判据为配对 task 差值可复现，正确候选严格 INT8/scale 回归通过；风险是半整数舍入、极小 scale 和设备倒数误差。mask 仅作有数值风险的诊断，不自动晋升。
