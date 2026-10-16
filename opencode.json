@@ -43,6 +43,8 @@
     { "action": "shell", "resource": "sh run.sh*", "effect": "ask" },
     { "action": "shell", "resource": "sudo *", "effect": "deny" },
 
-    { "action": "external_directory", "resource": "*", "effect": "ask" }
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
+    { "action": "external_directory", "resource": "/tmp/opencode/*", "effect": "allow" },
+    { "action": "edit", "resource": "/tmp/opencode/*", "effect": "allow" }
   ]
 }
