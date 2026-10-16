@@ -1,0 +1,63 @@
+# Build and generated directories
+build/
+optimization/build/
+out/
+dist/
+
+# CMake and compiler artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+*.o
+*.obj
+*.so
+*.a
+*.d
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# Local execution data and generated inputs/outputs
+input/
+output/
+inputs/
+outputs/
+*.dump
+*.npy
+*.npz
+*.bin
+
+# Experiment logs and generated benchmark results
+*.log
+optimization/results/
+optimization/dump/
+optimization/camodel/
+optimization/*.jsonl
+
+# CANNJudge credentials and local result snapshots
+gitlabcann/cookie
+gitlabcann/*.submit.json
+gitlabcann/*-result.json
+gitlabcann/*-ranking.json
+cannjudge-result-*.json
+cannjudge-ranking*.json
+
+gitlabcann/team.txt
+gitlabcann/userid.txt
+
+# Local editor and OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+team.txt

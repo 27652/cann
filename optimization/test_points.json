@@ -1,0 +1,17 @@
+{
+  "description": "固定种子 CANN/CAModel 回归点；输入保存在 results/ 下",
+  "profiles": {
+    "random": "INT8 均匀随机，scale 在 1e-3 到 1e-1",
+    "boundary": "INT8=127/-128，scale=1，检查极值和饱和",
+    "zero_rows": "每隔一行 x1 全零，检查 rowMax=0 路径",
+    "signed_scale": "零行与负 scale，检查 ReLU 符号路径",
+    "extreme_int8": "交替使用 127/-128，检查大累加",
+    "tiny_scale": "混合 1e-35 scale，检查 reciprocal fallback"
+  },
+  "cases": [
+    [1,1,1,"boundary"],[4,8,16,"random"],[16,16,32,"random"],[17,33,65,"random"],
+    [3,7,31,"zero_rows"],[8,17,128,"signed_scale"],[16,256,256,"random"],[2,1025,32,"random"],
+    [2,4097,32,"zero_rows"],[32,65,257,"extreme_int8"],[129,128,256,"random"],[1024,256,64,"random"],
+    [4,64,65536,"random"],[2,8,131072,"extreme_int8"],[16,1024,1024,"tiny_scale"]
+  ]
+}
