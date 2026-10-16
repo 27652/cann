@@ -127,6 +127,24 @@ half-even 输入。它是主机语义回归，不是 CAModel 或正式 score 证
 - **工具状态（观察）**：CANN 9.1.0 安装包含 `tools/profiler/bin/msprof`，但本轮没有在忙碌的 CAModel 上调用它，也没有证明它能解析当前 simulator dump。因此本轮没有产生新的 profiling 数值。
 - **最小可行方案（建议）**：等待 CAModel 空闲后，在独立 `BENCHMARK_RESULTS_ROOT` 下固定小/中/大代表 shape，分别运行 `optimized`、`vector`、`mask`、必要时 `cache`，核对同一 fingerprint 和 INT32 正确性，再对独立 profile dump 做字段级解析；若仍只有 MIXAIC 聚合时间，则只能报告消融差值，不能声称阶段时间。
 
+## 多 Agent 实验调度（本轮实现）
+
+- **审计观察**：实现调度器时 PID `1218378`（benchmark case 12/13/14/15）及其 `bench_optimized` 子进程仍占用 CAModel；本轮未杀进程、未启动并行模型。随后复查时该进程已结束，且未检测到新的模型进程。机器内存和磁盘空间充足，但共享 CAModel 与现有结果/构建目录仍是主要冲突源。
+- 新增 `optimization/camodel_scheduler.py`：JSON 文件队列由 `fcntl` 保护，任务状态为 `queued`、`running`、`passed`、`failed`、`timeout`、`cancelled`；提交只生成任务和候选快照，不阻塞 Agent。任务要求 candidate/source/binary/case/variant/golden/environment 身份元数据，拒绝重复活动任务和结果目录冲突。
+- 新增 `optimization/camodel_resource.py`：固定使用 `/tmp/opencode/camodel-host.lock` 的主机级 lease，Worker 将 lease FD 传给 benchmark 子进程，避免 Worker 异常退出时模型子进程继续运行却提前释放锁；发现既有未托管 benchmark/CAModel 进程时 fail-closed，不杀进程。
+- 每个任务绑定提交时的源文件/二进制 hash 和独立快照；Worker 运行前重新核对快照，实际命令从快照工作目录执行，因此提交后工作树修改不会改变排队实验。结果目录在提交时原子保留，独立于 `optimization/results/`，并由任务唯一占用。调度器不修改 `report.md`、不执行正式提交；Coordinator 统一比较结果和维护正式证据。
+- 模拟测试 `PYTHONPATH=optimization python3 -m unittest optimization.test_camodel_scheduler`：6 项通过，验证跨队列 `flock` 互斥、任务结束/失败/超时/取消状态、锁释放、Worker 被杀后的孤儿任务恢复、快照篡改/缺失拒绝、提交后工作树修改隔离、重复任务与结果目录冲突。测试不调用真实 CAModel。
+- 当前不具备安全启动两个 CAModel 的条件。单实例队列通过模拟锁验证，但尚未证明 simulator/ACL/日志系统支持双实例资源隔离；后续即使考虑并发 2，也必须先做独立目录、独立环境、正确性、资源峰值、日志和 task-cycle 可比性测试，否则保持并发 1。
+
+### 真实调度器验收（2026-10-16）
+
+- 使用已有 `optimization/build/bench_optimized`，未编译、未修改根 kernel，使用项目 `env.sh Ascend910B1` 和新的隔离目录；完整机器可读记录位于 `/tmp/opencode/scheduler-acceptance-ssu3h5ye/acceptance.json`，不属于正式证据或 Git 版本内容。
+- 单 Worker Case 1：`passed`；结果位于 `results/single/.../result.json`，严格 INT32 `int32_mismatches=0`、`int32_scale_ok=true`，`task_cycles=24154`、`total_ticks=24452`，保存了 benchmark fingerprint。
+- 双 Worker 资源竞争：观察到真实 CAModel PID `1233928`；第二 Worker 返回 `busy=true`、`host CAModel lease busy`，没有启动第二个模型。前一任务完成后，排队任务随后获得 lease 并成功完成，严格 INT32 通过，`task_cycles=24154`。
+- 执行期间提交任务：提交耗时约 12--24 ms，调用方未等待模型；第二任务保持 `queued`，其后使用提交时快照完成。排队后仅修改本轮 staging worktree 的 `kernel.asc`，快照 hash 和结果仍对应原始 `bca59d...9a81d`。
+- Worker 异常退出：只终止本轮创建的 Worker PID `1233994`，观察到其真实模型子进程 PID `1233996` 仍存活；新 Worker 被 lease 拒绝，模型结束并释放 inherited lease 后 successor 成功。孤儿任务标记 `failed`，successor 严格 INT32 通过。没有终止其他任务或模型进程。
+- 验收脚本为 `optimization/accept_scheduler.py`，需要显式 `--real-camodel` 才运行；该脚本不提交 CANNJudge、不清理历史结果。验收结论是：**单实例调度器在已有二进制和 Case 1 上通过真实验收**；并发数仍保持 1，不代表双 CAModel 并发安全。
+
 ### 下一轮候选方向（假设，不是已确认瓶颈）
 
 1. **Exact quantization 的认证/修正成本**：历史 `STRUCTURAL_EXPERIMENTS.md` 中 `(16,256,256)` 的 v2/mask/vector task 为 433,160/60,356/46,622 cycles，提示优先研究量化路径。但历史源码身份、宏和 golden 不足以证明这是当前根的单变量差值。最小实验为独立源码快照构建 optimized/vector 配对，先测 case 7，再测半整数密集与非精确倒数；vector 只作非正确消融。成功判据为配对 task 差值可复现，正确候选严格 INT8/scale 回归通过；风险是半整数舍入、极小 scale 和设备倒数误差。mask 仅作有数值风险的诊断，不自动晋升。

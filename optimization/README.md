@@ -76,6 +76,80 @@ includes scheduling/model activity. Results are simulator measurements, not
 physical-device latency. Absolute cycle counts depend on input data because
 the original exact quantizer uses data-dependent scalar branches.
 
+## Multi-agent CAModel scheduler
+
+Agents may analyze, edit candidates, run host tests, and compile in separate Git
+worktrees. CAModel is different: `optimization/camodel_scheduler.py` admits one
+model process at a time using the host-wide `/tmp/opencode/camodel-host.lock`.
+Queue state and immutable candidate snapshots live outside the repository by
+default, and every task has its own result directory. The scheduler refuses
+`optimization/results/`, duplicate tasks, unbound command files, tampered
+snapshots, and incomplete experiment identity metadata. Commands execute from
+the submitted snapshot, so later worktree edits cannot change a queued task.
+
+Submit is non-blocking from the agent's perspective:
+
+```bash
+python3 optimization/camodel_scheduler.py submit \
+  --cwd "$WORKTREE" \
+  --result-dir "/tmp/opencode/camodel-results/$TASK_ID" \
+  --bind "$WORKTREE/kernel.asc" \
+  --bind "$WORKTREE/optimization/build/bench_optimized" \
+  --bind "$WORKTREE/optimization/benchmark.py" \
+  --bind "$WORKTREE/optimization/int32_golden.py" \
+  --bind "$WORKTREE/optimization/test_points.json" \
+  --metadata /tmp/opencode/task-metadata.json \
+  -- python3 optimization/benchmark.py --case-ids 1 --variants optimized
+python3 optimization/camodel_scheduler.py worker --loop
+python3 optimization/camodel_scheduler.py list
+```
+
+Metadata must contain `candidate_id`, `source_sha256`, `binary_sha256`,
+`case`, `variant`, `golden_mode`, and `environment_fingerprint`. The worker
+records `queued`, `running`, `passed`, `failed`, `timeout`, or `cancelled` and
+writes `task.json` and `run.log` beneath the task result directory. The lease
+file descriptor is passed to the benchmark child, so the host lock remains held
+until the model process exits. Existing unmanaged model/benchmark processes are
+detected and cause fail-closed requeue; they are never killed.
+
+The scheduler does not perform formal submissions or update `report.md`; a
+coordinator reviews completed results and applies the existing formal score and
+promotion rules. Do not use the current shared `optimization/build` from two
+worktrees for writes; use a worktree-local build directory or an independent
+out-of-tree build.
+
+Create an isolated research worktree from the repository root (do not place
+two agents in the same writable directory):
+
+```bash
+git worktree add /tmp/opencode/worktrees/vector -b research/vector
+git worktree add /tmp/opencode/worktrees/cache -b research/cache
+cmake -S /tmp/opencode/worktrees/vector/optimization \
+      -B /tmp/opencode/worktrees/vector/optimization/build
+cmake --build /tmp/opencode/worktrees/vector/optimization/build -j4
+```
+
+The coordinator should review completed queue records and update the main
+worktree's `report.md`; agents should not edit another worktree or reuse its
+build/result directories.
+
+### Real acceptance (single CAModel only)
+
+After confirming no unrelated model process is active, the coordinator can run
+the opt-in acceptance script with an existing binary:
+
+```bash
+python3 optimization/accept_scheduler.py --real-camodel \
+  --toolkit /mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0
+```
+
+It uses only Case 1, creates a fresh `/tmp/opencode/scheduler-acceptance-*`
+directory, and exercises one Worker, two competing Workers, enqueue-while-
+running, staging-worktree mutation after enqueue, and termination of only the
+acceptance Worker. It must not be used while another user's model is running.
+The resulting `acceptance.json` is local scheduler evidence, not an official
+score or formal CANNJudge result.
+
 ## Initial measurements (before incorporating `op/kernel.asc`)
 
 The repository's original case (`M=16,N=16,K=32`) passed before and after the

@@ -17,6 +17,8 @@
   `/tmp/opencode/cannjudge-ranking-team-file.json`。这些文件不属于仓库版本内容。
 - 本地 `optimization/test_points.json` 是自建回归，不是正式 15 个测试点；CAModel 结果不替代正式 score。
 - `optimization/int32_golden.py` 是严格 INT32 主机参考与边界回归入口，覆盖 K=65536、K=131072、INT32 signed boundary、极值 INT8、scale 下溢/负 scale 和 half-even；它不是设备或正式评分结果。
+- `optimization/camodel_scheduler.py` 与 `camodel_resource.py` 提供非阻塞队列、不可变候选快照、独立结果目录和主机级单 CAModel lease；`optimization/test_camodel_scheduler.py` 覆盖跨队列互斥、状态结束、异常恢复和快照隔离。
+- `optimization/accept_scheduler.py` 是显式 opt-in 的真实 Case 1 调度器验收脚本；最近一次完整验收记录位于 `/tmp/opencode/scheduler-acceptance-ssu3h5ye/acceptance.json`，通过单 Worker、资源竞争、排队快照和 Worker 异常退出场景。
 - `evidence/formal/` 保存不含原始回包的正式结果元数据、提交文件 hash 和历史提交源码恢复副本；离线校验入口为 `evidence/formal_evidence.py`，原始结果仍位于受保护的仓库外路径，详见 `report.md`。
 
 ## 1. 从哪里开始看
@@ -25,8 +27,9 @@
 2. **当前开发入口**：[kernel.asc](kernel.asc)，由根 `main.asc` 和实验程序共同引用。
 3. **保留版本**：`op/` 下的三个 kernel，不覆盖、不当作临时实验文件使用。
 4. **现有评测与风险**：先看 `ev/`，再看 `optimization/` 中的历史实验。
-5. **复现测试**：使用 `optimization/benchmark.py`；单点示例入口为根 `main.asc`。
-6. **外部实现参考**：看 `reference/README.md`，再按 AscendC → DynamicQuant → CUDA epilogue 顺序阅读。
+5. **正式结果与恢复**：先看 `evidence/formal/README.md` 和 `report.md`，再使用只读的 `evidence/formal_evidence.py`。
+6. **复现测试**：使用 `optimization/benchmark.py`；单点示例入口为根 `main.asc`。
+7. **外部实现参考**：看 `reference/README.md`，再按 AscendC → DynamicQuant → CUDA epilogue 顺序阅读。
 
 ### 当前状态（避免混淆）
 
@@ -132,11 +135,16 @@ op/kernel_v3.asc  64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e2202
 | `optimization/CMakeLists.txt` | 构建多个对照 variant |
 | `optimization/bench.asc` | 可传入 M/N/K 的统一运行器，通过编译宏选择 kernel |
 | `optimization/benchmark.py` | 固定种子生成输入/golden、串行运行 CAModel、比较输出、记录 cycles 和二进制 hash |
+| `optimization/camodel_scheduler.py` | 多 Agent 实验队列；默认单 Worker、主机级 CAModel 互斥和不可变任务快照 |
+| `optimization/camodel_resource.py` | 主机级 CAModel lease 及遗留未托管模型进程 fail-closed 检查 |
+| `optimization/test_camodel_scheduler.py` | 调度器轻量并发/生命周期测试，不启动真实 CAModel |
+| `optimization/accept_scheduler.py` | 显式 `--real-camodel` 的真实 Case 1 调度器验收；仅使用已有二进制和新隔离目录 |
 | `optimization/test_points.json` | 本地 15 点及 profile 说明；runner 的 `SUITE` 另有一份定义，修改用例时需同步 |
 | `optimization/check_quant.py` | 提取根 kernel exact helper，在宿主 C++ 上测试随机 hint、半整数边界和 IEEE mask 模型 |
 | `optimization/int32_golden.py` | 严格 INT32 累加/显式 int32 wrap 的主机 golden 与大 K、scale、舍入边界回归 |
 | `optimization/vector_error_distribution.py` | 假设 reciprocal 误差预算的宿主扰动实验；不能代替设备 reciprocal 精度保证 |
 | `optimization/baseline/kernel.asc` | 更早的原始源码对照，不是 `op/kernel.asc` |
+| `optimization/candidates/`、`optimization/snapshots/` | 未晋升候选和修改前快照；当前为 `unit-token-scale/kernel.asc` 与 `pre-unit-token-scale/kernel.asc` |
 
 ### variant 对照
 
@@ -188,3 +196,25 @@ OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --suite --variants prio
 ```
 
 CAModel 回归应串行执行，避免与正在运行的任务共用相同结果目录。`--resume` 仅在完整 fingerprint 匹配时复用结果；fingerprint 覆盖输入、双 golden、variant 源码、benchmark/golden 脚本、测试点文件、二进制和关键环境变量。
+
+## 9. `evidence/`：正式结果证据与恢复
+
+`evidence/` 是正式评测结果的可版本化、脱敏证据层，不保存 Cookie、会话令牌或原始 API 回包。正式结果的来源、score 和当前根差异见 `report.md`；仓库内校验器只检查元数据、文件集合和 hash 的一致性。
+
+| 路径 | 用途 | 备注 |
+|---|---|---|
+| `evidence/formal/README.md` | 证据规范和离线命令 | 包含权限、脱敏和恢复边界 |
+| `evidence/formal/manifest.txt` | 历史提交摘要索引 | 包含提交、15/15、score、来源路径和 SHA256 |
+| `evidence/formal/submission-files.sha256` | 实际 editable 文件的 hash 清单 | 当前历史提交为 8 个文件 |
+| `evidence/formal/historical-6ad2872c/` | 历史提交 bundle | `evidence.json` 与 8 个可恢复源码文件 |
+| `evidence/formal_evidence.py` | 离线 `recover`、`validate`、`decide` 入口 | `recover` 创建新 bundle；`decide` 只输出资格，不修改工作树 |
+| `evidence/test_formal_evidence.py` | 离线校验单测 | 覆盖字段、15/15、score 归属及源码 hash 等拒绝条件 |
+
+从根目录执行历史 bundle 校验：
+
+```bash
+python3 evidence/formal_evidence.py validate evidence/formal/historical-6ad2872c
+python3 -m unittest evidence.test_formal_evidence
+```
+
+`recover` 只应针对已核对的受保护快照运行；`decide <candidate> --best <bundle>` 要求相同 scoring context 且 score 严格更高。正式晋升仍须另外确认实际上传 payload、submission ID、服务端 15/15 和同一提交的官方 score。

@@ -10,6 +10,7 @@ import subprocess
 import numpy as np
 
 from int32_golden import reference as int32_reference
+from camodel_resource import lease
 
 ROOT = Path(__file__).resolve().parent
 
@@ -128,9 +129,11 @@ def run_case(shape, variant, mode="random", resume=False, case_id=None, timeout=
     env = dict(os.environ, CAMODEL_LOG_PATH=str(logs), STARS_LOG_PATH=str(logs),
                OPENBLAS_NUM_THREADS="1")
     try:
-        proc = subprocess.run([str(binary), *map(str, shape)],
-                              cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                              text=True, timeout=timeout)
+        with lease() as lease_fd:
+            env['CAMODEL_LEASE_FD'] = str(lease_fd)
+            proc = subprocess.run([str(binary), *map(str, shape)],
+                                  cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                  text=True, timeout=timeout, pass_fds=(lease_fd,))
     except subprocess.TimeoutExpired as exc:
         output = exc.stdout or ""
         if isinstance(output, bytes):
