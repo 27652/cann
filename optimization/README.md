@@ -2,11 +2,11 @@
 
 ## Latest snapshot
 
-The current root candidate is frozen as `op/kernel_v3.asc`. The user's external
-15-point evaluation passed all cases with zero output errors, but latency still
-lags the reported best times substantially. See `../ev/V3_EVALUATION.md` for the data,
-remaining correctness limitations and next-step priorities. Measurements below
-describe earlier versions unless explicitly stated otherwise.
+`op/kernel_v3.asc` is a frozen historical snapshot, not the current root. The current
+root is `../kernel.asc`; its default `QUANT_MASK_FAST_PATH=0` differs from v3, and
+its `K >= 65536` path uses FP32 Matmul. The external v3 evaluation and its limitations
+are recorded in `../ev/V3_EVALUATION.md`. Measurements below describe earlier
+versions unless explicitly stated otherwise.
 
 ## Fixed public test points
 
@@ -65,8 +65,10 @@ OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --shapes 4x17x32 --mode
 Run these serially. Each run has its own input, output, model logs and
 `result.json` under `results/<shape>_<mode>/<variant>/`. The driver checks INT8
 output with exact equality and scales with `rtol=atol=1e-4`. It also propagates
-runtime failures. `--resume` reuses existing results and should only be used
-when the binaries have not changed.
+runtime failures. `--resume` reuses an existing result only when its recorded
+`binary_sha256` matches the current binary. It does not verify input/golden hashes,
+benchmark-script hash, CANN/CAModel version, or source hash; use it only after
+independently confirming those conditions.
 
 Compare `task_cycles` from CAModel `profile_task_log0.toml`, not wall-clock
 runtime (which is dominated by simulator startup/logging). `total_ticks` also

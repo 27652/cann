@@ -42,6 +42,13 @@ optimization/dump/
 optimization/camodel/
 optimization/*.jsonl
 
+# Formal evidence metadata is versioned; raw API payloads remain local-only.
+!evidence/
+!evidence/formal/
+!evidence/formal/*.md
+!evidence/formal/*.txt
+evidence/formal/raw/
+
 # CANNJudge credentials and local result snapshots
 gitlabcann/cookie
 gitlabcann/*.submit.json
@@ -52,6 +59,10 @@ cannjudge-ranking*.json
 
 gitlabcann/team.txt
 gitlabcann/userid.txt
+
+# Historical baseline build outputs are local artifacts, not source.
+optimization/baseline/profile_task_log0.toml
+optimization/baseline/quant_matmul_relu_quant_custom
 
 # Local editor and OS files
 .DS_Store

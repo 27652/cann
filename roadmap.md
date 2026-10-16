@@ -1,13 +1,23 @@
-# QuantMatmulReluQuant：文件导航与后续路线
+# QuantMatmulReluQuant：文件导航与当前状态
 
-更新时间：2026-10-16。本文按用途列出源码和文档；大量自动生成的输入、输出、编译缓存与 CAModel dump 按目录/命名规则归类，不逐个枚举。
+更新时间：2026-10-16。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
-## 总目标
+## 当前状态
 
-在题目 15 个测试点全部通过的前提下，以题目实际计时口径最小化端到端用时，
-最终达到全体候选实现中的最优平均性能。参考资料和实验必须服务于这个目标：
-先做瓶颈归因，再做可回退的候选；正确性、设备语义和正式计时口径未确认时，
-不以单点 CAModel 加速替代最终结论。详细参考入口见 [`reference/`](reference/README.md)。
+- 当前工作实现为根 `kernel.asc`，SHA256 为
+  `bca59d1594b46f6d93e5e6b9769a141001ceccd2a15cf712f53c83fdb9a9a81d`。
+- `optimization/candidates/unit-token-scale/kernel.asc` 为跳过 unit token scale 乘法的
+  未编译、未正式验证候选，未晋升；优化前快照位于
+  `optimization/snapshots/pre-unit-token-scale/kernel.asc`，根保持优化前内容。
+- 当前根默认 `QUANT_MASK_FAST_PATH=0`；`K >= 65536` 时使用 FP32 Matmul 路径。
+- `op/kernel_v3.asc` 为冻结快照，SHA256 为
+  `64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e220220`；当前根与 v3 至少在 `QUANT_MASK_FAST_PATH` 宏上不同。
+- 已复核的历史正式有效提交及 score 记录在 `report.md`；原始结果位于
+  `/tmp/opencode/kernel-existing-submission-result.json`，排行快照位于
+  `/tmp/opencode/cannjudge-ranking-team-file.json`。这些文件不属于仓库版本内容。
+- 本地 `optimization/test_points.json` 是自建回归，不是正式 15 个测试点；CAModel 结果不替代正式 score。
+- `optimization/int32_golden.py` 是严格 INT32 主机参考与边界回归入口，覆盖 K=65536、K=131072、INT32 signed boundary、极值 INT8、scale 下溢/负 scale 和 half-even；它不是设备或正式评分结果。
+- `evidence/formal/` 保存不含原始回包的正式结果元数据和提交文件 hash；原始结果仍位于受保护的仓库外路径，详见 `report.md`。
 
 ## 1. 从哪里开始看
 
@@ -25,7 +35,7 @@
 - `op/kernel.asc` 是历史对照基线，`op/kernel_v2.asc` 是早期候选快照，均保留不动。
 - `bench_vector` 仅消融量化精确校正；**仍包含矩阵乘等整个算子阶段**，不是已完成的独立纯 Vector 微基准，也不是可提交的正确实现。
 - `optimization/vector_error_distribution.py` 是宿主误差模型，不是设备指令误差分布或设备误差上界证明。
-- 新的保守版本已编译；`optimization/safe_regression.log` 本轮 11 个指定 case 均完成，mismatch=0 且 scale_ok=true。详细周期对比和限制见 `report.md`；这不是官方 15/15 或 score 证据。
+- 历史安全回归记录在 `report.md` 和 `optimization/safe_regression.log`；这不是当前根与正式提交一致性的证明，也不是官方 15/15 或 score 证据。
 - `reference/` 保存公开源码/文档入口和分析，不保存未经核对的第三方代码副本；CUDA 资料可用于算法、数值处理和结构对照，但不能未经适配当作 AscendC 实现。
 
 ## 2. 根目录：实现与单点执行
@@ -48,14 +58,14 @@
 |---|---|---|
 | `gitlabcann/README.md` | 提交工具的登录、提交、结果查询和排行榜查询说明 | 默认对应本题赛事与题目 |
 | `gitlabcann/cannjudge_cli.py` | CANNJudge 命令行客户端 | 支持登录、提交工程、轮询结果、查询已有提交及读取 `rank`/`score` |
-| `gitlabcann/userid.txt` | 默认 CANNJudge 用户 ID | 提交和排行榜命令自动读取；可用 `--user-id` 覆盖 |
+| `gitlabcann/userid.txt` | 本地未跟踪的默认 CANNJudge 用户 ID | 提交和排行榜命令自动读取；可用 `--user-id` 覆盖；不属于版本化输入 |
 | `team.txt` | 默认排行榜搜索队伍名称 | 当前值为 `西西里 的队伍`；排行榜命令可用 `--query` 覆盖 |
 | `gitlabcann/cookie` | 登录会话 Cookie | 敏感凭证，不应分享或提交到版本库 |
 | `gitlabcann/__pycache__/` | Python 自动缓存 | 非源码 |
 
 注意：该工具向 CANNJudge 提交，不是 GitLab OAuth 客户端；实际上传文件以服务端
-题目模板中的可编辑文件为准。已用真实账号完成一次提交与结果/排行榜查询联调，
-结果与提交 ID 见 `report.md`；Cookie 仍为敏感凭证。
+题目模板中的可编辑文件为准。已复核的历史提交文件清单、hash、结果和排行榜快照见
+`report.md`；Cookie 仍为敏感凭证。
 
 ## 3. `ques/`：题目原始资料
 
@@ -124,6 +134,7 @@ op/kernel_v3.asc  64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e2202
 | `optimization/benchmark.py` | 固定种子生成输入/golden、串行运行 CAModel、比较输出、记录 cycles 和二进制 hash |
 | `optimization/test_points.json` | 本地 15 点及 profile 说明；runner 的 `SUITE` 另有一份定义，修改用例时需同步 |
 | `optimization/check_quant.py` | 提取根 kernel exact helper，在宿主 C++ 上测试随机 hint、半整数边界和 IEEE mask 模型 |
+| `optimization/int32_golden.py` | 严格 INT32 累加/显式 int32 wrap 的主机 golden 与大 K、scale、舍入边界回归 |
 | `optimization/vector_error_distribution.py` | 假设 reciprocal 误差预算的宿主扰动实验；不能代替设备 reciprocal 精度保证 |
 | `optimization/baseline/kernel.asc` | 更早的原始源码对照，不是 `op/kernel.asc` |
 
@@ -176,15 +187,4 @@ OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --case-ids 1 5 6 --vari
 OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --suite --variants prior optimized --timeout 1800
 ```
 
-CAModel 回归应串行执行，避免与正在运行的任务共用相同结果目录。`--resume` 只复用 binary hash 匹配的结果；历史日志仍需检查其源码状态与测量口径。
-
-## 9. 后续 roadmap（按优先级）
-
-1. **对齐正式计分口径和题目语义**：核对本地 FP32 matmul golden 与题面 INT32 累加差异、正式 CANN 版本、H2D/Kernel/D2H 计时范围、INT32 溢出假设、非有限输入和超小 scale 行为；独立生成标准参考，不改写历史基线。
-2. **建立最优用时基线**：收齐 15 点、极端 INT8、零行、负 scale、tail、tiny scale、K=65536/131072、大 M 与多核测试；对 prior、v3、safe kernel 记录源码/二进制 hash、端到端时间和 CAModel 分阶段指标。
-3. **优先减少 Cube/Vector 协同和 GM 流量**：按 `reference/01_ascend_sources.md` 对照 GroupedMatmulQuantMixCore/FFNQuant，验证 tile 级 CrossCore 流水、workspace 生命周期、scale 广播和 UB 复用。
-4. **完成真正独立的设备诊断**：增加固定 workspace 的 Vector-only 微基准、Cube-only 对照、fallback/scale 分支统计，以及 Compare mask 位序、GatherMask 压缩布局和 Select 行为测试。计数版本不得用作正式性能结果。
-5. **降低精确校正成本**：按 `reference/03_current_kernel_mapping.md` 制作独立候选，研究先生成原始索引、再用风险 mask 一致筛选值和索引、精确校正后按索引写回；风险判据本身需验证，不能只验证 GatherMask 布局。目标是减少逐元素 `GetValue/SetValue`，覆盖半整数与非精确倒数边界后再测 CAModel。
-6. **按 shape 做专用调优**：小形状优化启动和同步，中等形状优化 UB/Vector pipeline，大形状优化 Cube 利用率、M/N 负载和 GM 带宽；按题面逐点得分评估，不能用平均耗时直接代替平均得分。
-7. **最后考虑 row-max 跨 N 重构**：只有 profile 证明收益明确时，才做 partial row max、跨核同步和第二阶段量化；不能用局部 max 替代完整 row max。
-8. **合入门槛与回退**：全部正式测试点通过、INT8 采用当前保守的完全一致策略、scale 合格、设备语义有证据，并且按正式规则评估后性能收益足以抵消回归风险，才替换根版本；否则保留 `op/kernel.asc` 历史基线和所有候选快照。
+CAModel 回归应串行执行，避免与正在运行的任务共用相同结果目录。`--resume` 只检查结果中记录的 `binary_sha256` 是否匹配当前二进制；它不检查输入/golden、脚本、CANN/CAModel 或源码 hash，复用前必须另行核对。

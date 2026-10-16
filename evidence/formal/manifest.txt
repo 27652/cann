@@ -1,0 +1,9 @@
+submission_id=6ad2872c193e507d8ed198c9
+status=Pass
+testcases=15
+precision_ratio=1
+score=11.67
+ranking_submission_id=6ad2872c193e507d8ed198c9
+ranking_score=11.67
+result_source=/tmp/opencode/kernel-existing-submission-result.json
+ranking_source=/tmp/opencode/cannjudge-ranking-team-file.json

@@ -1,45 +1,48 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "read": {
-      "*": "allow",
-      "*.env": "deny",
-      "*.env.*": "deny",
-      "*.env.example": "allow",
-      "gitlabcann/cookie": "deny",
-      "*/gitlabcann/cookie": "deny"
-    },
-    "edit": {
-      "*": "allow",
-      "op/kernel.asc": "deny",
-      "op/kernel_v2.asc": "deny",
-      "op/kernel_v3.asc": "deny",
-      "*/op/kernel.asc": "deny",
-      "*/op/kernel_v2.asc": "deny",
-      "*/op/kernel_v3.asc": "deny",
-      "gitlabcann/cookie": "deny",
-      "*/gitlabcann/cookie": "deny",
-      "AGENTS.md": "ask",
-      "*/AGENTS.md": "ask",
-      "opencode.json": "ask",
-      "*/opencode.json": "ask"
-    },
-    "bash": {
-      "*": "allow",
-      "rm *": "ask",
-      "git clean *": "deny",
-      "git reset --hard*": "deny",
-      "git push*": "deny",
-      "git commit*": "ask",
-      "git restore *": "ask",
-      "git checkout -- *": "ask",
-      "./run.sh*": "ask",
-      "bash run.sh*": "ask",
-      "sh run.sh*": "ask",
-      "sudo *": "deny"
-    },
-    "external_directory": "ask",
-    "doom_loop": "ask"
-  }
-}
+  "permissions": [
+    { "action": "read", "resource": "*", "effect": "allow" },
+    { "action": "read", "resource": "*.env", "effect": "deny" },
+    { "action": "read", "resource": "*.env.*", "effect": "deny" },
+    { "action": "read", "resource": "*.env.example", "effect": "allow" },
+    { "action": "read", "resource": "gitlabcann/cookie", "effect": "deny" },
+    { "action": "read", "resource": "*/gitlabcann/cookie", "effect": "deny" },
+    { "action": "read", "resource": "gitlabcann/userid.txt", "effect": "deny" },
+    { "action": "read", "resource": "*/gitlabcann/userid.txt", "effect": "deny" },
+    { "action": "read", "resource": "evidence/formal/raw/*", "effect": "deny" },
+    { "action": "read", "resource": "*/evidence/formal/raw/*", "effect": "deny" },
 
+    { "action": "edit", "resource": "*", "effect": "allow" },
+    { "action": "edit", "resource": "op/kernel.asc", "effect": "deny" },
+    { "action": "edit", "resource": "op/kernel_v2.asc", "effect": "deny" },
+    { "action": "edit", "resource": "op/kernel_v3.asc", "effect": "deny" },
+    { "action": "edit", "resource": "*/op/kernel.asc", "effect": "deny" },
+    { "action": "edit", "resource": "*/op/kernel_v2.asc", "effect": "deny" },
+    { "action": "edit", "resource": "*/op/kernel_v3.asc", "effect": "deny" },
+    { "action": "edit", "resource": "gitlabcann/cookie", "effect": "deny" },
+    { "action": "edit", "resource": "*/gitlabcann/cookie", "effect": "deny" },
+    { "action": "edit", "resource": "gitlabcann/userid.txt", "effect": "deny" },
+    { "action": "edit", "resource": "*/gitlabcann/userid.txt", "effect": "deny" },
+    { "action": "edit", "resource": "evidence/formal/raw/*", "effect": "deny" },
+    { "action": "edit", "resource": "*/evidence/formal/raw/*", "effect": "deny" },
+    { "action": "edit", "resource": "AGENTS.md", "effect": "ask" },
+    { "action": "edit", "resource": "*/AGENTS.md", "effect": "ask" },
+    { "action": "edit", "resource": "opencode.json", "effect": "ask" },
+    { "action": "edit", "resource": "*/opencode.json", "effect": "ask" },
+
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "rm *", "effect": "ask" },
+    { "action": "shell", "resource": "git clean *", "effect": "deny" },
+    { "action": "shell", "resource": "git reset --hard*", "effect": "deny" },
+    { "action": "shell", "resource": "git push*", "effect": "deny" },
+    { "action": "shell", "resource": "git commit*", "effect": "ask" },
+    { "action": "shell", "resource": "git restore *", "effect": "ask" },
+    { "action": "shell", "resource": "git checkout -- *", "effect": "ask" },
+    { "action": "shell", "resource": "./run.sh*", "effect": "ask" },
+    { "action": "shell", "resource": "bash run.sh*", "effect": "ask" },
+    { "action": "shell", "resource": "sh run.sh*", "effect": "ask" },
+    { "action": "shell", "resource": "sudo *", "effect": "deny" },
+
+    { "action": "external_directory", "resource": "*", "effect": "ask" }
+  ]
+}
