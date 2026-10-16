@@ -9,6 +9,8 @@ import re
 import subprocess
 import numpy as np
 
+from int32_golden import reference as int32_reference
+
 ROOT = Path(__file__).resolve().parent
 
 SUITE = [
@@ -34,17 +36,19 @@ def run_case(shape, variant, mode="random", resume=False, case_id=None, timeout=
     m, n, k = shape
     binary = ROOT / "build" / ("bench_" + variant)
     binary_hash = hashlib.sha256(binary.read_bytes()).hexdigest()
+    variant_sources = {
+        "baseline": ROOT / "baseline/kernel.asc", "prior": ROOT.parent / "op/kernel.asc",
+        "v2": ROOT.parent / "op/kernel_v2.asc", "v3": ROOT.parent / "op/kernel_v3.asc",
+    }
+    source_path = variant_sources.get(variant, ROOT.parent / "kernel.asc")
     label = (f"case{case_id:02d}_" if case_id is not None else "") + "x".join(map(str, shape)) + "_" + mode
-    work = ROOT / "results" / label / variant
-    if resume and (work / "result.json").exists():
-        result = json.loads((work / "result.json").read_text())
-        if result.get("binary_sha256") == binary_hash:
-            print(json.dumps(result), flush=True)
-            return result
-    (work / "input").mkdir(parents=True, exist_ok=True)
-    (work / "output").mkdir(exist_ok=True)
-    logs = work / "logs"
-    logs.mkdir(exist_ok=True)
+    results_root = Path(os.environ.get("BENCHMARK_RESULTS_ROOT", str(ROOT / "results")))
+    work = results_root / label / variant
+    def digest(path):
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
+    # Generate deterministic inputs before checking --resume so the fingerprint
+    # covers the actual bytes, not merely the shape and RNG seed.
     rng = np.random.default_rng(20261016 + (case_id or 0) * 1009)
     a = rng.integers(-128, 128, (m, k), dtype=np.int8)
     b = rng.integers(-128, 128, (n, k), dtype=np.int8)
@@ -76,14 +80,51 @@ def run_case(shape, variant, mode="random", resume=False, case_id=None, timeout=
         delta = (np.arange(n) // 127) % 9 - 4
         t[:] = (bits.astype(np.int64) + delta).astype(np.uint32).view(np.float32)
         t[-1] = 127.0
+
+    def array_digest(*values):
+        h = hashlib.sha256()
+        for value in values:
+            h.update(value.tobytes(order="C"))
+        return h.hexdigest()
+
+    fp_activation = np.maximum((a.astype(np.float32) @ b.astype(np.float32).T) * s[:, None] * t[None, :], 0)
+    fp_maximum = fp_activation.max(axis=1)
+    fp_scale = np.where(fp_maximum > 0, fp_maximum / np.float32(127), np.float32(1)).astype(np.float32)
+    fp_expected = np.clip(np.rint(fp_activation / fp_scale[:, None]), -128, 127).astype(np.int8)
+    int_expected, int_scale, _ = int32_reference(a, b, s, t)
+    fingerprint = {
+        "schema_version": 3, "shape": list(shape), "mode": mode, "case_id": case_id,
+        "variant": variant, "binary_sha256": binary_hash,
+        "input_sha256": array_digest(a, b, s, t),
+        "int32_golden_sha256": array_digest(int_expected, int_scale),
+        "fp32_golden_sha256": array_digest(fp_expected, fp_scale),
+        "source_sha256": digest(source_path),
+        "benchmark_sha256": digest(Path(__file__)),
+        "int32_golden_script_sha256": digest(ROOT / "int32_golden.py"),
+        "test_points_sha256": digest(ROOT / "test_points.json"),
+        "environment": {k: os.environ.get(k, "") for k in (
+            "ASCEND_HOME_PATH", "ASCEND_TOOLKIT_HOME", "CAMODEL_HOME", "CAMODEL_PATH",
+            "CANN_PATH", "ASCEND_OPP_PATH", "ASCEND_AICPU_PATH")},
+    }
+    if resume and (work / "result.json").exists():
+        result = json.loads((work / "result.json").read_text())
+        if result.get("fingerprint") == fingerprint:
+            print(json.dumps(result), flush=True)
+            return result
+    (work / "input").mkdir(parents=True, exist_ok=True)
+    (work / "output").mkdir(exist_ok=True)
+    logs = work / "logs"
+    logs.mkdir(exist_ok=True)
     for name, value in zip(("x1", "x2", "x1Scale", "x2Scale"), (a, b, s, t)):
         value.tofile(work / "input" / (name + ".bin"))
-    activation = np.maximum((a.astype(np.float32) @ b.astype(np.float32).T) * s[:, None] * t[None, :], 0)
-    maximum = activation.max(axis=1)
-    scale = np.where(maximum > 0, maximum / np.float32(127), np.float32(1))
-    expected = np.clip(np.rint(activation / scale[:, None]), -128, 127).astype(np.int8)
+    # Strict INT32 semantics are the primary acceptance reference.  FP32 stays
+    # visible as a compatibility diagnostic because older runs used it.
+    expected, scale = int_expected, int_scale
     expected.tofile(work / "output/golden_y.bin")
     scale.tofile(work / "output/golden_yScale.bin")
+    fp_expected.tofile(work / "output/golden_fp32_y.bin")
+    fp_scale.tofile(work / "output/golden_fp32_yScale.bin")
+    (work / "fingerprint.json").write_text(json.dumps(fingerprint, indent=2) + "\n")
     env = dict(os.environ, CAMODEL_LOG_PATH=str(logs), STARS_LOG_PATH=str(logs),
                OPENBLAS_NUM_THREADS="1")
     try:
@@ -109,10 +150,15 @@ def run_case(shape, variant, mode="random", resume=False, case_id=None, timeout=
     duration = re.search(r"^\s*duration\s*=\s*(\d+)", task, re.M)
     ticks = re.search(r"Total tick: (\d+)", proc.stdout)
     result = dict(case_id=case_id, shape=shape, mode=mode, variant=variant,
-                  binary_sha256=binary_hash,
+                  fingerprint=fingerprint, binary_sha256=binary_hash,
                   mismatches=int(np.count_nonzero(y != expected)),
                   scale_ok=bool(np.allclose(ys, scale, rtol=1e-4, atol=1e-4)),
+                  int32_mismatches=int(np.count_nonzero(y != int_expected)),
+                  int32_scale_ok=bool(np.allclose(ys, int_scale, rtol=1e-4, atol=1e-4)),
+                  fp32_mismatches=int(np.count_nonzero(y != fp_expected)),
+                  fp32_scale_ok=bool(np.allclose(ys, fp_scale, rtol=1e-4, atol=1e-4)),
                   scale_max_diff=float(np.max(np.abs(ys - scale))),
+                  fp32_scale_max_diff=float(np.max(np.abs(ys - fp_scale))),
                   task_cycles=int(duration[1]) if duration else None,
                   total_ticks=int(ticks[1]) if ticks else None)
     (work / "result.json").write_text(json.dumps(result, indent=2))
@@ -137,5 +183,5 @@ if __name__ == "__main__":
     else:
         results = [run_case(tuple(map(int, shape.split("x"))), variant, args.mode, args.resume, timeout=args.timeout)
                    for shape in args.shapes for variant in args.variants]
-    if any(r["mismatches"] or not r["scale_ok"] for r in results):
+    if any(r["int32_mismatches"] or not r["int32_scale_ok"] for r in results):
         raise SystemExit(1)

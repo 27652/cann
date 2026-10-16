@@ -7,3 +7,7 @@ ranking_submission_id=6ad2872c193e507d8ed198c9
 ranking_score=11.67
 result_source=/tmp/opencode/kernel-existing-submission-result.json
 ranking_source=/tmp/opencode/cannjudge-ranking-team-file.json
+recovery_bundle=evidence/formal/historical-6ad2872c
+validator=evidence/formal_evidence.py
+result_sha256=3a0ec0152b0db07af2e6888b6d162b97b87d6b2e553508ab6aa103fe2106bea9
+ranking_sha256=9dc93f6f3aceb49e6157f1ec6862160e5ddde2ef4a28c822fbe6f367ed3265b3

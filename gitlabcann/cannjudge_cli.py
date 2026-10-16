@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import base64
 import getpass
+import hashlib
 import http.cookiejar
 import http.cookies
 import json
@@ -269,6 +270,31 @@ def collect_files(root: pathlib.Path, template_files):
     return result
 
 
+def file_manifest(files, contest, problem, problem_id, template):
+    """Return a secret-free record of the exact editable payload.
+
+    File contents stay in the submission request and are never copied into the
+    manifest.  The manifest is useful even when a later result is incomplete.
+    """
+    return {
+        "schema_version": 1,
+        "contest": contest,
+        "problem": problem,
+        "problem_id": problem_id,
+        "template_files": [
+            {"path": entry.get("path"), "editable": entry.get("editable", True)}
+            for entry in template
+        ],
+        "files": {
+            entry["path"]: {
+                "sha256": hashlib.sha256(entry["content"].encode("utf-8")).hexdigest(),
+                "bytes": len(entry["content"].encode("utf-8")),
+            }
+            for entry in files
+        },
+    }
+
+
 def submit(client: Client, args):
     user_id = args.user_id or load_user_id()
     group, contest, problem = get_problem(client, args.contest, args.problem)
@@ -280,6 +306,7 @@ def submit(client: Client, args):
     if not template_files:
         raise RuntimeError("无法获取工程模板文件列表；为防止误提交，已停止")
     files = collect_files(pathlib.Path(args.project).expanduser().resolve(), template_files)
+    manifest = file_manifest(files, args.contest, args.problem, pid, template_files)
     payload = {
         "userId": user_id, "problemId": pid, "files": files,
         "tiling_h": "", "tiling_key_h": "", "host_cpp": "", "kernel_cpp": "",
@@ -293,6 +320,8 @@ def submit(client: Client, args):
     print(f"提交成功，ID：{submission_id}")
     result_path = pathlib.Path(args.output or f"cannjudge-result-{submission_id}.json").expanduser()
     result_path.parent.mkdir(parents=True, exist_ok=True)
+    result_path.with_suffix(".manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     result_path.with_suffix(".submit.json").write_text(
         json.dumps(response, ensure_ascii=False, indent=2), encoding="utf-8")
     watch(client, submission_id, result_path, args.wait, args.timeout)

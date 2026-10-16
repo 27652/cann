@@ -17,7 +17,7 @@
   `/tmp/opencode/cannjudge-ranking-team-file.json`。这些文件不属于仓库版本内容。
 - 本地 `optimization/test_points.json` 是自建回归，不是正式 15 个测试点；CAModel 结果不替代正式 score。
 - `optimization/int32_golden.py` 是严格 INT32 主机参考与边界回归入口，覆盖 K=65536、K=131072、INT32 signed boundary、极值 INT8、scale 下溢/负 scale 和 half-even；它不是设备或正式评分结果。
-- `evidence/formal/` 保存不含原始回包的正式结果元数据和提交文件 hash；原始结果仍位于受保护的仓库外路径，详见 `report.md`。
+- `evidence/formal/` 保存不含原始回包的正式结果元数据、提交文件 hash 和历史提交源码恢复副本；离线校验入口为 `evidence/formal_evidence.py`，原始结果仍位于受保护的仓库外路径，详见 `report.md`。
 
 ## 1. 从哪里开始看
 
@@ -82,7 +82,7 @@
 **已确认的区别与待核对事项：**
 
 - 题目元数据标注 CANN **9.0.0**，本地实验使用 **9.1.0**；接口与精度结论不能无条件跨版本沿用。
-- 题面 CPU 参考使用 **INT32 matmul**，但本地 `scripts/QuantMatmulReluQuant.py` 和 `optimization/benchmark.py` 当前使用 FP32 matmul golden。大 K、累加溢出/转换边界必须独立核对，不能把本地通过等同于严格题意通过。
+- 题面 CPU 参考使用 **INT32 matmul**；历史 `scripts/QuantMatmulReluQuant.py` 和旧 benchmark 记录曾使用 FP32 matmul，当前 `optimization/benchmark.py` 已输出严格 INT32 主结果和 FP32 对照。大 K、累加溢出/转换边界仍须结合设备结果独立核对。
 - 题面没有给出 15 个正式测试点的具体形状；API 返回的测试点 ID 不等于输入数据。`optimization/test_points.json` 的 15 点是本地自建回归，不能与正式编号对应。
 - 题面性能章节描述含 H2D/Kernel/D2H 的端到端时间；本地记录的是 CAModel task cycles。正式评测实际计时范围仍需核对，不能直接互换。
 - 题面精度章节未单独说明 INT8 容差；本工程继续采用 **INT8 完全一致**、`yScale` 既有浮点容差作为保守验收口径。
@@ -167,7 +167,7 @@ op/kernel_v3.asc  64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e2202
 | `optimization/baseline/` 中的二进制与 dump | 早期基线运行遗留产物；区别于同目录的源码 |
 | `optimization/__pycache__/` | Python 缓存 |
 
-`result.json` 中关注 `mismatches`、`scale_ok`、`scale_max_diff`、`binary_sha256`、`task_cycles`。宿主仿真墙钟时间不代表 NPU 延迟。
+`result.json` 中关注 `int32_mismatches`、`int32_scale_ok`、`fp32_mismatches`、`fp32_scale_ok`、`binary_sha256`、`task_cycles` 和完整 `fingerprint`。`BENCHMARK_RESULTS_ROOT` 可将本次输出定向到隔离目录。宿主仿真墙钟时间不代表 NPU 延迟。
 
 ## 8. 常用复现入口
 
@@ -187,4 +187,4 @@ OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --case-ids 1 5 6 --vari
 OPENBLAS_NUM_THREADS=1 python3 optimization/benchmark.py --suite --variants prior optimized --timeout 1800
 ```
 
-CAModel 回归应串行执行，避免与正在运行的任务共用相同结果目录。`--resume` 只检查结果中记录的 `binary_sha256` 是否匹配当前二进制；它不检查输入/golden、脚本、CANN/CAModel 或源码 hash，复用前必须另行核对。
+CAModel 回归应串行执行，避免与正在运行的任务共用相同结果目录。`--resume` 仅在完整 fingerprint 匹配时复用结果；fingerprint 覆盖输入、双 golden、variant 源码、benchmark/golden 脚本、测试点文件、二进制和关键环境变量。
