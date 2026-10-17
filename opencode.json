@@ -35,7 +35,7 @@
     { "action": "shell", "resource": "git clean *", "effect": "deny" },
     { "action": "shell", "resource": "git reset --hard*", "effect": "deny" },
     { "action": "shell", "resource": "git push*", "effect": "deny" },
-    { "action": "shell", "resource": "git commit*", "effect": "ask" },
+    { "action": "shell", "resource": "git commit*", "effect": "allow" },
     { "action": "shell", "resource": "git restore *", "effect": "ask" },
     { "action": "shell", "resource": "git checkout -- *", "effect": "ask" },
     { "action": "shell", "resource": "./run.sh*", "effect": "ask" },
@@ -44,6 +44,9 @@
     { "action": "shell", "resource": "sudo *", "effect": "deny" },
 
     { "action": "external_directory", "resource": "*", "effect": "ask" },
+    { "action": "external_directory", "resource": "/mnt/data_server/llm_course/zzfs_202615/Ascend/*", "effect": "allow" },
+    { "action": "read", "resource": "/mnt/data_server/llm_course/zzfs_202615/Ascend/*", "effect": "allow" },
+    { "action": "edit", "resource": "/mnt/data_server/llm_course/zzfs_202615/Ascend/*", "effect": "deny" },
     { "action": "external_directory", "resource": "/tmp/opencode/*", "effect": "allow" },
     { "action": "edit", "resource": "/tmp/opencode/*", "effect": "allow" }
   ]
