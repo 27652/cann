@@ -2,6 +2,11 @@
 
 更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
+## 最新正式状态（2026-10-17，02:43 UTC，直接 CLI）
+
+- 当前根及最高有效：`6ad2e0a8193e507d8e164f44`，Pass 15/15，score **14.71**；kernel SHA256 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`。证据与完整恢复：`evidence/formal/fast-track-6ad2e0a8/`；旧最佳 `fast-track-6ad2dbba/`，旧根快照 `optimization/snapshots/pre-aggressive-combined-14.66/`。
+- 组合候选 `optimization/candidates/aggressive-combined/`：全 K INT8 + 同步 row-job + 单元素免 workspace；已有编译/主机检查，本地设备验证未完成，风险见 report 最新条目。以下“当前/最新”均为历史时点。
+
 - all-K INT8 新隔离实验入口：`optimization/candidates/int8-all-k-safe/`、`int8-all-k-128k/`、`int8-k-split-no-atomic/`，各自 `RESEARCH.md` 记录源码/构建身份与已运行的弱覆盖 boundary smoke。未正式提交、未晋升；仍需正输出/溢出有效设备测试，详见 report 对应条目。
 
 ## 最新正式状态（2026-10-17，Aggressive Coordinator）

@@ -2,6 +2,14 @@
 
 更新时间：2026-10-17
 
+## 激进组合直接 CLI 晋升（2026-10-17，02:43 UTC）
+
+- 使用用户指定会话完成 CLI 查询验证并替换本地会话文件；不保存认证内容。组合候选保留全 K INT8，合并同步 row-job 与 M=N=K=1 免 workspace 路径。
+- 正式 submission `6ad2e0a8193e507d8e164f44`：Pass 15/15，全部 precision_ratio=1，同提交 ranking score **14.71**、rank 219；首次 POST 明确 429 等待 138 秒后客户端受控重试，无重复受理。
+- `recover/validate/decide` 均通过；14.71 严格高于已核实 14.66。完整证据 `evidence/formal/fast-track-6ad2e0a8/`，原始回包 `/tmp/opencode/aggressive-combined-submit*.json`。动态上传仅 kernel.asc，完整八文件工程与构建身份匹配。
+- 已晋升根 kernel，SHA256 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`；替换前逐项核对旧根匹配 14.66，旧根快照 `optimization/snapshots/pre-aggressive-combined-14.66/`，旧最佳完整恢复 `evidence/formal/fast-track-6ad2dbba/source/`。其他未提交工作保留。
+- 编译与主机检查为候选已有证据，本次复核上传 hash；**未完成本地设备验证**。同步、all-K stride/tail/atomic modulo、FTZ/mask/UB 和单元素路径边界风险仍在，正式通过不证明全输入正确。0.05 分单次收益不等于稳定收益；下一步比较逐点时间并研究真正跨 N 并行归约。
+
 ## Aggressive Coordinator 正式结果与晋升（2026-10-17）
 
 - 用户授权并行结构优化并直接 Fast Track。五路隔离研究已交付；本轮提交三项，均通过真实服务端正式 15/15，且排行榜 score 精确绑定 submission ID：tile row-job `6ad2da51193e507d8e1001ee` / **14.55**；single-element workspace bypass `6ad2db06193e507d8e10a3ef` / **14.52**；all-K INT8 `6ad2dbba193e507d8e11549f` / **14.66**。三个候选分别独立提交，未合并全部优化。
