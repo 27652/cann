@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "job_id": "1792203193071-7dcefe71f5",
+  "candidate_id": "aggressive-tile-streaming-20261017",
+  "submission_id": "6ad2da51193e507d8e1001ee",
+  "status": "evaluated_pass",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    }
+  ],
+  "payload_manifest": {
+    "path": "/tmp/opencode/aggressive-coordinator-20261017/results/1792203193071-7dcefe71f5/result.manifest.json",
+    "sha256": "17e5ca90955cd10c1fb5dda77937cd318b58df57d4897b57f49745a3caad62d5",
+    "files": {
+      "kernel.asc": {
+        "sha256": "34baf6de5eb84d36816ffcc30eee1fccaa829645ec1fd8a019f71dd8c969bde1",
+        "bytes": 52319
+      }
+    }
+  },
+  "result_sha256": "f82b153fbbf3a809865ea10fbccf5840647a3061ca9b7a484f3d6e876ce0c48f",
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2da51193e507d8e1001ee",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "14.55",
+    "ranking_sha256": "558bbbec96eb25306d707a5d9c44ed84264372b9e385a674b7a86af9e672f561"
+  },
+  "evaluated_at": 1792203407.8789485,
+  "risks": [
+    "\u672a\u5b8c\u6210\u672c\u5730\u8bbe\u5907\u9a8c\u8bc1\uff1bhost-only \u8bb0\u5f55\u4e0d\u8bc1\u660e\u8bbe\u5907\u4e25\u683c\u6b63\u786e\u6027",
+    "\u6b63\u5f0f testcase shape \u4e0e\u6027\u80fd\u6536\u76ca\u672a\u77e5",
+    "\u5019\u9009\u7279\u6709\u540c\u6b65/\u6570\u503c\u8fb9\u754c\u98ce\u9669\u89c1 RESEARCH.md"
+  ],
+  "source_sha256": "34baf6de5eb84d36816ffcc30eee1fccaa829645ec1fd8a019f71dd8c969bde1",
+  "binary_sha256": "3abd7ace2ccf95306c461d21a943aec135888c80a6e21731e2313167aecf3151"
+}

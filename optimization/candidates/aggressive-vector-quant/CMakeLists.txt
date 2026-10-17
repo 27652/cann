@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(aggressive_vector_quant LANGUAGES ASC CXX)
+set(CMAKE_CXX_STANDARD 14)
+# Neither target is submission-qualified. A is intentionally inexact; B is a prototype.
+foreach(variant a b)
+    add_executable(bench_${variant} main.asc)
+    target_compile_options(bench_${variant} PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+    target_link_libraries(bench_${variant} PRIVATE tiling_api register platform unified_dlog dl m graph_base)
+endforeach()
+target_compile_definitions(bench_a PRIVATE QUANT_VECTOR_ONLY=1 QUANT_MASK_FAST_PATH=0 QUANT_SPARSE_COMPACT=0)
+target_compile_definitions(bench_b PRIVATE QUANT_VECTOR_ONLY=0 QUANT_MASK_FAST_PATH=1 QUANT_SPARSE_COMPACT=1)

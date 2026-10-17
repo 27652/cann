@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "type": "host-only",
+  "passed": true,
+  "checks": [
+    "CANN compile -j2; build.log",
+    "targeted source/chunk arithmetic checks; host-checks.log"
+  ],
+  "fingerprint": {
+    "source_sha256": "b9a856aec216e11e8014a8808cc8f12be086a3dbf60831a3372c0d769a54a8a7",
+    "binary_sha256": "48e504d33d96d24c514aeea0fed1de379dcbfdd958e621f36ba642c195145d06",
+    "environment": {
+      "compiler": "CANN 9.1.0 / bisheng",
+      "soc": "dav-2201",
+      "validation": "host-only; device not run"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "job_id": "1792203193209-708d99184a",
+  "candidate_id": "aggressive-workspace-launch-20261017",
+  "submission_id": "6ad2db06193e507d8e10a3ef",
+  "status": "evaluated_pass",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    }
+  ],
+  "payload_manifest": {
+    "path": "/tmp/opencode/aggressive-coordinator-20261017/results/1792203193209-708d99184a/result.manifest.json",
+    "sha256": "0ad77dcfb9241ee55e937522041d925c7240af5b17cea4a5effa599e60551a75",
+    "files": {
+      "kernel.asc": {
+        "sha256": "7729da91c9b211c52f959bbeebc4048c6fab09c0c945fa0a3de94a771bc15890",
+        "bytes": 55407
+      }
+    }
+  },
+  "result_sha256": "e31278975a15f114f1bc52f7075e43903217cf8ca2791c9a5063863f96e8d8fb",
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2db06193e507d8e10a3ef",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "14.52",
+    "ranking_sha256": "6a8db080918c5a39c74727e684f4e111a5934d03a0d8525cb402e8b511c114df"
+  },
+  "evaluated_at": 1792203587.621106,
+  "risks": [
+    "\u672a\u5b8c\u6210\u672c\u5730\u8bbe\u5907\u9a8c\u8bc1\uff1bhost-only \u8bb0\u5f55\u4e0d\u8bc1\u660e\u8bbe\u5907\u4e25\u683c\u6b63\u786e\u6027",
+    "\u6b63\u5f0f testcase shape \u4e0e\u6027\u80fd\u6536\u76ca\u672a\u77e5",
+    "\u5019\u9009\u7279\u6709\u540c\u6b65/\u6570\u503c\u8fb9\u754c\u98ce\u9669\u89c1 RESEARCH.md"
+  ],
+  "source_sha256": "7729da91c9b211c52f959bbeebc4048c6fab09c0c945fa0a3de94a771bc15890",
+  "binary_sha256": "b8766d697ab66677a634deb461162e188096a37f8badc3ba915085bc9a57b75e"
+}

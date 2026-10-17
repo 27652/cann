@@ -65,6 +65,29 @@ def read_strict(path: Path) -> dict:
     }
 
 
+def read_host_validation(path: Path) -> dict:
+    """Validate the deliberately weaker, host-only enrollment evidence.
+
+    This is a qualification record, not a claim of device correctness.  Keep
+    the identity binding as strict as the INT32 record so it cannot be moved
+    between candidates or binaries.
+    """
+    data = _json(path)
+    if not isinstance(data, dict) or data.get("schema_version") != 1 or data.get("type") != "host-only":
+        raise ValueError("host validation must have schema_version=1 and type=host-only")
+    if data.get("passed") is not True:
+        raise ValueError("host validation is not passing")
+    if not isinstance(data.get("checks"), list) or not data["checks"]:
+        raise ValueError("host validation checks must be nonempty")
+    fingerprint = data.get("fingerprint")
+    if not isinstance(fingerprint, dict) or not fingerprint.get("source_sha256") or \
+            not fingerprint.get("binary_sha256") or not fingerprint.get("environment"):
+        raise ValueError("host validation source/binary/environment identity is required")
+    return {"type": "host-only", "passed": True, "checks": data["checks"],
+            "fingerprint": fingerprint, "result_sha256": digest(path),
+            "schema_version": data.get("schema_version", 1)}
+
+
 def _safe_relative(name: str) -> bool:
     path = Path(name)
     return bool(name) and not path.is_absolute() and ".." not in path.parts and not any(
@@ -131,11 +154,19 @@ def _with_queue(root: Path, callback):
         return result
 
 
-def enroll(project: Path, strict: Path, root: Path, candidate_id: str, metadata: dict) -> dict:
+def enroll(project: Path, strict: Path | None, root: Path, candidate_id: str,
+           metadata: dict, host_validation: Path | None = None) -> dict:
     """Validate and atomically enroll one candidate snapshot."""
-    project, strict, root = project.resolve(), strict.resolve(), root.resolve()
-    if not project.is_dir() or not strict.is_file():
-        raise ValueError("project and strict result are required")
+    project, root = project.resolve(), root.resolve()
+    if strict is not None:
+        strict = strict.resolve()
+    if host_validation is not None:
+        host_validation = host_validation.resolve()
+    if not project.is_dir() or (strict is None and host_validation is None) or \
+            (strict is not None and host_validation is not None) or \
+            (strict is not None and not strict.is_file()) or \
+            (host_validation is not None and not host_validation.is_file()):
+        raise ValueError("project and exactly one validation result are required")
     if not candidate_id or not candidate_id.replace("-", "").replace("_", "").replace(".", "").isalnum():
         raise ValueError("invalid candidate ID")
     if any(part in FORBIDDEN_PARTS for part in project.parts):
@@ -157,7 +188,8 @@ def enroll(project: Path, strict: Path, root: Path, candidate_id: str, metadata:
             raise ValueError("missing/unsafe project file: " + name)
         files[name] = digest(path)
     source = files["kernel.asc"]
-    strict_info = read_strict(strict)
+    validation_mode = "strict" if strict is not None else "host-only"
+    validation_info = read_strict(strict) if strict is not None else read_host_validation(host_validation)
     binary = metadata.get("binary_sha256")
     if not isinstance(binary, str) or len(binary) != 64 or any(c not in "0123456789abcdef" for c in binary):
         raise ValueError("metadata.binary_sha256 is required")
@@ -172,12 +204,16 @@ def enroll(project: Path, strict: Path, root: Path, candidate_id: str, metadata:
             build.get("files") != files or build.get("binary_sha256") != binary or
             build.get("payload_enabled") is not True):
         raise ValueError("build fingerprint must bind project files, binary and payload activation")
-    fp = strict_info["fingerprint"]
+    fp = validation_info["fingerprint"]
     if (not isinstance(fp, dict) or fp.get("source_sha256") != source or
             fp.get("binary_sha256") != binary or not fp.get("environment")):
-        raise ValueError("strict result source/binary/environment identity mismatch")
+        raise ValueError("validation source/binary/environment identity mismatch")
     if not isinstance(metadata.get("risks"), list):
         raise ValueError("explicit risks list is required (may be empty)")
+    if validation_mode == "host-only" and not any(
+            isinstance(risk, str) and "未完成本地设备验证" in risk
+            for risk in metadata["risks"]):
+        raise ValueError("host-only enrollment must explicitly record 未完成本地设备验证 in risks")
 
     project_hash = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
 
@@ -196,9 +232,10 @@ def enroll(project: Path, strict: Path, root: Path, candidate_id: str, metadata:
                 if digest(target) != expected:
                     raise ValueError("project changed during snapshot")
                 target.chmod(0o400)
-            shutil.copy2(strict, snapshot / "strict-result.json")
-            if digest(snapshot / "strict-result.json") != strict_info["result_sha256"]:
-                raise ValueError("strict result changed during snapshot")
+            validation_name = "strict-result.json" if validation_mode == "strict" else "host-validation.json"
+            shutil.copy2(strict or host_validation, snapshot / validation_name)
+            if digest(snapshot / validation_name) != validation_info["result_sha256"]:
+                raise ValueError("validation result changed during snapshot")
             shutil.copy2(binary_path, snapshot / "compiled-binary")
             if digest(snapshot / "compiled-binary") != binary:
                 raise ValueError("binary changed during snapshot")
@@ -208,7 +245,9 @@ def enroll(project: Path, strict: Path, root: Path, candidate_id: str, metadata:
         job = {
             "job_id": job_id, "candidate_id": candidate_id, "source_sha256": source,
             "binary_sha256": binary, "files": files, "project_sha256": project_hash,
-            "strict": strict_info, "metadata": metadata, "snapshot": str(snapshot),
+            "validation_mode": validation_mode, "validation": validation_info,
+            "strict": validation_info if validation_mode == "strict" else None,
+            "metadata": metadata, "snapshot": str(snapshot),
             "status": "queued", "created_at": time.time(), "official": True,
         }
         data["jobs"][job_id] = job
@@ -512,9 +551,12 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
         snap = Path(job["snapshot"])
         result_dir = output / job["job_id"]
         try:
+            mode = job.get("validation_mode", "strict")
+            validation_name = "strict-result.json" if mode == "strict" else "host-validation.json"
+            validation = job.get("validation") or job.get("strict")
             if (any(digest(snap / "project" / name) != expected for name, expected in job["files"].items()) or
                     digest(snap / "compiled-binary") != job["binary_sha256"] or
-                    digest(snap / "strict-result.json") != job["strict"]["result_sha256"]):
+                    digest(snap / validation_name) != validation["result_sha256"]):
                 raise ValueError("snapshot integrity check failed")
             result_dir.mkdir(parents=True, exist_ok=False, mode=0o700)
             expected = result_dir / "expected-project.json"
@@ -585,7 +627,9 @@ def main():
     sub = parser.add_subparsers(dest="action", required=True)
     e = sub.add_parser("enroll")
     e.add_argument("--project", type=Path, required=True)
-    e.add_argument("--strict-result", type=Path, required=True)
+    validation = e.add_mutually_exclusive_group(required=True)
+    validation.add_argument("--strict-result", type=Path)
+    validation.add_argument("--host-validation", type=Path)
     e.add_argument("--candidate-id", required=True)
     e.add_argument("--metadata", type=Path, required=True)
     sub.add_parser("list")
@@ -614,7 +658,8 @@ def main():
         if args.action == "enroll":
             metadata = _json(args.metadata)
             print(json.dumps(enroll(args.project, args.strict_result, args.root,
-                                     args.candidate_id, metadata), indent=2))
+                                     args.candidate_id, metadata,
+                                     host_validation=args.host_validation), indent=2))
         elif args.action == "list":
             print(json.dumps(list_jobs(args.root), indent=2))
         else:

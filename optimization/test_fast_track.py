@@ -108,6 +108,113 @@ class FastTrackTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "unsupported"):
                 enroll(project, strict, Path(temp) / "queue", "c1", {"binary_sha256": "a" * 64, "cookie": "x"})
 
+    def _host_qualified(self, base, risks=None):
+        project = self._project(base)
+        binary = base / 'binary'; binary.write_bytes(b'binary')
+        files = {name: digest(project / name) for name in (
+            'CMakeLists.txt', 'data_utils.h', 'kernel.asc', 'main.asc', 'run.sh',
+            'scripts/gen_data.py', 'scripts/QuantMatmulReluQuant.py', 'scripts/verify_result.py')}
+        binary_hash = digest(binary)
+        validation = base / 'host.json'
+        validation.write_text(json.dumps({
+            'schema_version': 1, 'type': 'host-only', 'passed': True,
+            'checks': ['compile', 'host-shape-check'],
+            'fingerprint': {'source_sha256': files['kernel.asc'], 'binary_sha256': binary_hash,
+                            'environment': {'compiler': 'test-host'}}}))
+        metadata = {'binary_sha256': binary_hash, 'binary_path': str(binary),
+                    'risks': risks if risks is not None else ['未完成本地设备验证；同步和设备指令语义未验证'],
+                    'build_fingerprint': {'returncode': 0, 'files': files,
+                                          'binary_sha256': binary_hash, 'payload_enabled': True}}
+        return project, validation, metadata
+
+    def test_host_only_enroll_freezes_validation_and_mode(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp); project, validation, metadata = self._host_qualified(base)
+            job = enroll(project, None, base / 'queue', 'host1', metadata,
+                         host_validation=validation)
+            self.assertEqual(job['validation_mode'], 'host-only')
+            self.assertEqual(job['status'], 'queued')
+            snapshot = Path(job['snapshot']) / 'host-validation.json'
+            self.assertEqual(digest(snapshot), job['validation']['result_sha256'])
+            self.assertFalse((Path(job['snapshot']) / 'strict-result.json').exists())
+
+    def test_host_only_rejects_failed_identity_hash_and_missing_device_disclaimer(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp); project, validation, metadata = self._host_qualified(base)
+            broken = json.loads(validation.read_text()); broken['passed'] = False
+            validation.write_text(json.dumps(broken))
+            with self.assertRaisesRegex(ValueError, 'not passing'):
+                enroll(project, None, base / 'q1', 'hostfail', metadata, host_validation=validation)
+            identity = base / 'identity'; identity.mkdir()
+            project, validation, metadata = self._host_qualified(identity)
+            record = json.loads(validation.read_text())
+            record['fingerprint']['binary_sha256'] = '0' * 64
+            validation.write_text(json.dumps(record))
+            with self.assertRaisesRegex(ValueError, 'identity mismatch'):
+                enroll(project, None, identity / 'q', 'hostidentity', metadata,
+                       host_validation=validation)
+            missing = base / 'missing'; missing.mkdir()
+            project, validation, metadata = self._host_qualified(missing, risks=[])
+            with self.assertRaisesRegex(ValueError, '未完成本地设备验证'):
+                enroll(project, None, missing / 'q', 'hostrisk', metadata,
+                       host_validation=validation)
+
+    def test_host_protocol_and_build_are_required(self):
+        for field, value in (('type', 'strict'), ('schema_version', 2),
+                             ('checks', []), ('passed', 1), ('fingerprint', {})):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as temp:
+                base = Path(temp); project, validation, metadata = self._host_qualified(base)
+                record = json.loads(validation.read_text()); record[field] = value
+                validation.write_text(json.dumps(record))
+                with self.assertRaises(ValueError):
+                    enroll(project, None, base / 'q', 'invalid-host', metadata,
+                           host_validation=validation)
+        for field, value in (('source_sha256', '0' * 64), ('environment', {})):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as temp:
+                base = Path(temp); project, validation, metadata = self._host_qualified(base)
+                record = json.loads(validation.read_text()); record['fingerprint'][field] = value
+                validation.write_text(json.dumps(record))
+                with self.assertRaises(ValueError):
+                    enroll(project, None, base / 'q', 'invalid-host', metadata,
+                           host_validation=validation)
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp); project, validation, metadata = self._host_qualified(base)
+            metadata['build_fingerprint']['returncode'] = 1
+            with self.assertRaisesRegex(ValueError, 'build fingerprint'):
+                enroll(project, None, base / 'q', 'invalid-build', metadata,
+                       host_validation=validation)
+
+    def test_host_snapshot_all_hashes_checked_before_execution(self):
+        for target in ('project/kernel.asc', 'compiled-binary', 'host-validation.json'):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as temp:
+                base = Path(temp); project, validation, metadata = self._host_qualified(base)
+                job = enroll(project, None, base / 'queue', 'host1', metadata,
+                             host_validation=validation)
+                path = Path(job['snapshot']) / target
+                path.chmod(0o600); path.write_text('tampered')
+                with patch('fast_track.subprocess.run') as run:
+                    results = worker(base / 'queue', base / 'unused.py', base / 'results',
+                                     ['--ranking-query', 'test'])
+                run.assert_not_called()
+                self.assertEqual(results[0]['status'], 'uncertain')
+                self.assertFalse((base / 'results').exists())
+
+    def test_host_worker_accepts_valid_snapshot_without_network(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp); project, validation, metadata = self._host_qualified(base)
+            enroll(project, None, base / 'queue', 'host1', metadata,
+                   host_validation=validation)
+            def fake_submit(command, **kwargs):
+                output = Path(command[command.index('--output') + 1])
+                output.write_text(json.dumps({'status': 'queued', 'submissionId': 'a' * 24}))
+                return SimpleNamespace(returncode=0, stdout='fake local CLI')
+            with patch('fast_track.subprocess.run', side_effect=fake_submit) as run:
+                results = worker(base / 'queue', base / 'unused.py', base / 'results',
+                                 ['--ranking-query', 'test'])
+            self.assertEqual(results[0]['status'], 'submitted')
+            self.assertEqual(run.call_count, 1)
+
+
     def test_worker_submits_snapshot_without_network(self):
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)

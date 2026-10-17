@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(upper_bound LANGUAGES ASC CXX)
+add_executable(bench_upper_bound bench.asc)
+target_compile_options(bench_upper_bound PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+target_link_libraries(bench_upper_bound PRIVATE tiling_api register platform unified_dlog dl m graph_base)

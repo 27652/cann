@@ -2,6 +2,22 @@
 
 更新时间：2026-10-17
 
+## 大 K 同身份消融完成（2026-10-17，弱数值覆盖）
+
+- `optimization/upper_bound/results/common-1x2x65536-v2/`：同输入/环境/二进制 fingerprint 完全一致，baseline/all-K INT8/no-exact cycles 为 `181708/64830/181708`；all-K 降低 `64.322%`（2.803x），workspace 从 `17563656` 降为 `16777224` 字节。仅为 A/D 联合路径诊断，未拆分转换、Cube 或 GM 阶段计时。
+- 严格 INT32 golden 比较三者均 INT8 mismatch=0、scale max abs diff=0；但输出全零、yScale=1，数值覆盖弱，不能证明正累加/chunk/atomic。no-exact 的零收益也不能外推到正输出。
+- 独立 all-K 候选 job `1792203318246-0b939ae9a4` 已冻结入队；本流程 Worker 返回 busy，未 POST、无 submission ID。不得与并发 Coordinator 的提交混同。本条不更改根实现或历史最高有效 score。
+
+## all-K INT8 隔离实验（2026-10-17，本轮未晋升）
+
+- 创建三份候选 `optimization/candidates/{int8-all-k-safe,int8-all-k-128k,int8-k-split-no-atomic}/`，未主动替换根 kernel 或冻结 op 文件。前两份以极高 FP32 threshold 绕开合法常见 K 的转换分派，并分别使用 65536/131072 chunk；FP32 类及死分支源码仍保留，不宣称已经物理删除整个 FP32 实现。同时继承原 threshold 派生的 all-M 16 行分区，因此不是仅改变数据类型的纯单变量消融。
+- no-atomic 使用每 chunk 独立 GM plane、Vector owner 串行 INT32 Add，是用户所提 Cube 内串行累加的替代实验，**不是 Cube L0C 内保留累加的实现**。workspace 随 chunk 数增长，UB 复用和整数 Add wrap 仍待有效数值测试。
+- 三份隔离正式 main 工程及 benchmark 均在 CANN 9.1.0 / dav-2201 编译成功。首轮 `KERNEL_SOURCE` 被 CMake 忽略，只编译了根实现，不算候选证据；后续复制完整 main/kernel 工程重新编译，详见各候选 RESEARCH.md。临时工程 `/tmp/opencode/int8-*-project/`、benchmark `/tmp/opencode/int8-*-bench/`。
+- CAModel 串行执行并使用 host lease：safe/128k 完成 `1x1x{65536,65537,131072,131073}` boundary，均 strict mismatch=0、scale_ok=true；cycles 分别为 `[61652,66262,104472,108773]` / `[61652,62969,101149,105838]`。no-atomic 只完成前两点 `[62196,66794]`，外层 120 秒命令超时中断后两点，未声称完成；检查时已无模型进程。
+- **覆盖限制**：boundary 输入为 `127*(-128)`，ReLU 后全部为零，不能有效证明正累加、chunk 寻址、atomic 或 overflow 正确。没有当前 FP32 根的同条件配对，不声称加速。宿主 int32_golden 六组通过仅证明 host reference，不证明三个设备候选。
+- 更正对话中的数学笔误：`127*127*131072=2114060288 < 2^31`；恰达 `2^31` 的是 `(-128)*(-128)*131072`。应补做正输出随机、多通道/多行、极值溢出与正负交错后再裁决 128k。
+- 本轮未正式提交、未取得新 score、未晋升；历史报告最高有效为 14.37（本轮未重新联网复核）。未执行晋升 commit。最终 status 发现前两候选 kernel 已变为 Git 跟踪且根原有修改状态改变，提示存在并发 Git 操作；不覆盖或提交他人变化。
+
 ## 三路配对完成与并发工作区保护（2026-10-17，后续核查）
 
 - 共享队列三组配对均终态 passed/returncode=0，`compare_scheduled_pair.py` 验收通过：严格 INT32 零 INT8 mismatch、scale_ok=true；FP32 诊断亦通过，共同输入/golden/script/环境 fingerprint 一致。Quant `1x1144x1 / half_boundary`：207223→117037 cycles（-43.521%），207581→117374 ticks；Shape Case12 `1024x256x64 / random`：3369038→3370081 cycles（+0.031%），3369512→3370450 ticks；Cache `2x4097x32 / random`：819869→815554 cycles（-0.526%），820296→816010 ticks。均仅单 case CAModel 诊断，不替代官方 score。

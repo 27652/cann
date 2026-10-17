@@ -1,0 +1,11 @@
+{
+  "evidence_type": "host_only_not_device_validation",
+  "source_sha256": "3f72b4bd04907ed4c14e8c43c5cacf0104954a3915ab20502b3620240a27698e",
+  "returncode": 0,
+  "stdout": "A_COUNTEREXAMPLE a=0x1.95edc4p+7 b=0x1.c5ca14p+0 q=0x1.ca0002p+6 actual=115 expected=114\nHOST_ONLY masks=264192 staged_lanes=4193179 exact_checks=595422 A_counterexamples=27114\n",
+  "device_validation_completed": false,
+  "fast_track_eligible": {
+    "A": false,
+    "B": false
+  }
+}

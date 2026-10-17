@@ -1,0 +1,40 @@
+{
+  "shape": [
+    2,
+    1025,
+    32
+  ],
+  "mode": 2,
+  "tag": "narrow-v1",
+  "seed": 20261017,
+  "fingerprint": {
+    "binary_sha256": "655a0e284358fb5d2291872c1b79b4dcb0fa3d53e980177c1b4af114db2285f1",
+    "input_sha256": "007c3e4e89a9224eefea75bdd577c23c0c4d6215596ebd2666b6bbbc653e0e64",
+    "golden_sha256": "44c79871aed559283c89c9521ab9fd1a0c5487c789aa436a580a22926c3ff5b8",
+    "runner_sha256": "f49114ef297c1a793d15ee1bd9733885b9b7568ce03fef61982708e7b14d09b3",
+    "environment": {
+      "ASCEND_AICPU_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+      "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+      "ASCEND_OPP_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp",
+      "ASCEND_PROCESS_LOG_PATH": "/mnt/data_server/llm_course/zzfs_202615/.ascend/log",
+      "ASCEND_SOC_VERSION": "Ascend910B1",
+      "ASCEND_TOOLKIT_HOME": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+      "ASCEND_WORK_PATH": "/mnt/data_server/llm_course/zzfs_202615/.ascend",
+      "CAMODEL_LIB_DIR": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib",
+      "CAMODEL_LOG_PATH": "/mnt/data_server/llm_course/zzfs_202615/.ascend/log",
+      "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib"
+    },
+    "source_identity": {
+      "CMakeLists.txt": "0a8b4eb8ff3409c2377afde7d14d59ce2fff47bb0aa0fa88f5986172d2b4a57c",
+      "kernel.asc": "913572c4988f642fdecea3db08c4df4babac02efca3bcdf7e408d2ca838ac01f",
+      "baseline.asc": "782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56",
+      "bench.asc": "71f172f1c7a1dcdcc7acb8594cc440b40f7f6d9746144ff3fbe293f8e625c4e1"
+    }
+  },
+  "binary_sha256": "655a0e284358fb5d2291872c1b79b4dcb0fa3d53e980177c1b4af114db2285f1",
+  "returncode": 0,
+  "int8_mismatches": 0,
+  "scale_max_diff": 0.0,
+  "scale_ok": true,
+  "task_cycles": 35186
+}

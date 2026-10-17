@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "submission_id": "6ad2db06193e507d8e10a3ef",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "status": "Pass",
+  "scoring_context": "official ranking score for op_challenge_hangxia_prelim/quantmatmulreluquant",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 26.6,
+      "best_time": 2.1,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 13.07,
+      "best_time": 1.67,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 26.34,
+      "best_time": 2.12,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 35.73,
+      "best_time": 7.55,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 41.7,
+      "best_time": 8.28,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 73.93,
+      "best_time": 12.02,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 189.6,
+      "best_time": 14.68,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 248.72,
+      "best_time": 15.8,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 199.73,
+      "best_time": 19.27,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 459.62,
+      "best_time": 35.63,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1411.48,
+      "best_time": 52.73,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1058.3,
+      "best_time": 64.52,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1520.72,
+      "best_time": 76.73,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 3218.4,
+      "best_time": 173.37,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 6712.39,
+      "best_time": 340.89,
+      "score": 0
+    }
+  ],
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2db06193e507d8e10a3ef",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "14.52",
+    "queried_at": "2026-10-17T02:19:47Z"
+  },
+  "files": {
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "kernel.asc": "7729da91c9b211c52f959bbeebc4048c6fab09c0c945fa0a3de94a771bc15890",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17"
+  },
+  "provenance": {
+    "result_sha256": "e31278975a15f114f1bc52f7075e43903217cf8ca2791c9a5063863f96e8d8fb",
+    "ranking_sha256": "6a8db080918c5a39c74727e684f4e111a5934d03a0d8525cb402e8b511c114df"
+  }
+}
