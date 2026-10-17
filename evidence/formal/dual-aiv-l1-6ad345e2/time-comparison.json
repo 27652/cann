@@ -1,0 +1,130 @@
+{
+  "baseline_submission_id": "6ad33b78193e507d8ea310c4",
+  "candidate_submission_id": "6ad345e2193e507d8ebb20ec",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "interpretation": "Timing feedback only; not an official score or promotion decision. Positive delta means slower. Shape mapping and repeatability unknown.",
+  "time_unit": "server time field; not independently inferred",
+  "faster_cases": 9,
+  "slower_cases": 6,
+  "equal_cases": 0,
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "baseline_time": 18.41,
+      "candidate_time": 19.91,
+      "delta_time": 1.5,
+      "relative_change_percent": 8.147745790331351
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "baseline_time": 9.36,
+      "candidate_time": 8.02,
+      "delta_time": -1.3399999999999999,
+      "relative_change_percent": -14.31623931623932
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "baseline_time": 12.36,
+      "candidate_time": 13.71,
+      "delta_time": 1.3500000000000014,
+      "relative_change_percent": 10.922330097087386
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "baseline_time": 20.75,
+      "candidate_time": 20.47,
+      "delta_time": -0.28000000000000114,
+      "relative_change_percent": -1.3493975903614563
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "baseline_time": 17.66,
+      "candidate_time": 18.02,
+      "delta_time": 0.35999999999999943,
+      "relative_change_percent": 2.0385050962627327
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "baseline_time": 38.9,
+      "candidate_time": 40.18,
+      "delta_time": 1.2800000000000011,
+      "relative_change_percent": 3.2904884318766037
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "baseline_time": 61.65,
+      "candidate_time": 59.88,
+      "delta_time": -1.769999999999996,
+      "relative_change_percent": -2.871046228710461
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "baseline_time": 136.64,
+      "candidate_time": 136.12,
+      "delta_time": -0.5199999999999818,
+      "relative_change_percent": -0.38056206088992184
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "baseline_time": 103.41,
+      "candidate_time": 104.36,
+      "delta_time": 0.9500000000000028,
+      "relative_change_percent": 0.9186732424330435
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "baseline_time": 266.85,
+      "candidate_time": 263.01,
+      "delta_time": -3.840000000000032,
+      "relative_change_percent": -1.4390106801574043
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "baseline_time": 327.58,
+      "candidate_time": 308.83,
+      "delta_time": -18.75,
+      "relative_change_percent": -5.723792661334636
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "baseline_time": 661.18,
+      "candidate_time": 648.98,
+      "delta_time": -12.199999999999932,
+      "relative_change_percent": -1.8451858797906673
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "baseline_time": 873.24,
+      "candidate_time": 874.42,
+      "delta_time": 1.17999999999995,
+      "relative_change_percent": 0.13512894507810014
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "baseline_time": 1931.74,
+      "candidate_time": 1890.6,
+      "delta_time": -41.1400000000001,
+      "relative_change_percent": -2.1296861896528574
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "baseline_time": 4600.98,
+      "candidate_time": 4512.73,
+      "delta_time": -88.25,
+      "relative_change_percent": -1.9180696286443366
+    }
+  ],
+  "sources": {
+    "baseline": {
+      "path": "evidence/formal/dual-aiv-fixed-6ad33b78/evidence.json",
+      "sha256": "0b6a0fca927418df92f60889033d9090dac41d78081a768d56f7b77468357197",
+      "observed_at": "2026-10-17T09:10:55Z"
+    },
+    "candidate": {
+      "path": "evidence/formal/dual-aiv-l1-6ad345e2-score-pending/pending-result.json",
+      "sha256": "54434a6162a35a196a546aa581b72c9dca96afd76b610bc2ab5e6930f23d4a42",
+      "observed_at": "2026-10-17T09:55:24Z"
+    }
+  }
+}

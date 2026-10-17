@@ -2,6 +2,32 @@
 
 更新时间：2026-10-17
 
+## 最终 CLI 核验：19.48 / rank 195，晋升并归档（2026-10-17）
+
+- 仅使用现有 CLI 的 result/ranking GET 查询，未执行任何新提交 POST。
+  result 返回 `6ad345e2193e507d8ebb20ec`、Pass、valid=true、15/15，
+  全部 precision_ratio=1；10:08:02Z 同 ID ranking 返回 rank 195、score 19.48。
+  排名是查询时快照，不保证后续不变。此前 score-pending 是历史状态。
+- 恢复 bundle `evidence/formal/dual-aiv-l1-6ad345e2/` 绑定实际 kernel 上传
+  hash、完整八文件工程、脱敏结果与排行榜。formal_evidence validate 通过，
+  decide 确认同口径 19.48 > 19.45，提升 0.03（约 0.154%）。
+- 晋升前根 hash 与 19.45 冻结恢复源码一致，无根源码未提交修改；旧根完整
+  保存在 `evidence/formal/dual-aiv-fixed-6ad33b78/source/`，新根 hash 为
+  `431750131478b8b569b24d0f86e7fc224187d0ec87d81cf0eb4eac60f3fc249a`。
+  晋升后全部八文件与新 bundle hash 一致；未修改 op/ 冻结文件。
+- 最终优化：保留 dual-AIV ownership；K<=4096、K%32==0、N>256 时，
+  显式将 16×K A 面板装入 A1/NZ，最多四个相邻 N tile 复用，
+  SetOrgShape M 使用 tileM=16；其余保留父路径。不含 FIFO 或 chunk64 组合。
+- 对比父版本，正式 time 为 9 点变快、6 点变慢；点2 9.36→8.02，
+  点11 327.58→308.83，点15 4600.98→4512.73；点1/3 回退约 8.15%/10.92%。
+  单位沿用服务端 time，不用时间拼接计算替代 score，不推断未知 shape。
+- 已存四组严格 INT32 CAModel smoke（17x1025x64、65x513x256、
+  17x257x4096、17x513x65）零 INT8 mismatch、yScale 完全一致；本次未重跑
+  设备测试或编译。非覆盖输入、大 K、FTZ/RNE、L1 分配/同步仍有风险，
+  正式有效不等于所有合法输入严格正确。
+- 本次独立 commit 仅保存该晋升及必要恢复/验证材料，不混入未正式通过
+  的其他候选、缓存或 dump；其他工作区研究改动保留。赛事已结束，不新提交流程。
+
 ## 独立架构正式反馈与晋升（2026-10-17 08:46 UTC）
 
 - `optimization/candidates/architecture-trials-v1/` 分别完成三条独立路线编译和

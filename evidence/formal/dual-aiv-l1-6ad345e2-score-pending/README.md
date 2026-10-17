@@ -1,5 +1,9 @@
 # Dual-AIV A/L1 reuse: 15/15, score unconfirmed
 
+Historical snapshot: superseded by `../dual-aiv-l1-6ad345e2/` at
+2026-10-17T10:08:02Z: same-ID official score 19.48, rank 195, promoted.
+The original pending-state observations below are retained for provenance.
+
 Submission `6ad345e2193e507d8ebb20ec`, directly received using the reviewed
 CANNJudge CLI, final observation 2026-10-17T09:55:24Z. Status Pass, valid=true,
 15/15, every precision_ratio=1. Contest sealed as confirmed by the user.

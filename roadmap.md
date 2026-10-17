@@ -1,5 +1,16 @@
 # QuantMatmulReluQuant：文件导航与当前状态
 
+## 最终 CLI 核验与晋升（2026-10-17 10:08 UTC）
+
+- 最后已归档提交及最高有效：`6ad345e2193e507d8ebb20ec`，Pass 15/15，
+  全部 precision_ratio=1；同 ID 排行榜 **rank 195、score 19.48**。
+- 根 `kernel.asc` 已晋升为 A/L1 group4 stride16，SHA256
+  `431750131478b8b569b24d0f86e7fc224187d0ec87d81cf0eb4eac60f3fc249a`。
+- 完整八文件恢复、上传 manifest、脱敏排行榜和离线核验：
+  `evidence/formal/dual-aiv-l1-6ad345e2/`；旧根及 19.45 回退入口：
+  `evidence/formal/dual-aiv-fixed-6ad33b78/source/`。
+- 下文“当前/最高/待确认”按历史时点阅读；最终状态以上述 CLI 结果为准。
+
 ## 最新晋升：dual-AIV ownership 修复（2026-10-17）
 
 - 正式 `6ad33b78193e507d8ea310c4` Pass 15/15，同 ID score **19.45**，
