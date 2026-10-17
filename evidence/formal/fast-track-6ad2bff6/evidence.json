@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "candidate_id": "agent-quant",
+  "submission_id": "6ad2bff6193e507d8ef96ca5",
+  "contest": "op_challenge_hangxia_prelim",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem": "quantmatmulreluquant",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "status": "Pass",
+  "valid": true,
+  "testcases_total": 15,
+  "testcases_passed": 15,
+  "precision_ratio_all_one": true,
+  "score": 7.26,
+  "score_source": "ranking",
+  "score_submission_id": "6ad2bff6193e507d8ef96ca5",
+  "ranking_status": "Pass",
+  "ranking_queried_at": "2026-10-17T00:24:37Z",
+  "uploaded_editable_files": {
+    "kernel.asc": {
+      "sha256": "cc7784d4546e15f879ac12583d6ef3bca058aa36bf8697f657a482e1a0d87bc4",
+      "bytes": 50800
+    }
+  },
+  "template_editable_files": [
+    "kernel.asc"
+  ],
+  "build": {
+    "candidate": "agent-quant",
+    "source": "/tmp/opencode/worktrees/research-quant/optimization/candidates/agent-quant/kernel.asc",
+    "source_sha256": "cc7784d4546e15f879ac12583d6ef3bca058aa36bf8697f657a482e1a0d87bc4",
+    "build": "CANN 9.1.0 / Ascend910B1 / dav-2201 / Release",
+    "build_binary_sha256": "e481a0c1e6d1f103a3ea6ad5a60eadc944294fdf9bc47d56280c9cd7ee298da6",
+    "formal_risks": [
+      "device compiler lowering and broad non-unit-scale correctness not proven by this smoke",
+      "single half_boundary smoke is not full 15-point correctness"
+    ]
+  },
+  "formal_risks": [
+    "device compiler lowering and broad non-unit-scale correctness not proven by this smoke",
+    "single half_boundary smoke is not full 15-point correctness"
+  ],
+  "raw_result_path": "/tmp/opencode/cannjudge-fast-track-quant-20261017/result.json",
+  "raw_ranking_path": "/tmp/opencode/cannjudge-fast-track-quant-20261017/result.ranking.json",
+  "raw_result_sha256": "acc7dfd55e9ef58af001483d7c3424c6ab0a5c88250a350d5f64472e78a380e4",
+  "raw_ranking_sha256": "b0e8e36e39d32e1302b0b5d43b6c235a9b778912a3b9ef6f932c6b5f92232c55",
+  "historical_best_score": 11.67,
+  "promotion": "not promoted: score is lower than historical best"
+}

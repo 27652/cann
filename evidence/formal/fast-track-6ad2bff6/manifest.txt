@@ -1,0 +1,13 @@
+submission_id=6ad2bff6193e507d8ef96ca5
+status=Pass
+testcases=15
+precision_ratio=1
+score=7.26
+ranking_submission_id=6ad2bff6193e507d8ef96ca5
+ranking_score=7.26
+uploaded_editable_files=kernel.asc
+kernel_sha256=cc7784d4546e15f879ac12583d6ef3bca058aa36bf8697f657a482e1a0d87bc4
+raw_result_sha256=acc7dfd55e9ef58af001483d7c3424c6ab0a5c88250a350d5f64472e78a380e4
+raw_ranking_sha256=b0e8e36e39d32e1302b0b5d43b6c235a9b778912a3b9ef6f932c6b5f92232c55
+raw_api_snapshots=protected external path; not copied into repository
+promotion=not promoted; historical best 11.67 is higher

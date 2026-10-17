@@ -78,6 +78,17 @@ the original exact quantizer uses data-dependent scalar branches.
 
 ## Multi-agent CAModel scheduler
 
+### Fast Track formal handoff
+
+Qualified research candidates now use `optimization/fast_track.py` by default.
+Agents enroll immutable source/binary/strict-result snapshots; the Coordinator
+serially submits them through the existing CANNJudge client, reconciles the
+submission ID and score, and archives allowlisted evidence. A failed or
+uncertain submission halts the Fast Track queue rather than retrying a POST.
+See [`FAST_TRACK.md`](FAST_TRACK.md). Formal submission does not imply
+promotion; the AGENTS.md 15/15, submission-bound score, and strict-improvement
+gates still apply.
+
 Agents may analyze, edit candidates, run host tests, and compile in separate Git
 worktrees. CAModel is different: `optimization/camodel_scheduler.py` admits one
 model process at a time using the host-wide `/tmp/opencode/camodel-host.lock`.

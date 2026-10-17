@@ -1,0 +1,21 @@
+candidate_id=scale-resident-enabled
+submission_id=6ad2c647193e507d8efe5cf7
+status=Pass
+testcases=15
+precision_ratio_all_one=true
+score=7.29
+score_source=ranking with exact submission_id match
+uploaded_editable_files=kernel.asc
+kernel_sha256=e9aec40510579c62704b2bcc1035a2e50269f00b76230599fd28b5ec91761b8f
+source_default=QUANT_SCALE_RESIDENT=1
+source_origin=research-row-resident kernel.asc, default macro changed from 0 to 1 only in isolated staging
+original_source_sha256=37ce77eddbc77708c45cb61c5dc4199a498319a63611174800f94bef87770e24
+build=CANN 9.1.0 / dav-2201 / Release
+binary_sha256=af441399ef02500793b152d01806f018d036600e9ecc86b50b464dd8daeb8c30
+raw_result_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/scale-resident-enabled/result.json
+raw_ranking_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/scale-resident-enabled/result.ranking.json
+raw_manifest_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/scale-resident-enabled/result.manifest.json
+recovery=source/ contains all 8 server-result source files; only kernel.asc was uploaded as editable
+local_validation=compile and payload/source activation checks; prior host golden reported 6 groups, not rerun; no enabled-staging local device smoke
+risks=resident tensor cross-row lifetime/synchronization and broad numerical/device boundary behavior not established by local tests
+promotion=not promoted; score below historical best 11.67

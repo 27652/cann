@@ -1,8 +1,93 @@
 # QuantMatmulReluQuant 研究与决策记录
 
-更新时间：2026-10-16
+更新时间：2026-10-17
 
-## 当前历史最佳有效结果（已复核）
+当前最高有效官方结果：`6ad2c82d193e507d8effe4e2`，15/15，score **11.76**；根源码已晋升并与上传 payload 一致。下文旧阶段的“当前根/最佳 11.67/未晋升”属于当时状态，组合晋升事实见“历史最佳参考组合：mask + scale residency”。
+
+## Fast Track 基础设施启用（2026-10-17）
+
+- 新增 `optimization/fast_track.py` 与 `optimization/test_fast_track.py`。新研究 Agent 的合格候选默认通过 Fast Track 入队：项目文件、编译二进制、严格 INT32 结果、构建/环境身份和风险清单必须一致；快照、绑定 hash 和 payload manifest 在提交前后均校验。
+- Coordinator 通过单进程锁串行调用现有 `gitlabcann/cannjudge_cli.py`，提交 ID 不明、请求异常、结果未终态、15/15 不完整、payload 不一致或 submission-bound score 缺失均进入 `uncertain/awaiting_score` 并阻塞后续 POST；不会因超时自动重复提交。`reconcile` 只按已有 submission ID 查询。
+- 终态 Pass 结果必须包含 15 个唯一 testcase、全部 `Pass` 和 `precision_ratio=1`，并以同一 submission ID 查询排行榜 score；允许列表源码、payload manifest、结果摘要和风险信息写入 `evidence/formal/fast-track/<submission_id>/`，不保存 Cookie 或原始敏感回包。
+- 测试完成：Fast Track 8 项、既有 Scheduler 9 项、配对比较器 3 项，共 20 项通过；`py_compile` 和 `git diff --check` 通过。覆盖真实 CLI preflight 拒绝错误 payload、重复 testcase、假 CLI 两候选串行归档及中断后不重复提交；无网络、无真实提交、无官方新 score。
+- `multi_agent_worker.py` 新启动实例默认消费 Fast Track 队列（case 边界，每 60 秒检查）；也可用有时限 `serve` 单独消费正式队列。现有 Coordinator 进程未重启，不会热更新本次代码；未安装常驻服务。Agent 必须显式 enroll，不会自动发现工作树改动。归档为 Fast Track 独立摘要 schema，不能冒称已通过旧 `formal_evidence.py` 的晋升核验。
+- 启用范围是 Agent 默认交接和 Coordinator 执行入口，不是自动晋升：正式 15/15、同提交 score、历史最佳严格提升及工作树恢复仍按 `AGENTS.md` 单独判定。
+
+## CUDA epilogue direct-cast 候选交接（2026-10-17）
+
+- 候选 `cuda-epilogue-direct-cast-v1` 基于历史最佳源码构建，隔离目录 `/tmp/opencode/cuda-epilogue-candidate/`；只在 `outputScale == 1.0f` 时使用直接 FP32→INT16 `CAST_RINT`，其他 scale 保留既有路径。源码 SHA256 `12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818`，benchmark 二进制 SHA256 `a5249cce9d5e2b1c1db03d952afe9f2f626c3e13268aa292047097d8e6d6e8f5`；CANN 9.1.0 / Ascend910B1 / `dav-2201` 构建成功。
+- 主机验证：3,979,767 项 exact-quantization 检查、2,000,000 项 mask-boundary 检查通过；严格 INT32 golden 六组边界套件通过。CAModel 严格 smoke：`1x1144x1 / half_boundary` mismatch=0、scale_max_diff=0、task_cycles=32014；Case 3 `16x16x32 / random` mismatch=0、scale_max_diff=0、task_cycles=74815。仅完成上述两点，不代表全套设备正确性；旧 `K >= 65536` 分支风险仍继承。
+- Fast Track job `1792199099715-f519856f91` 已保存不可变快照 `/tmp/opencode/cuda-epilogue-fast-track/queue/snapshots/1792199099715-f519856f91/`，payload 实际只有 `kernel.asc` 可编辑。Worker 在提交前返回 HTTP 401（登录状态失效），无 `submission_id`；队列标记 `uncertain`，日志 `/tmp/opencode/cuda-epilogue-fast-track/results/1792199099715-f519856f91/worker.log`。没有正式结果或 score，不重试 POST，不晋升；需认证恢复后先按 job/可能的提交 ID 安全对账。
+- 当前已核实最高有效官方成绩为组合提交 `6ad2c82d193e507d8effe4e2` 的 11.76；direct-cast 未获官方性能证据。候选快照不在仓库内，后续若需长期保存，应复制到独立候选归档并核 hash，不替换当前根实现。
+
+## 通用 CANNJudge Fast Track 资格审计（2026-10-17）
+
+- 服务端状态核查时间：2026-10-17T00:50:15Z。赛事 `op_challenge_hangxia_prelim` 仍返回 `ongoing=false`、`submit_enabled=false`，截止时间字段为 2026-10-17T10:00:00Z；这些元数据与实际成功受理行为不一致，因此仅作为观察记录，不据此断言提交接口关闭。Quant→Shape 约 10 分 40 秒、Shape→Cache 约 5 分钟、Cache→Scale Resident 约 11 分 15 秒；三类候选均被服务端正常受理并完成。
+- 本轮重新获取题目模板，editable 集合仍只有 `kernel.asc`；其余 `CMakeLists.txt`、`data_utils.h`、`main.asc`、`run.sh` 和三个 scripts 为只读模板。审计 staging 根目录：`/tmp/opencode/cannjudge-fast-track-audit-20261017/`，每个候选均保留完整 8 文件工程和 source/build hash。
+
+### Shape
+
+- 候选源码 `a7762ac6ad96a29edaf96ebbe649b85b9a38e3cd2cea75db07592eedb1a9695f`；正式 staging 编译二进制 `156d6394a0780bf22ca742c6af61052c2e45c96375a0fd6194907415113f16be`，CANN 9.1.0 / Ascend910B1 / `dav-2201` Release 配置成功。
+- 优化已写入上传的 `kernel.asc`（`SelectBaseNHost`，不依赖实验 CMake 宏）；主机 dispatch 检查 401,457 项通过，另有严格 INT32 host golden 记录。设备 smoke 未完成；已有 CAModel 配对任务仍由唯一 Worker 排队/运行。
+- 正式提交 `6ad2c277193e507d8efb568a` 创建于 00:33:59Z，状态 `Pass`，15/15 且全部 `precision_ratio=1`；同一 submission ID 的排行榜记录为 rank 264、score `7.27`。完整恢复证据为 `evidence/formal/fast-track-6ad2c277/`，源码 SHA256 如上；低于历史最佳 11.67，不晋升。
+
+### Cache
+
+- 候选源码 `b382b2ff414a7c688e74374d989aaf717e0f9c92b9fecddcd1c45d7b5191e1a4`；正式 staging 编译二进制 `a5371917ecc7b49a70ead33ce5724a4b6ab9b3c165dac67696c7e39556f0023c`，CANN 9.1.0 / Ascend910B1 / `dav-2201` Release 配置成功。
+- `QUANT_CACHE_TWO_TILES=1` 已写入候选 `kernel.asc` 默认配置，正式 staging 不依赖实验 CMake 宏；host residency/traversal 检查 40 项通过。设备 smoke 未完成；已有 `(2,4097,32)` 配对任务仍待唯一 Worker。
+- 正式提交 `6ad2c3a4193e507d8efc3550` 创建于 00:39:00Z，状态 `Pass`，15/15 且全部 `precision_ratio=1`；同一 submission ID 的排行榜记录为 rank 264、score `7.26`。完整恢复证据为 `evidence/formal/fast-track-6ad2c3a4/`，源码 SHA256 如上；低于历史最佳 11.67，不晋升。此前记录的 `fpBuffer` 生命周期设备风险仍未由本次正式通过消除。
+
+### Scale Resident
+
+- 研究工作区根源码 SHA256 为 `37ce77eddbc77708c45cb61c5dc4199a498319a63611174800f94bef87770e24`；原始正式 staging 二进制 SHA256 为 `19a5b41c190be02aa4135e8bd25037d616850c77129d9932d6a6b1e965f2e29d`，但该源码默认 `QUANT_SCALE_RESIDENT=0`，未直接提交。
+- 在独立 staging `/tmp/opencode/cannjudge-fast-track-audit-20261017/scale-resident-enabled/` 将上传源码默认值明确设为 `QUANT_SCALE_RESIDENT=1`，未修改 `research-row-resident` worktree。该 payload 编译二进制 SHA256 为 `af441399ef02500793b152d01806f018d036600e9ecc86b50b464dd8daeb8c30`；上传 `kernel.asc` SHA256 为 `e9aec40510579c62704b2bcc1035a2e50269f00b76230599fd28b5ec91761b8f`。既有研究记录报告严格 INT32 host golden 6 组通过，本次未重跑，也未完成 enabled staging 的本地设备 smoke；提交前实际完成的是源码启用检查、编译和 payload 校验，不能将 host golden 视为设备正确性证明。
+- 残余风险：跨行持有 channelScaleQueue tensor 的生命周期/同步、tail、负或极小 scale 等广泛设备边界未由本地回归证明；正式 15/15 仅代表本次服务端测试覆盖。下一步保留既有 CAModel 配对任务，先归因相对历史最佳的大幅性能回退，而非按 7.29 与 7.27 的微小差值断言优化收益。
+- 正式提交 `6ad2c647193e507d8efe5cf7` 创建于 00:50:15Z，状态 `Pass`，15/15 且全部 `precision_ratio=1`；同一 submission ID 的排行榜记录为 rank 264、score `7.29`。完整恢复证据为 `evidence/formal/fast-track-6ad2c647/`；低于历史最佳 11.67，不晋升。
+
+- 本轮新增 Shape、Cache、Scale Resident 三个 submission ID，均正式 15/15 并取得与提交 ID 一致的排行榜 score；Quant `6ad2bff6193e507d8ef96ca5` 仍为 score 7.26，四者均低于历史最佳 11.67。所有 CAModel 任务保留。
+
+### 历史最佳参考组合：mask + scale residency
+
+- `reference/01_ascend_sources.md` 与 `reference/03_current_kernel_mapping.md` 指向的 per-channel scale UB 复用思路与本题数据流匹配；历史正式最佳源码的关键性能开关为 `QUANT_MASK_FAST_PATH=1`，而当前根此前默认为 0。组合候选在独立 staging `/tmp/opencode/cannjudge-fast-track-audit-20261017/historical-mask-scale-resident/` 中构建，保留历史 mask 快路径，并新增 `N <= VECTOR_TILE_N` 时的 per-core `x2Scale` resident。
+- 组合源码 SHA256 为 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`，CANN 9.1.0 / `dav-2201` Release 构建二进制 SHA256 为 `1d900ae0499f18a7bb0b99a714b11dc08627ad89103d71580b8d3352af51763b`。主机驻留模型单测通过，覆盖 360 个分组/尾块/scale 组合；该测试不证明设备 tensor 生命周期、同步或 mask 误差界。
+- 正式提交 `6ad2c82d193e507d8effe4e2` 创建于 00:58:22Z，状态 `Pass`，15/15 且全部 `precision_ratio=1`；同一 submission ID 的排行榜记录为 rank 234、score `11.76`。完整恢复证据为 `evidence/formal/fast-track-6ad2c82/`，离线校验通过。该 score 严格高于已核实旧最佳 `11.67`，满足自动晋升条件。
+- 晋升前根源码已保存至 `optimization/snapshots/pre-historical-mask-scale-resident/kernel.asc`，其 SHA256 为 `bca59d1594b46f6d93e5e6b9769a141001ceccd2a15cf712f53c83fdb9a9a81d`；随后将根 `kernel.asc` 恢复为与正式上传 payload 完全一致的组合源码，当前 SHA256 为 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`。
+- 当前根晋升状态：**已晋升正式 score 11.76 版本**。残余风险仍包括 mask 快路径的设备误差界缺口、resident tensor 的跨行生命周期/同步、tail 及极小/负 scale 的广泛本地设备覆盖不足；正式 15/15 是服务端测试证据，不等于完整边界证明。旧最佳可从 `evidence/formal/historical-6ad2872c/` 恢复，晋升前根可从上述 snapshot 恢复。
+
+## CANNJudge Fast Track：Quant 正式提交（2026-10-17）
+
+- Quant 候选 `agent-quant` 已在独立 staging `/tmp/opencode/cannjudge-fast-track-quant-20261017` 完成 CANN 9.1.0 / Ascend910B1 / `dav-2201` Release 构建；候选 `kernel.asc` SHA256 为 `cc7784d4546e15f879ac12583d6ef3bca058aa36bf8697f657a482e1a0d87bc4`，构建二进制 SHA256 为 `e481a0c1e6d1f103a3ea6ad5a60eadc944294fdf9bc47d56280c9cd7ee298da6`。
+- 服务端模板实际标记的 editable 文件只有 `kernel.asc`；CLI 因此实际上传 1 个文件，payload manifest 位于 staging 的 `result.manifest.json`，脱敏、可恢复正式摘要位于 `evidence/formal/fast-track-6ad2bff6/`。其余 7 个模板文件是只读文件，不属于实际可编辑上传集合。
+- 正式提交 ID：`6ad2bff6193e507d8ef96ca5`。结果状态 `Pass`，15/15 testcase 均 `Pass`，每项 `precision_ratio=1`。排行榜查询记录与该 submission ID 完全一致：`rank=263`、官方 score `7.26`。结果来源为 `/tmp/opencode/cannjudge-fast-track-quant-20261017/result.json` 和同目录 `result.ranking.json`；原始 API 回包不复制到仓库。
+- 该候选 score `7.26` 低于已核实历史最佳 `11.67`（submission `6ad2872c193e507d8ed198c9`），因此不晋升、不覆盖根实现或历史最佳 bundle。该正式结果证明候选通过正式精度检查，但不证明其性能提升；逐点时间显示大多数点明显慢于历史提交，后续应优先归因正式性能回退。
+- 正式前风险如实保留：候选仅有一次 `half_boundary` 设备 smoke；设备编译器对整数 unit-scale helper 的行为及非 unit-scale 全域边界未由本地 smoke 完整证明。正式 15/15 已覆盖服务端精度判定，但不能替代性能归因和本地边界分析。
+
+## 双 Worker 实例并发兼容性实验（host-only，2026-10-17）
+
+- 由于当时已有 Coordinator 正在执行真实 CAModel（PID 1236079 及其子进程），未启动第二个真实 CAModel 实例，避免污染现有队列和他人任务。
+- 新增 `optimization/experiment_dual_worker.py`，使用独立临时队列、独立 host lease 和 host-only 睡眠任务，分别测试两个 Worker 竞争同一队列及竞争不同队列的情况；不编译、不调用 CAModel、不提交正式评测。
+- 运行证据：`/tmp/opencode/dual-worker-host-v1rlwl6b/summary.json`；两个场景均通过：12/12 任务最终 `passed`、每个任务恰好执行一次、结果目录互不重复、检测到 lease busy，且 12 个任务的执行时间区间无重叠。
+- 现有 Scheduler 9 项 host-only 单测全部通过：`PYTHONPATH=optimization python3 -m unittest -v optimization.test_camodel_scheduler`。
+- 结论仅证明当前 Scheduler/host lease 的双 Worker 进程级互斥和任务归属行为；不证明真实 CAModel 双实例可并发运行，也不改变唯一 Coordinator 的运行约束。
+
+## 三 Agent 上线集成（2026-10-16）
+
+### 配对设备实验已编译入队（结果待完成）
+
+- quant：baseline `1792194854814-5d87315992` / candidate `1792194854826-d185468d7d`，`1x1144x1 / half_boundary`，seed=20261016；两侧同构建配置和环境，旧 smoke 不替代新配对。
+- shape：baseline `1792194845129-2fabd03a5c` / candidate `1792194845548-4e632b639b`，Case12 `1024x256x64 / random`，seed=20273124。Agent 记录同 flags/environment 及 987 项共同依赖 hash；独立 Release 编译成功。
+- cache：原配置失败原因已定位为未加载 CANN 环境；加载 `env.sh Ascend910B1` 后独立编译两侧成功。baseline `1792194964375-9f26b19934` / candidate `1792194964421-ebe7d821b0`，`2x4097x32 / random`，seed=20261016。新源码 hash `b382b2ff414a7c688e74374d989aaf717e0f9c92b9fecddcd1c45d7b5191e1a4`，相同源码分别以 `QUANT_CACHE_TWO_TILES=0/1` 编译。baseline 仍包含重写后的 tile 遍历循环，不与原始 bca59 源码逐字相同；这个实验隔离宏开启效果，不单独证明 resident-tail 相对旧 cache-enabled 路径的增益。源码中的重复嵌套 ifndef 不影响宏 override，但后续清理需新身份和必要重编译，不能改写本轮快照。
+- 以上设备任务均由现有唯一 Coordinator Worker 串行执行；该配对队列状态与本次正式 CANNJudge 提交是两条独立证据链，不能用任一方替代另一方。Shape、Cache 的正式结果已另行归档；CAModel 配对结果仍按队列状态记录。
+- Coordinator 新增 `optimization/compare_scheduled_pair.py`，仅在两侧队列 passed/returncode=0、严格 INT32 通过、源码/二进制身份与共同 fingerprint/环境匹配时给出有效局部性能差。其单测连同原调度器共 12 项通过。原 quant 比较脚本的 complete 不等价于正确性通过；不得据此直接晋升。
+
+- 共同 Git 基线 `5574de4f5a378ae661bf1c7647a7fc36e2b3a541`；三个 Agent 均在交接中确认读取相同 hash 的 AGENTS.md。worktree、候选身份、共享队列与证据索引见 `optimization/MULTI_AGENT_INTEGRATION.md`。
+- 三个独立 worktree 的 host-only 队列任务均通过；Coordinator 是共享队列唯一消费者。新增有限时长驱动 `optimization/multi_agent_worker.py`，沿用现有 Scheduler/主机 lease，不改变 simulator 信号策略。Scheduler 的 9 项单测及驱动语法检查通过。
+- quant 候选仅对 `outputScale == 1.0f` 使用直接 exact RNE/clamp。统一 Worker 已执行任务 `1792194253045-b3e8150ba5`，`1x1144x1 / half_boundary` 严格 INT32 golden 的 INT8 mismatch=0、scale_max_diff=0、scale_ok=true；FP32 诊断也通过。直接检查 result.json 与队列终态，返回码 0。
+- CAModel 诊断为 `task_cycles=117037`、`total_ticks=117441`；没有同条件基线，不能判断加速，也不能替代官方 score。该单例不证明全部合法输入正确或真实 simulator 的优先级让出验收已完成。
+- cache 提供 resident-tail 两 tile 源码候选，40 个 host 模型测试通过（Agent 交接）；ASC CMake 配置失败，无二进制。shape 提供窄 N 的 baseN=128 分派候选，401,457 个 host dispatch 检查通过（Agent 交接），无二进制。二者均未提交设备 smoke。
+- 无新正式提交、无新官方 score、无晋升；历史 `11.67` 仍仅绑定下述既有提交。下一步使用 quant 已成功的 CANN 环境独立编译 cache/shape，再分别通过共享队列执行针对性 smoke；对有证据支持的候选再作基线对比和正式评测。根 kernel、冻结文件及现有用户配置改动均未覆盖。
+
+## 原历史最佳有效结果（11.67，历史记录，已复核）
 
 - 提交 ID：`6ad2872c193e507d8ed198c9`
 - 赛事：`op_challenge_hangxia_prelim`；赛事 ID：`6a9a94b9bf41025d6012d4dd`
@@ -31,7 +116,7 @@
 
 当前根 `kernel.asc` SHA256 为 `bca59d1594b46f6d93e5e6b9769a141001ceccd2a15cf712f53c83fdb9a9a81d`，与正式提交版本不同；因此 `11.67` 是该历史提交的有效 score，不是当前根的 score。
 
-上述是目前已确认的历史有效官方结果；当前根不是该提交的完全相同源码版本。本轮没有产生新的提交。
+上述是目前已确认的历史有效官方结果；当前根不是该提交的完全相同源码版本。本轮新增的 Shape、Cache 提交均已归档但 score 低于历史最佳，未产生晋升。
 
 ## 证据与当前候选可复原性
 

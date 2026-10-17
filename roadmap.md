@@ -1,17 +1,42 @@
 # QuantMatmulReluQuant：文件导航与当前状态
 
-更新时间：2026-10-16。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
+更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
+
+## 通用 Fast Track 状态（2026-10-17）
+
+- 服务端核查仍返回赛事 `ongoing=false`、`submit_enabled=false`，截止时间为 2026-10-17T10:00:00Z；该元数据与实际成功受理行为不一致，不能单独作为关闭证明。Shape、Cache、Scale Resident 及历史-mask+scale-resident 组合均已完成正式提交。
+- 审计 staging：`/tmp/opencode/cannjudge-fast-track-audit-20261017/`。Shape、Cache、Scale Resident 的正式 8 文件工程均编译成功，优化逻辑均存在于对应上传的 `kernel.asc`；Scale Resident 使用独立 enabled staging 将默认宏设为 1。
+- Shape 为 `6ad2c277193e507d8efb568a` / 15/15 / score 7.27，Cache 为 `6ad2c3a4193e507d8efc3550` / 15/15 / score 7.26，Scale Resident 为 `6ad2c647193e507d8efe5cf7` / 15/15 / score 7.29；新组合 `6ad2c82d193e507d8effe4e2` / 15/15 / score 11.76，已严格超过历史最佳 `6ad2872c193e507d8ed198c9` / 11.67。组合证据、hash、验证和风险见 `report.md`。
+
+## Fast Track 正式结果（2026-10-17）
+
+- Quant 候选已正式提交：submission `6ad2bff6193e507d8ef96ca5`，状态 `Pass`，15/15、全部 `precision_ratio=1`；同一 submission ID 的排行榜记录为 `rank=263`、score `7.26`。
+- 实际 editable payload 只有 `kernel.asc`，SHA256 为 `cc7784d4546e15f879ac12583d6ef3bca058aa36bf8697f657a482e1a0d87bc4`。独立编译二进制 SHA256 为 `e481a0c1e6d1f103a3ea6ad5a60eadc944294fdf9bc47d56280c9cd7ee298da6`。
+- 正式证据摘要和候选源码恢复副本：`evidence/formal/fast-track-6ad2bff6/`。该结果 score 低于历史有效最佳 `11.67`，未晋升；历史最佳 bundle 不变。
+- Shape 正式证据及完整恢复源码：`evidence/formal/fast-track-6ad2c277/`；提交状态 `Pass`、15/15、排行榜 score `7.27`，与请求 submission ID 一致，未晋升。
+- Cache 正式证据及完整恢复源码：`evidence/formal/fast-track-6ad2c3a4/`；提交状态 `Pass`、15/15、排行榜 score `7.26`，与请求 submission ID 一致，未晋升。
+- Scale Resident 正式证据及完整恢复源码：`evidence/formal/fast-track-6ad2c647/`；提交状态 `Pass`、15/15、排行榜 score `7.29`，与请求 submission ID 一致，上传源码默认 `QUANT_SCALE_RESIDENT=1`，未晋升。
+- 历史 mask + Scale Resident 组合正式证据及完整恢复源码：`evidence/formal/fast-track-6ad2c82/`；提交状态 `Pass`、15/15、排行榜 score `11.76`，与请求 submission ID 一致，上传源码 SHA256 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`，已按严格高于 11.67 的条件晋升为当前根实现。
 
 ## 当前状态
 
+- CUDA direct-cast 独立候选：`/tmp/opencode/cuda-epilogue-candidate/kernel.asc`，SHA256 `12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818`；已完成编译、严格 INT32 主机检查及两个针对性 CAModel smoke，完整设备回归未运行。Fast Track job `1792199099715-f519856f91` 因 HTTP 401 停在 `uncertain`，没有 `submission_id` 或官方 score，未晋升；快照和日志位于 `/tmp/opencode/cuda-epilogue-fast-track/`，详见 `report.md`。
+
+- Fast Track 已接入新启动 Coordinator 的默认正式评测队列：`optimization/fast_track.py`、`optimization/FAST_TRACK.md`、`optimization/multi_agent_worker.py`。Agent 显式 enroll 后由 Coordinator 串行提交、按 submission ID 对账并归档脱敏摘要；异常不重试 POST，正式晋升仍需独立证据门禁。20 项相关回归通过；基础设施测试未进行真实网络提交。已有运行进程未重启，未安装常驻服务。
+
+- 双 Worker host-only 并发兼容性入口：`optimization/experiment_dual_worker.py`；同队列/跨队列两个场景各 12 项任务通过且无执行重叠，证据 `/tmp/opencode/dual-worker-host-v1rlwl6b/summary.json`。未运行真实 CAModel 双实例；详见 `report.md`。
+
+- 三 Agent 上线集成入口与交接记录：`optimization/MULTI_AGENT_INTEGRATION.md`；共同研究基线 `5574de4`，统一 Worker 驱动 `optimization/multi_agent_worker.py`。三个 host-only 任务通过，quant 候选经共享队列完成一个严格 INT32 CAModel smoke；cache/shape 的后续正式 staging 已完成并提交，CAModel 配对结果仍按队列状态记录。本轮 Shape/Cache 有新官方 score，但均未晋升。
+- 后续三路 baseline/candidate 均已独立编译并提交配对任务，结果待完成；cache/shape 的“尚无二进制”仅适用于首次交接。配对终态/严格正确性/共同 fingerprint 核验入口为 `optimization/compare_scheduled_pair.py`，任务与构建证据索引见 `report.md` 及各 worktree 候选的 `RESEARCH.md`。
+
 - 当前工作实现为根 `kernel.asc`，SHA256 为
-  `bca59d1594b46f6d93e5e6b9769a141001ceccd2a15cf712f53c83fdb9a9a81d`。
+  `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`。
 - `optimization/candidates/unit-token-scale/kernel.asc` 为跳过 unit token scale 乘法的
   未编译、未正式验证候选，未晋升；优化前快照位于
-  `optimization/snapshots/pre-unit-token-scale/kernel.asc`，根保持优化前内容。
-- 当前根默认 `QUANT_MASK_FAST_PATH=0`；`K >= 65536` 时使用 FP32 Matmul 路径。
+   `optimization/snapshots/pre-unit-token-scale/kernel.asc`；根现已晋升正式 mask+scale-resident 组合，晋升前根备份为 `optimization/snapshots/pre-historical-mask-scale-resident/kernel.asc`。
+- 当前根默认 `QUANT_MASK_FAST_PATH=1` 且 `QUANT_SCALE_RESIDENT=1`（仅在 `N <= VECTOR_TILE_N` 时启用 scale residency）；`K >= 65536` 时使用 FP32 Matmul 路径。
 - `op/kernel_v3.asc` 为冻结快照，SHA256 为
-  `64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e220220`；当前根与 v3 至少在 `QUANT_MASK_FAST_PATH` 宏上不同。
+  `64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e220220`；当前根包含新增 scale residency，不与 v3 逐字相同。
 - 已复核的历史正式有效提交及 score 记录在 `report.md`；原始结果位于
   `/tmp/opencode/kernel-existing-submission-result.json`，排行快照位于
   `/tmp/opencode/cannjudge-ranking-team-file.json`。这些文件不属于仓库版本内容。
@@ -33,7 +58,7 @@
 
 ### 当前状态（避免混淆）
 
-- 根 `kernel.asc` 已将 `QUANT_MASK_FAST_PATH` 默认值改为 **0**：保留向量 hint，但由 exact helper 认证/修正，不能再称它与 v3 逐字相同。
+- 根 `kernel.asc` 当前恢复为正式组合 payload：`QUANT_MASK_FAST_PATH=1` 与 `QUANT_SCALE_RESIDENT=1`；源码 SHA256 为 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`，与 `evidence/formal/fast-track-6ad2c82/` 一致。
 - `op/kernel_v3.asc` 是开启 boundary-mask 快路径时的冻结快照；用户外部评测曾 15/15 通过，但这不是所有 FP32 输入的正确性证明。
 - `op/kernel.asc` 是历史对照基线，`op/kernel_v2.asc` 是早期候选快照，均保留不动。
 - `bench_vector` 仅消融量化精确校正；**仍包含矩阵乘等整个算子阶段**，不是已完成的独立纯 Vector 微基准，也不是可提交的正确实现。
@@ -154,7 +179,7 @@ op/kernel_v3.asc  64c6384d6f72449ca59a13cfa076b6b93dd5ae7ea548b7f39f9f32732e2202
 | `prior` / `bench_prior` | `op/kernel.asc` |
 | `v2` / `bench_v2` | `op/kernel_v2.asc` |
 | `v3` / `bench_v3` | `op/kernel_v3.asc` |
-| `optimized` / `bench_optimized` | 当前根 `kernel.asc`，默认 mask 快路径关闭 |
+| `optimized` / `bench_optimized` | 引用当前根 `kernel.asc`，默认 mask 与 scale residency 开启；既有二进制必须重编译，不能继承新源码身份 |
 | `vector` / `bench_vector` | 根 kernel + `QUANT_VECTOR_ONLY=1`，仅性能消融 |
 | `cache` / `bench_cache` | 根 kernel + 两 tile activation cache 实验 |
 | `tile128` / `bench_tile128` | 根 kernel + Cube base N=128 实验 |

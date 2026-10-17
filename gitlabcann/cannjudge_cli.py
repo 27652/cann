@@ -307,6 +307,20 @@ def submit(client: Client, args):
         raise RuntimeError("无法获取工程模板文件列表；为防止误提交，已停止")
     files = collect_files(pathlib.Path(args.project).expanduser().resolve(), template_files)
     manifest = file_manifest(files, args.contest, args.problem, pid, template_files)
+    expected_project = getattr(args, 'expected_project', None)
+    if expected_project:
+        expected = json.loads(pathlib.Path(expected_project).read_text())
+        root = pathlib.Path(args.project).resolve()
+        for name, expected_hash in expected.items():
+            path = (root / name).resolve()
+            if not path.is_relative_to(root) or hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+                raise RuntimeError('Fast Track project identity mismatch')
+        if any(entry['path'] not in expected or manifest['files'][entry['path']]['sha256'] != expected[entry['path']] for entry in files):
+            raise RuntimeError('Dynamic editable payload differs from qualified project')
+        # Persist BEFORE the POST, including when the response times out.
+        preflight = pathlib.Path(args.output).with_suffix('.manifest.json')
+        preflight.parent.mkdir(parents=True, exist_ok=True)
+        preflight.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
     payload = {
         "userId": user_id, "problemId": pid, "files": files,
         "tiling_h": "", "tiling_key_h": "", "host_cpp": "", "kernel_cpp": "",
@@ -403,6 +417,7 @@ def main():
     sp.add_argument("--contest", default=DEFAULT_CONTEST)
     sp.add_argument("--problem", default=DEFAULT_PROBLEM)
     sp.add_argument("--output", help="结果 JSON 输出路径")
+    sp.add_argument('--expected-project', help='Fast Track qualified project hash map; checked before POST')
     sp.add_argument("--wait", type=float, default=3, help="轮询间隔秒数，默认 3")
     sp.add_argument("--timeout", type=float, default=0, help="等待超时秒数，0 表示一直等待")
     sp.add_argument("--ranking-query", help="评测查询结束后查询排行榜的搜索词，例如队名关键字")

@@ -1,0 +1,22 @@
+candidate_id=historical-mask-scale-resident
+submission_id=6ad2c82d193e507d8effe4e2
+status=Pass
+testcases=15
+precision_ratio_all_one=true
+score=11.76
+score_source=live official ranking with exact submission_id match
+uploaded_editable_files=kernel.asc
+kernel_sha256=f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163
+source_defaults=QUANT_MASK_FAST_PATH=1 QUANT_SCALE_RESIDENT=1
+build=CANN 9.1.0 / dav-2201 / Release
+binary_sha256=1d900ae0499f18a7bb0b99a714b11dc08627ad89103d71580b8d3352af51763b
+raw_result_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/historical-mask-scale-resident/result.json
+raw_ranking_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/historical-mask-scale-resident/result.ranking.json
+raw_manifest_path=/tmp/opencode/cannjudge-fast-track-audit-20261017/historical-mask-scale-resident/result.manifest.json
+recovery=source/ contains all 8 server-result source files; only kernel.asc was editable/uploaded
+local_validation=ASC build and host indexing model, 360 combinations; no local device smoke for this combination
+risks=mask device error bound and resident tensor lifetime/synchronization and broad numerical boundaries remain unproven locally; large K FP32 path inherited
+promotion=promoted; 11.76 strictly exceeds verified 11.67 in identical scoring context
+previous_best=evidence/formal/historical-6ad2872c/source/
+previous_root=optimization/snapshots/pre-historical-mask-scale-resident/kernel.asc
+previous_root_sha256=bca59d1594b46f6d93e5e6b9769a141001ceccd2a15cf712f53c83fdb9a9a81d
