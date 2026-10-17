@@ -2,6 +2,32 @@
 
 更新时间：2026-10-17
 
+## tileM=16 persistent MIX 正式晋升（2026-10-17，06:44 UTC）
+
+- 隔离候选 `optimization/candidates/mix-2d-tile16-persistent/` 仅将正式 16.07
+  实现的 Cube M tile 从 64 改为 16；其余单次 MIX、二维 ownership、全核
+  `SyncAll<false>()`、K chunk 和 VectorStage 保持不变。候选 kernel SHA256
+  `cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae`。
+- 提交前已完成 CANN 9.1.0/dav-2201 主工程与 benchmark 编译、360 ownership +
+  8 K-chunk 主机检查，以及三组严格 INT32 CAModel smoke；三组均 INT8 mismatch=0、
+  scale max abs/rel diff=0，包含零行与负 scale。大形状额外诊断因旧 binary 在
+  `aclInit=500000` 失败，未作为性能依据。
+- CLI 动态模板确认实际 editable payload 只有 `kernel.asc`。服务端受理并完成
+  submission `6ad31941193e507d8e654e7b`：`valid=true`、`Pass`、15/15，全部
+  `precision_ratio=1`。排行榜记录的 submission ID 与本次完全一致，score **16.66**、
+  rank 210。受保护的原始结果/榜单位于 `/tmp/opencode/tile16-persistent-result.json`
+  与对应 `.ranking.json`；完整正式证据及八文件恢复源码位于
+  `evidence/formal/tile16-persistent-6ad31941/`。
+- `formal_evidence.py recover`、`validate`、相对历史最佳
+  `evidence/formal/mix-2d-single-launch-6ad2ed99/` 的 `decide` 均通过；新 score
+  相对 16.07 严格提高 **0.59**，满足自动晋升条件。旧根完整 kernel 快照位于
+  `optimization/snapshots/pre-tile16-persistent-16.07/`。本次晋升只替换根 `kernel.asc`，
+  未覆盖其他未提交研究修改。
+- 当前根已晋升为该正式有效版本；仍不声称全输入严格设备正确性，保留大 K、FTZ、
+  mask、UB lifetime、全核同步和多 stream 资源风险。后续可研究更深的 CV ring/在线
+  epilogue，但不得将本轮 tile 粒度消融误称为已实现的 partial-max 流水。
+
+
 ## 单次 launch 二维 MIX 正式晋升（2026-10-17，03:38 UTC）
 
 - 修复“两次 launch 被拒绝”后，正式提交 `6ad2ed99193e507d8e278978`：服务端

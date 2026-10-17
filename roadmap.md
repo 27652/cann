@@ -2,6 +2,16 @@
 
 更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
+
+## 最新正式状态（2026-10-17，tileM=16 persistent MIX）
+
+- 当前根及最高有效：`6ad31941193e507d8e654e7b`，正式 15/15，score **16.66**。
+- kernel SHA256：`cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae`。
+- 正式证据及完整恢复：`evidence/formal/tile16-persistent-6ad31941/`。
+- 候选与严格 smoke：`optimization/candidates/mix-2d-tile16-persistent/`。
+- 晋升前 16.07 根快照：`optimization/snapshots/pre-tile16-persistent-16.07/`。
+- 以下“最新/当前”属于历史时点；数值与同步等残余风险见 `report.md` 晋升条目。
+
 ## 最新正式状态（2026-10-17，03:38 UTC，单次 launch 二维 MIX）
 
 - 当前根及最高有效：`6ad2ed99193e507d8e278978`，Pass 15/15，score **16.07**；kernel SHA256 `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。完整恢复与 validate/decide 证据：`evidence/formal/mix-2d-single-launch-6ad2ed99/`；前一 14.94 版本：`evidence/formal/fast-track-6ad2e531/`，晋升前完整根快照：`optimization/snapshots/pre-mix-2d-single-launch-14.94/`。
