@@ -1,0 +1,3 @@
+/tmp/opencode/ub-resident-8192-result.json
+/tmp/opencode/ub-resident-8192-result.ranking.json
+/tmp/opencode/ub-resident-8192-result.manifest.json
