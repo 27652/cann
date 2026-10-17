@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "submission_id": "6ad326cc193e507d8e7c7d4e",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "status": "Pass",
+  "scoring_context": "official ranking score for op_challenge_hangxia_prelim/quantmatmulreluquant",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 22.73,
+      "best_time": 2.06
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 9.51,
+      "best_time": 1.67
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 16.95,
+      "best_time": 2.11
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 26.99,
+      "best_time": 7.55
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 20.26,
+      "best_time": 8.28
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 61.38,
+      "best_time": 12.02
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 92.55,
+      "best_time": 14.68
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 236.74,
+      "best_time": 15.8
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 173.93,
+      "best_time": 19.27
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 455.87,
+      "best_time": 35.63
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 492.02,
+      "best_time": 52.73
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1139.51,
+      "best_time": 64.52
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1462.5,
+      "best_time": 76.73
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 3411.98,
+      "best_time": 173.37
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 7603.49,
+      "best_time": 340.89
+    }
+  ],
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad326cc193e507d8e7c7d4e",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "16.57",
+    "rank": 211,
+    "queried_at": "2026-10-17T07:45:04Z"
+  },
+  "files": {
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "kernel.asc": "8a55c8d40c19581a5bae5ebbfef74a58d4bbabd480c46c28a322f8bc9be5ad72",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6"
+  },
+  "provenance": {
+    "result_sha256": "6b12fa117fc8295c84f6b08b61985dede6ec563ba27468f21c319fe9e979131d",
+    "ranking_sha256": "a66af5f94762c942db5069919807a2fd4039712e5197c059ae9a803f0f6b18ca"
+  }
+}
