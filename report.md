@@ -2,6 +2,26 @@
 
 更新时间：2026-10-17
 
+## 紧急停止后四个会话末期成果与其余未提交成果归档（2026-10-17）
+
+- 按用户要求保存其余源码、脚本、定向结果、失败复现工程与诊断；不改根、
+  不新提交评测，不把归档混同晋升。最高有效仍为最终 19.48 / rank 195。
+- 完成交接 `optimization/RESEARCH_HANDOFF_20261017.md`：整理四个会话末期的
+  A/L1 反馈归档、A/L1 提交与后续获分、N-tile/TBest 逐项对照、
+  Cube→VECIN / workspace-free 接口核查。`ba58a6b` 与 `6ad345…` 经核对
+  关联同一 A/L1 submission，不重复算作独立候选或提交；N-tile 保留历史
+  19.45 对照与未完成 early-max 生产超时诊断。按源码和结果记录，session ID
+  映射未知，不臆造；更早三 Agent 历史单独保留。
+- 其他成果包括多行 reduction 正式 Compile Error/WA、N-shard 已知严格失败与
+  DMA 修订待测、local-k API 风险、FIFO+UB 组合退化、wide-row 消融等。
+  未完成的主机/设备/性能/正式验证分别标明，失败原始结论不隐藏。
+- 文件清单及 SHA256：`optimization/research-archive-20261017/manifest.json`；
+  未纳入 Git 的生成物清单 `excluded.json`，本地均不删除。历史记录中的“当前
+  19.45/未提交/待设备验证”按当时状态解释，最终状态以顶部 19.48 bundle 为准。
+- 归档轻量检查：154 个 JSON 解析、61 个 Python AST 解析通过；敏感赋值模式
+  扫描无命中（不等同完整安全审计）。`git diff --cached --check` 仅报告 129 处
+  历史生成日志末尾空行，保留原字节；本轮未重跑编译、设备测试或正式评测。
+
 ## 最终 CLI 核验：19.48 / rank 195，晋升并归档（2026-10-17）
 
 - 仅使用现有 CLI 的 result/ranking GET 查询，未执行任何新提交 POST。
@@ -27,6 +47,47 @@
   正式有效不等于所有合法输入严格正确。
 - 本次独立 commit 仅保存该晋升及必要恢复/验证材料，不混入未正式通过
   的其他候选、缓存或 dump；其他工作区研究改动保留。赛事已结束，不新提交流程。
+
+## N-tile early-max pipeline follow-up（2026-10-17）
+
+- Candidate `optimization/candidates/n-tile-max-pipeline/` remains isolated
+  from the promoted dual-AIV root (`6ad33b78193e507d8ea310c4`, score 19.45).
+  It extends FIFO row jobs only for `M>=1024, 4096<N<=16384`, then was made
+  protocol-testable with `N_TILE_MIN_ROWS=17`.
+- Corrected protocol uses two outstanding N tiles: ready lanes 4/5, consumed
+  lanes 6/7, row-complete lane 8 and row-consumed lane 9. It does not claim a
+  global dynamic queue. CANN 9.1/dav-2201 compiled successfully.
+- Strict INT32 CAModel results under `source env.sh Ascend910B1`: 17x4097x33,
+  17x8201x33, 65x4097x33, and single-core 33x4097x33 all had zero INT8
+  mismatches and exact yScale. 33x16385x33 exercised fallback and also passed.
+  The production-dispatch 1025x4097x33 run timed out at 240 seconds; logs are
+  retained and it is not classified as correctness pass or deadlock.
+- No formal submission or performance claim. The current verified baseline's
+  testcase-ID-aligned TBest comparison is retained in
+  `optimization/candidates/n-tile-max-pipeline/TBEST.md`; dual-AIV remains
+  2.13x--13.50x above stored TBest per testcase. Shapes are unknown and this
+  comparison cannot trigger promotion.
+
+## 双 AIV 显式 A/L1 驻留候选（2026-10-17，设备验证待运行）
+
+- 基于正式 `6ad33b78193e507d8ea310c4`（15/15，19.45）的精确恢复工程，
+  在 `optimization/candidates/dual-aiv-l1-v4/` 建立独立候选与父版本快照，
+  未覆盖根或冻结版本。假设是显式 A1/NZ 驻留可减少同 A 行块跨 N tile 的
+  重复加载；没有直接阶段计时证明当前 Cube 供给或 GM 是主瓶颈。
+- `a-l1-group4-stride16` 对 K<=4096、K%32==0、N>256 的输入，将 16×K A
+  面板显式装入 L1，复用于至多四个 N tile。其他 shape 保留父路径；
+  INT32 GM 平面、全核 barrier 与双 AIV epilogue 未改。分组同时改变调度粒度，
+  因而即便获益也不能仅归因于 L1 流量。
+- 初版编译后检查发现 NZ 面板跨度风险，保留初版，另建 stride16 修正版。
+  修正版 hash `431750131478b8b569b24d0f86e7fc224187d0ec87d81cf0eb4eac60f3fc249a`。
+  修正版及精确父版本 CANN 9.1 / dav-2201 编译成功，175 组主机 ownership、
+  工程 hash 与 NZ 地址模型检查通过；这些不是设备语义证明。
+- 严格 INT32 `17x1025x64` smoke 因全机 CAModel lease busy 在启动前被拒绝，
+  **未完成本地设备验证**，没有数值或性能结果。未抢占其他会话任务。
+  仍需验证 NZ 布局、外部 A1 与 Matmul L1 分配共存、tail 及事件生命周期。
+- 未正式提交、未取得新官方 score、不晋升；历史最高已核实有效 score 仍为
+  19.45。封榜期间如只有正式逐点耗时，将按 testcase ID 对齐作为临时反馈，
+  不替代 score 或触发晋升。恢复、构建与下一步命令见该目录 `RESEARCH.md`。
 
 ## 独立架构正式反馈与晋升（2026-10-17 08:46 UTC）
 
@@ -894,3 +955,36 @@ INT8 mismatch、yScale 完全一致（rtol=atol=1e-4）。实际 MDL scheduler �
 不覆盖当前根，也不修改历史最高有效版本。dual-AIV 修正版的 19.45 是本轮
 真正的重大结构反馈；本组合只作为独立失败/消融证据保存。未取得新的高于
 19.45 的正式 score。
+
+## Workspace-free Cube→VECIN 假设核查（2026-10-17）
+
+隔离诊断 `optimization/diagnostics/workspace-free-api-20261017/` 核对了
+CANN 9.1/dav-2201 的客户端、C220 server、芯片能力表和 Fixpipe 实现。
+关键发现不是简单 NZ 格式限制：2201 选择 USE_WORKSPACE，能力表
+`ifSupportL0CToUB=false`；同步 GetTensorC(LocalTensor) 经 GetGlobalAddr
+分配内部 GM staging、Cube 写 GM、CopyToUB 读取，AsyncGetTensorC 同样要求
+GM cache workspace。真正的 GetTensorCWithoutGm 属于 USE_SSBUF 分支，不能
+仅凭跨架构接口存在将其用于 2201；GM+LocalTensor 重载也明确经过 GM。
+dav_c220 LocalTensor Fixpipe 的所示实现是 L0C→L1，不是 L0C→VECIN。
+
+决策：暂停“切换 CType/VECIN/NZ 即直接 Cube→UB”的候选路线，不构造隐式
+绕回 GM 却标为 workspace-free 的实现。这是当前 toolkit/目标的支持范围
+结论，不声称证明所有 workspace 缩减方案或所有底层硬件方法不可行。
+完整调用链、源码行号和指纹见诊断 RESEARCH.md/source-audit.json。
+
+同时纠正旧性能基准归属：TBEST_ANALYSIS 的约 143× 点 11 对应旧提交
+6ad2cb6b，而当前正式 19.45 的点 11 为 327.58/52.73≈6.21×；当前逐点
+time/best_time 范围约 2.13×–13.50×。这些是已归档正式时间，不是新查询
+或分阶段测量；shape 未知，不能证明 workspace/sync 占 90% 或必得 10×。
+
+实际完成：source audit 通过、当前正式 bundle 离线 validate 返回
+valid=true/19.45、ASC compile-only capability 对象编译通过（dav-2201，
+实际编译检查 USE_WORKSPACE 与不支持 L0C→UB）。配置路径/环境和首次
+CFG_NORM 命名错误已修正，最终日志留在 compile.log。未进行设备数值测试、
+CAModel、性能 upper-bound 或正式提交；无新 score、无晋升，根与冻结文件
+未修改。下一步优先单 launch 有界 GM tile/row buffer + N≤4096 行激活
+UB 驻留，或单变量 Cube/epilogue/sync 消融；不得将缩小分配等同于消除 GM。
+已纳入封榜临时评价规则：新提交若无可核验 score，仅按 testcase ID
+对齐与 19.45 比较逐点官方绝对/相对耗时并保存查询来源，不据此晋升。
+新增审计器的三个轻量单测通过（真实解析、transport 变化拒绝、能力变化拒绝）；
+git diff --check 通过。未提交 Git commit；本轮没有正式通过的新候选。

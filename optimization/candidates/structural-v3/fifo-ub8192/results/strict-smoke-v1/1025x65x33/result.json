@@ -1,0 +1,13 @@
+{
+  "shape": [
+    1025,
+    65,
+    33
+  ],
+  "int8_mismatches": 0,
+  "scale_ok": true,
+  "scale_max_abs_diff": 0.0,
+  "scale_max_rel_diff": 0.0,
+  "rtol": 0.0001,
+  "atol": 0.0001
+}

@@ -1,0 +1,26 @@
+{
+  "shape": [
+    17,
+    257,
+    131073
+  ],
+  "seed": 20261017,
+  "source_sha256": "c5bbefeb9ceaf0b0019b5ea021f83b31a91e4682b019e0c605e5ceccb62dc7d6",
+  "binary_sha256": "8706d2779454089f83f5dedc67a38c1f3dc2b811062eac390a99d554455cfd62",
+  "runner_sha256": "9b61b878566c2dfd9d3d4d94da695ac2078594c84acc1ba9ef732fe88c9117cc",
+  "golden_script_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "files": {
+    "input/x2Scale.bin": "839bfbe4185ecaa69ba9744a71849aad04e793c9bced8b5e8a3a4b78307a2451",
+    "input/x2.bin": "c83e902287f77077ac97fad0211be2920aade35c99c05e5d34f4d0cffb186d01",
+    "input/x1.bin": "ae2960b420cee6d5bf77b36d04378d662483a0a2ddf3aa585b5261784f2b711d",
+    "input/x1Scale.bin": "0ddf9446be76697d0fbba487583dcab359c4165d5faaf0866fcb0191b981ff53",
+    "output/golden_y.bin": "05d2adb754eeed4e7751047a36e2aafd458c026f9467846e85f72d1e4f540a85",
+    "output/golden_yScale.bin": "cb1af105a17b61aaf3e06e1afc4f388d230bf4d3746804f19da190f313942994"
+  },
+  "environment": {
+    "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+    "CAMODEL_HOME": "",
+    "CAMODEL_PATH": "",
+    "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib"
+  }
+}

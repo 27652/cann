@@ -1,5 +1,13 @@
 # QuantMatmulReluQuant：文件导航与当前状态
 
+## 收尾研究归档入口（2026-10-17）
+
+- `optimization/RESEARCH_HANDOFF_20261017.md`：四个会话末期的 A/L1 反馈归档、
+  A/L1 提交与后续获分、N-tile/TBest 对照、Cube→VECIN 接口核查，及未完成项
+  和恢复入口；session ID 映射未知，A/L1 归档与获分关联同一正式提交。
+- `optimization/research-archive-20261017/{manifest.json,excluded.json}`：
+  新增研究材料 hash 清单及仅留本地生成物清单；不改变下述最终获分版本。
+
 ## 最终 CLI 核验与晋升（2026-10-17 10:08 UTC）
 
 - 最后已归档提交及最高有效：`6ad345e2193e507d8ebb20ec`，Pass 15/15，
@@ -11,6 +19,16 @@
   `evidence/formal/dual-aiv-fixed-6ad33b78/source/`。
 - 下文“当前/最高/待确认”按历史时点阅读；最终状态以上述 CLI 结果为准。
 
+## Cube→UB API 核查入口（2026-10-17）
+
+- `optimization/diagnostics/workspace-free-api-20261017/`：CANN 9.1/dav-2201
+  源码审计与编译期能力检查均通过；当前 Matmul LocalTensor GetTensorC 使用
+  内部 GM staging，芯片能力表 `ifSupportL0CToUB=false`，不是直接 Cube→UB。
+  见 `RESEARCH.md`、`source-audit.json` 和 `compile.log`。未运行设备测试、
+  性能消融或新正式提交；根实现及 19.45 最高有效版本不变。
+- `optimization/TBEST_ANALYSIS_20261017.md` 的约 143× 是旧提交对照；19.45
+  bundle 的点 11 为 327.58/52.73≈6.21×，逐点表见上述诊断文档。
+
 ## 最新晋升：dual-AIV ownership 修复（2026-10-17）
 
 - 正式 `6ad33b78193e507d8ea310c4` Pass 15/15，同 ID score **19.45**，
@@ -21,8 +39,26 @@
   基于 16.66 架构，不包含 FIFO；旧根恢复入口仍为 FIFO bundle 的 source。
 - 320 组 host ownership 及三个严格 INT32 CAModel smoke 通过。
   下文较早“最高”状态仅为历史记录。
+- N-tile early-max follow-up remains unsubmitted: four targeted strict smokes
+  passed (including a forced single-core three-job reuse case), one production
+  1025x4097x33 run timed out at 240s. Testcase-ID-aligned TBest diagnostics are
+  in `optimization/candidates/n-tile-max-pipeline/TBEST.md`; no score or
+  promotion is inferred.
+- 独立 L0C chunk 候选 submission `6ad34061193e507d8eaf555b` 已正式返回
+  15/15、`valid=true`、全部 precision ratio=1；榜单暂未找到同 submission
+  记录，score 待确认，故不具备晋升资格。脱敏恢复材料见
+  `evidence/formal/l0c-chunk64-6ad34061-score-pending/`。
 
 ## 已核实更新：独立架构反馈（2026-10-17）
+
+- 结构 v3 组合 `fifo-ub8192` 已完成正式反馈：submission
+  `6ad33c2d193e507d8ea490bc`，15/15、score **16.85**；证据
+  `evidence/formal/fifo-ub8192-6ad33c2d/`，validate 通过。该组合低于 FIFO
+  16.89，且低于当前 dual-AIV 修正版 19.45，不晋升；候选源码与 hash 见
+  `optimization/candidates/structural-v3/fifo-ub8192/`。
+- 当前最高已核实有效版本仍为 dual-AIV 修正版 submission
+  `6ad33b78193e507d8ea310c4`、15/15、score **19.45**；恢复证据为
+  `evidence/formal/dual-aiv-fixed-6ad33b78/`。FIFO+UB 组合不改变根版本。
 
 - 最高已核实正式 score 为 **16.89**：CV FIFO submission
   `6ad335a8193e507d8e985b8b`，15/15；证据

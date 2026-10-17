@@ -1,0 +1,28 @@
+{
+  "shape": [
+    129,
+    257,
+    33
+  ],
+  "rows": 2,
+  "seed": 20261017,
+  "source_sha256": "05f88c1e501145b3578d4ab486eb3b6d1f9d63075706288784e3031eb9d2f1a4",
+  "binary_sha256": "8c68bc2cc076991f1d19b076a1582c640d78469eae6280db1f89411297c5ba87",
+  "runner_sha256": "9044a366234ca1faff23d562464011ea3c94fc1e1466cb621f57e264cfd225e1",
+  "cmake_sha256": "de78ebd17ef5c31e7a97f3c5cbc7b0213ebe8919de79368b1dba67e47ccc937a",
+  "golden_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "files": {
+    "input/x2Scale.bin": "e5bbc1443a5dfdb94143cb1e9ca322c9957421889ff5ebb697d563bfd06cc6b3",
+    "input/x2.bin": "f18d4604a0d263e39545af1fb6f886c6f01dfb38b1a35253b229df985941c438",
+    "input/x1.bin": "eb11ac142f812575142d018406d1054f7bd4a07a80b171d933f51179e4352573",
+    "input/x1Scale.bin": "6c86bdf11a7aa492a496ef699b89650653f6ef531fcf01d0d4c59892593a051a",
+    "output/golden_y.bin": "470ccf6ddecf3bef8cde87eac0da5e910c016ef25d424a1ce52ac9fbeea8ffe4",
+    "output/golden_yScale.bin": "6c86bdf11a7aa492a496ef699b89650653f6ef531fcf01d0d4c59892593a051a"
+  },
+  "environment": {
+    "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+    "CAMODEL_HOME": "",
+    "CAMODEL_PATH": "",
+    "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib"
+  }
+}

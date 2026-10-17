@@ -1,0 +1,24 @@
+{
+  "kind": "posthoc_strict_int32_comparison_of_existing_camodel_outputs",
+  "shape": [
+    16,
+    16,
+    32
+  ],
+  "new_device_run": false,
+  "int8_mismatches": 0,
+  "scale_max_abs_diff": 0.0,
+  "scale_exact_equal": true,
+  "source_sha256": "a3dc9c94b2570cfad682a7ae1b2bca6ecb784ceb7c22d1613e976c497ccaae29",
+  "binary_sha256": "cd4cdab64858de533a19779ba8f4c4bffa4348b3528f51ff5bb03c5500d187bc",
+  "fingerprints": {
+    "input/x1.bin": "bdf37c93713a7c946f28b43bab28d16d3a97dc0aba9ed02d037790845c844378",
+    "input/x2.bin": "b9726c7e6e8aa90a698775fc2afd84d9bbf9674728017eaf2c62c113ab7fb76b",
+    "input/x1Scale.bin": "8ed8762822153ed28cef292f82236c500951b815dca18fba630d6e7b5e086f79",
+    "input/x2Scale.bin": "e33526df240851b1770edf1f074e21b700922d8b3b758751bcac741fd808e9ce",
+    "output/y.bin": "2286fd8ea1e3f526918ea8734e8343439d04b3fde5d65e40010148a359dad3d4",
+    "output/yScale.bin": "bf7718cc73bf2d0bf503191b3ef4e582e0e5b22b27a962fc3ad96a464301ee7d"
+  },
+  "reference_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "limitation": "Existing single-case output only; not full device regression or 2D-tail/chunk validation."
+}

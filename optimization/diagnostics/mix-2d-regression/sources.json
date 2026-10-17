@@ -1,0 +1,14 @@
+{
+  "baseline": {
+    "kernel.asc": "5cc48d36e97c00f0a3e84bfba645470fc9ec770ed8bd8603b00baf7f43d9b102",
+    "bench.asc": "9d1b89c8310f8783176c7dd07e2093b6f5f9398563996b8bc4d1fb7c35b29e5f"
+  },
+  "current": {
+    "kernel.asc": "fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62",
+    "bench.asc": "9d1b89c8310f8783176c7dd07e2093b6f5f9398563996b8bc4d1fb7c35b29e5f"
+  },
+  "tile16": {
+    "kernel.asc": "cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae",
+    "bench.asc": "9d1b89c8310f8783176c7dd07e2093b6f5f9398563996b8bc4d1fb7c35b29e5f"
+  }
+}

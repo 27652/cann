@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(mix_regression LANGUAGES ASC CXX)
+foreach(variant baseline current tile16)
+  add_executable(bench_${variant} snapshots/${variant}/bench.asc)
+  target_compile_options(bench_${variant} PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+  target_link_libraries(bench_${variant} PRIVATE tiling_api register platform unified_dlog dl m graph_base)
+endforeach()

@@ -1,0 +1,40 @@
+{
+  "shape": [
+    65,
+    257,
+    33
+  ],
+  "int8_mismatches": 0,
+  "scale_ok": true,
+  "scale_max_abs_diff": 0.0,
+  "scale_max_rel_diff": 0.0,
+  "scale_rtol": 0.0001,
+  "scale_atol": 0.0001,
+  "status": "finished",
+  "fingerprint": {
+    "shape": [
+      65,
+      257,
+      33
+    ],
+    "seed": 20261017,
+    "source_sha256": "0ce41f1d47b2844b5d69108c5f3745a1087c844ff8af3c264b008276cb20efa1",
+    "binary_sha256": "2f89f190181b15886ae5bdf6b7b04fb6c41e0c3f3c15beca1ca64e4de926e074",
+    "runner_sha256": "c1341c7c629836848f09f0aa44fa6388cf6ff5b2d834000fa95fc5ab0236afea",
+    "golden_script_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+    "files": {
+      "input/x2Scale.bin": "d2cb782c81ede07adb608be445fee3e24a608981655f7dd57b041637517c0c0b",
+      "input/x2.bin": "d0a4d996c7ea25cde0a79dc1cdc15d91c25e065ad8c1beac951738db382697f4",
+      "input/x1.bin": "f6ae4b89dbd472912b6a598a874e2baaee2b08d9103976cbc09d7c0983b4a479",
+      "input/x1Scale.bin": "4cec61bd825f27ce64e9d94cbee41f68d7904f1fa0b52457b20ae04f765c4010",
+      "output/golden_y.bin": "ccfecca4d47a1ee585a8c99825a4b5cfb24fe0067a801ff75a5dfbe38c39c2f9",
+      "output/golden_yScale.bin": "2125bf85b8c5b54bf258a8017fff0d9665f50f66f1876f45b99d825c6e945715"
+    },
+    "environment": {
+      "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+      "CAMODEL_HOME": "",
+      "CAMODEL_PATH": "",
+      "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib"
+    }
+  }
+}

@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "scope": "local generated artifacts excluded from Git",
+  "files": [
+    {
+      "path": "optimization/candidates/architecture-trials-v1/local-k-safe/formal-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/local-k-safe/formal-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/local-k-safe/formal-build/quant_matmul_relu_quant_custom",
+      "bytes": 854464,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/scale-owner/formal-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/scale-owner/formal-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/scale-owner/formal-build/quant_matmul_relu_quant_custom",
+      "bytes": 879336,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/tile-fifo/formal-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/tile-fifo/formal-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/architecture-trials-v1/tile-fifo/formal-build/quant_matmul_relu_quant_custom",
+      "bytes": 923792,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-k-plane-a/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-k-plane-a/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-k-plane-a/bench-build/bench_mix_2d",
+      "bytes": 858416,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-wide-row-b/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-wide-row-b/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/conditional-wide-row-b/bench-build/bench_mix_2d",
+      "bytes": 875608,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4-stride16/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4-stride16/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4-stride16/bench-build/bench_l1",
+      "bytes": 911744,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/a-l1-group4/bench-build/bench_l1",
+      "bytes": 911744,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/baseline/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/baseline/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/dual-aiv-l1-v4/baseline/bench-build/bench_l1",
+      "bytes": 850232,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/fp32-activation-cache/formal-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/fp32-activation-cache/formal-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/fp32-activation-cache/formal-build/quant_matmul_relu_quant_custom",
+      "bytes": 861088,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/bench-build/bench_mix_2d",
+      "bytes": 890504,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/build-e/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/build-e/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/k-plane-parallel-int8/build-e/quant_matmul_relu_quant_custom",
+      "bytes": 862720,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-single-launch/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-single-launch/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-single-launch/bench-build/bench_mix_2d",
+      "bytes": 850280,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/bench-build/bench_mix_2d",
+      "bytes": 883384,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/build-release/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/build-release/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/mix-2d-tile16-persistent/build-release/quant_matmul_relu_quant_custom",
+      "bytes": 854432,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/bench-build/bench_mix_2d",
+      "bytes": 907056,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/build-d/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/build-d/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/n-shard-single-launch/build-d/quant_matmul_relu_quant_custom",
+      "bytes": 878296,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/dual-aiv-fixed/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/dual-aiv-fixed/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/dual-aiv-fixed/bench-build/bench_probe",
+      "bytes": 851336,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/l0c-chunk64-probe/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/l0c-chunk64-probe/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/ownership-l0c-v3/l0c-chunk64-probe/bench-build/bench_probe",
+      "bytes": 867832,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build-v2/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build-v2/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build-v2/bench_mix_2d",
+      "bytes": 919656,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/bench-build/bench_mix_2d",
+      "bytes": 919656,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/build-release/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/build-release/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/row-ring-pipeline/build-release/quant_matmul_relu_quant_custom",
+      "bytes": 923792,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/dual-aiv/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/dual-aiv/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/dual-aiv/bench-build/bench_structural",
+      "bytes": 850328,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/bench-build/bench_structural",
+      "bytes": 850136,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/formal-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/formal-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-breakthrough-v2/ub-resident-8192/formal-build/quant_matmul_relu_quant_custom",
+      "bytes": 854320,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/dual-aiv-corrected/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/dual-aiv-corrected/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/dual-aiv-corrected/bench-build/bench_structural",
+      "bytes": 850312,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/fifo-ub8192/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/fifo-ub8192/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/structural-v3/fifo-ub8192/bench-build/bench_structural",
+      "bytes": 919320,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/ancillary-only/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/ancillary-only/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/ancillary-only/bench-build/bench_ablation",
+      "bytes": 851736,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/baseline/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/baseline/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/baseline/bench-build/bench_ablation",
+      "bytes": 850280,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/vector-only/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/vector-only/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-ablation/vector-only/bench-build/bench_ablation",
+      "bytes": 873304,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/bench-build/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/bench-build/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/bench-build/bench_mix_2d",
+      "bytes": 873384,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/build-d/autogen/custom_compile_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/build-d/autogen/custom_opc_options.ini",
+      "bytes": 0,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    },
+    {
+      "path": "optimization/candidates/wide-row-tile-cv/build-d/quant_matmul_relu_quant_custom",
+      "bytes": 878296,
+      "reason": "generated build/cache/runtime artifact; retained locally, not versioned"
+    }
+  ]
+}

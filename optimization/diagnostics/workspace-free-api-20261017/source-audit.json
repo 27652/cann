@@ -1,0 +1,175 @@
+{
+  "kind": "source_api_audit_not_device_or_stage_measurement",
+  "target": "dav-2201",
+  "features": {
+    "supportUnitFlag": "true",
+    "ifNeedUB": "false",
+    "ifSupportUBToL1": "false",
+    "supportMNL0DB": "true",
+    "fixpipeParamsType": "FixpipeParamsType::V220",
+    "ifSupportLoad3dV2": "true",
+    "ifSupportLoad2dTranspose": "true",
+    "ifSupportLoad2dV2": "false",
+    "ifSupportCmatrixInitVal": "false",
+    "ifSupportFmatrixB": "true",
+    "ifSupportUserDefine": "true",
+    "ifSupportUBToL1Singleshape": "false",
+    "ifMmadInstrSupportAntiQuant": "false",
+    "ifSupportL0CToUB": "false",
+    "ifSupportTrianMatmul": "true",
+    "ifSupportDisableGemvMode": "false"
+  },
+  "get_tensor_c_local_transport": "internal GM staging then GM-to-UB copy",
+  "direct_l0c_to_ub_supported_by_installed_matmul": false,
+  "baseline_submission_id": "6ad33b78193e507d8ea310c4",
+  "baseline_official_score": "19.45",
+  "baseline_kernel_sha256": "bae4d14b3b7eaa918034a8f0bde94bfa49ce38dc2c992d9e7d7326c50ac9fc95",
+  "baseline_times": [
+    {
+      "point": 1,
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "time_us": 18.41,
+      "best_time_us": 2.06,
+      "time_over_best": 8.936893203883495
+    },
+    {
+      "point": 2,
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "time_us": 9.36,
+      "best_time_us": 1.67,
+      "time_over_best": 5.604790419161676
+    },
+    {
+      "point": 3,
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "time_us": 12.36,
+      "best_time_us": 2.11,
+      "time_over_best": 5.85781990521327
+    },
+    {
+      "point": 4,
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "time_us": 20.75,
+      "best_time_us": 7.55,
+      "time_over_best": 2.748344370860927
+    },
+    {
+      "point": 5,
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "time_us": 17.66,
+      "best_time_us": 8.28,
+      "time_over_best": 2.132850241545894
+    },
+    {
+      "point": 6,
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "time_us": 38.9,
+      "best_time_us": 12.02,
+      "time_over_best": 3.2362728785357735
+    },
+    {
+      "point": 7,
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "time_us": 61.65,
+      "best_time_us": 14.68,
+      "time_over_best": 4.199591280653951
+    },
+    {
+      "point": 8,
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "time_us": 136.64,
+      "best_time_us": 15.8,
+      "time_over_best": 8.648101265822783
+    },
+    {
+      "point": 9,
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "time_us": 103.41,
+      "best_time_us": 19.27,
+      "time_over_best": 5.366372599896212
+    },
+    {
+      "point": 10,
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "time_us": 266.85,
+      "best_time_us": 35.63,
+      "time_over_best": 7.489475161380859
+    },
+    {
+      "point": 11,
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "time_us": 327.58,
+      "best_time_us": 52.73,
+      "time_over_best": 6.212402806751375
+    },
+    {
+      "point": 12,
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "time_us": 661.18,
+      "best_time_us": 64.52,
+      "time_over_best": 10.24767513949163
+    },
+    {
+      "point": 13,
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "time_us": 873.24,
+      "best_time_us": 76.73,
+      "time_over_best": 11.380685520656849
+    },
+    {
+      "point": 14,
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "time_us": 1931.74,
+      "best_time_us": 173.37,
+      "time_over_best": 11.142296821826152
+    },
+    {
+      "point": 15,
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "time_us": 4600.98,
+      "best_time_us": 340.89,
+      "time_over_best": 13.496963829974478
+    }
+  ],
+  "min_time_over_best": 2.132850241545894,
+  "max_time_over_best": 13.496963829974478,
+  "historical_comparison_submission_id": "6ad2cb6b193e507d8e02c24b",
+  "inputs": {
+    "utils": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/impl/adv_api/detail/matmul/utils/matmul_utils.h",
+      "sha256": "b63d73bd7cf79752793e8bdca0d1f4858ca02e63640c1cd32c929ac3cd1e2042"
+    },
+    "chip": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/impl/adv_api/detail/matmul/feature_trait/matmul_chip_cap.h",
+      "sha256": "ca4c327a2fb0dcb1723a1b3431f5e50140d45a2fad6b665ff01555d51e4d4437"
+    },
+    "trait": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h",
+      "sha256": "c2a5f85fd06ec00a556c3b23b77a3609547e18799fd9ac80bb120c0206501bc0"
+    },
+    "client": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/include/adv_api/matmul/matmul_client.h",
+      "sha256": "e7b2bddcee068d7d1a624bcf2618a38857f39957ae42ccdc3e3ef614926387da"
+    },
+    "server": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/impl/adv_api/detail/matmul/kfc/matmul_server_impl_c220.h",
+      "sha256": "095e545c61778082077b51986bf9ddae2347b38a8c5e9e78eef7789594c05976"
+    },
+    "fixpipe": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/x86_64-linux/asc/impl/basic_api/dav_c220/kernel_operator_fixpipe_impl.h",
+      "sha256": "08a35fb878ec4d979d285a0bfc500659621842c6bba3f18e48b256dfa0d85284"
+    },
+    "kernel": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/kernel.asc",
+      "sha256": "bae4d14b3b7eaa918034a8f0bde94bfa49ce38dc2c992d9e7d7326c50ac9fc95"
+    },
+    "evidence": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/evidence/formal/dual-aiv-fixed-6ad33b78/evidence.json",
+      "sha256": "0b6a0fca927418df92f60889033d9090dac41d78081a768d56f7b77468357197"
+    },
+    "historical_comparison": {
+      "path": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/optimization/TBEST_ANALYSIS_20261017.md",
+      "sha256": "a3a35a2e83ccaecffa847859208c80e68d9a84dbf7a199f62a7da5dfd7fde646"
+    }
+  }
+}

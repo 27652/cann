@@ -1,0 +1,44 @@
+[network.stream2.task0.subtask0.thread0.block0]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 0
+	core_id = 0
+	start_cycle = 241
+	early_end_cycle = 0
+	end_cycle = 39651
+	duration = 39410
+[network.stream2.task0.subtask0.thread0.block1]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 1
+	core_id = 1
+	start_cycle = 242
+	early_end_cycle = 0
+	end_cycle = 40634
+	duration = 40392
+[network.stream2.task0.subtask0.thread0.block2]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 2
+	core_id = 2
+	start_cycle = 243
+	early_end_cycle = 0
+	end_cycle = 42685
+	duration = 42442
+[network.stream2.task0.subtask0.thread0.block3]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 3
+	core_id = 3
+	start_cycle = 244
+	early_end_cycle = 0
+	end_cycle = 41483
+	duration = 41239

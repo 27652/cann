@@ -1,0 +1,9 @@
+[network.stream2]
+	stream_id = 2
+	num_tasks = 1
+	task_id_list = [0]
+	start_cycle = 1335
+	end_cycle = 267843
+	duration = 266508
+	wait_cycle = 0
+

@@ -1,0 +1,29 @@
+{
+  "shape": [
+    16,
+    1024,
+    256
+  ],
+  "seed": 20261017,
+  "variant": "tile16",
+  "source_sha256": "cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae",
+  "bench_sha256": "9d1b89c8310f8783176c7dd07e2093b6f5f9398563996b8bc4d1fb7c35b29e5f",
+  "binary_sha256": "d3ca8aacf440440f03d2f586c2418587bc0cdf61afdf80db5d7a5522a95d4358",
+  "runner_sha256": "4e38d2b214a475cf9d7fae780222c3164df4d3b169f364d4264f5314ea37e2ab",
+  "golden_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "cmake_sha256": "4b4f226a2149d596ce43149f8bf7758383da40f24ee56fb826026f7bf9c2cf4a",
+  "environment": {
+    "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+    "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib",
+    "CAMODEL_HOME": "",
+    "CAMODEL_PATH": ""
+  },
+  "files": {
+    "input/x2Scale.bin": "89350a550259a8fb7cd5551e814aed8f59876c1041463eb73dc03442df2d00ac",
+    "input/x2.bin": "257a124f6bac0197e417bca12f9f58c282c7c09250d78cc7fa1845e259856990",
+    "input/x1.bin": "e2864166816be17566e2aaed2d1f16797268967f1b94fadc0c8e76457ebbc9b1",
+    "input/x1Scale.bin": "7a5c8d2dc53930cf390740d4e95e4b486576e6ee9578c417ee616fa8736822c8",
+    "output/golden_y.bin": "4d5d58f0e2c607b71fe8a70e0192d8709a74ef1de9a49c14f5775c6f9a005d84",
+    "output/golden_yScale.bin": "26eeaccd9fb43ac6d7c3d9586d97737a51661a44eafc457b22a288e741aced41"
+  }
+}

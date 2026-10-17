@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(dual_aiv_l1 LANGUAGES ASC CXX)
+add_executable(bench_l1 "${CMAKE_CURRENT_SOURCE_DIR}/../../../bench.asc")
+target_compile_definitions(bench_l1 PRIVATE BENCH_KERNEL="${CMAKE_CURRENT_SOURCE_DIR}/submit-project/kernel.asc")
+target_compile_options(bench_l1 PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+target_link_libraries(bench_l1 PRIVATE tiling_api register platform unified_dlog dl m graph_base)

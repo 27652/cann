@@ -1,0 +1,198 @@
+{
+  "submission_id": "6ad334f3193e507d8e96fa05",
+  "status": "Pass",
+  "valid": true,
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "time": 29.76,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 2.06
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "time": 9.33,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 1.67
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "time": 19.1,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 2.11
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "time": 26.6,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 7.55
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "time": 19.52,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 8.28
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "time": 61.17,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 12.02
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "time": 92.15,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 14.68
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "time": 235.14,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 15.8
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "time": 170.28,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 19.27
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "time": 441.37,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 35.63
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "time": 481.29,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 52.73
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "time": 1114.97,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 64.52
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "time": 1435.03,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 76.73
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "time": 3305.01,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 173.37
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "time": 7367.47,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": 340.89
+    }
+  ],
+  "manifest": {
+    "schema_version": 1,
+    "contest": "op_challenge_hangxia_prelim",
+    "problem": "quantmatmulreluquant",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "template_files": [
+      {
+        "path": "CMakeLists.txt",
+        "editable": false
+      },
+      {
+        "path": "data_utils.h",
+        "editable": false
+      },
+      {
+        "path": "kernel.asc",
+        "editable": true
+      },
+      {
+        "path": "main.asc",
+        "editable": false
+      },
+      {
+        "path": "run.sh",
+        "editable": false
+      },
+      {
+        "path": "scripts/gen_data.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/QuantMatmulReluQuant.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/verify_result.py",
+        "editable": false
+      }
+    ],
+    "files": {
+      "kernel.asc": {
+        "sha256": "59afc75beb0afbf440615ec547447e75bff82673edaea00d586b7e99b8600679",
+        "bytes": 67774
+      }
+    }
+  },
+  "ranking": [
+    {
+      "rank": 213,
+      "score": 16.58,
+      "submission_id": "6ad334f3193e507d8e96fa05",
+      "status": "Pass",
+      "matches_requested_submission": true
+    }
+  ],
+  "raw_result_path": "/tmp/opencode/a-panel-grouped-v1-result.json"
+}

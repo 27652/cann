@@ -1,5 +1,11 @@
 # Dual-AIV v4: explicit A/L1 reuse
 
+Final archival note (2026-10-17): the same-ID CLI ranking later confirmed
+score **19.48**, rank **195**, for `6ad345e2193e507d8ebb20ec`; stride16 was
+promoted in commit `b60f59c`. See `evidence/formal/dual-aiv-l1-6ad345e2/`
+(repository-relative) and `optimization/RESEARCH_HANDOFF_20261017.md`.
+Statements below are chronological observations, not the final pending status.
+
 Parent: official dual-AIV `6ad33b78193e507d8ea310c4`, 15/15, score 19.45,
 kernel SHA256 bae4d14b3b7eaa918034a8f0bde94bfa49ce38dc2c992d9e7d7326c50ac9fc95.
 Root and other workflows are not edited. Frozen parent remains recoverable.

@@ -1,0 +1,66 @@
+[network.stream2.task0.subtask0.thread0.block0]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 0
+	core_id = 0
+	start_cycle = 1511
+	early_end_cycle = 0
+	end_cycle = 10313
+	duration = 8802
+[network.stream2.task0.subtask0.thread0.block1]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 1
+	core_id = 1
+	start_cycle = 1512
+	early_end_cycle = 0
+	end_cycle = 10315
+	duration = 8803
+[network.stream2.task0.subtask0.thread0.block2]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 2
+	core_id = 2
+	start_cycle = 1513
+	early_end_cycle = 0
+	end_cycle = 10318
+	duration = 8805
+[network.stream2.task0.subtask0.thread0.block3]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 3
+	core_id = 3
+	start_cycle = 1514
+	early_end_cycle = 0
+	end_cycle = 10316
+	duration = 8802
+[network.stream2.task0.subtask0.thread0.block4]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 4
+	core_id = 4
+	start_cycle = 1515
+	early_end_cycle = 0
+	end_cycle = 10321
+	duration = 8806
+[network.stream2.task0.subtask0.thread0.block5]
+	stream_id = 2
+	task_id = 0
+	subtask_id = 0
+	thread_id = 0
+	block_id = 5
+	core_id = 5
+	start_cycle = 1516
+	early_end_cycle = 0
+	end_cycle = 10318
+	duration = 8802

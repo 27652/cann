@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(workspace_free_capability LANGUAGES ASC CXX)
+add_library(capability OBJECT capability.asc)
+target_compile_options(capability PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)

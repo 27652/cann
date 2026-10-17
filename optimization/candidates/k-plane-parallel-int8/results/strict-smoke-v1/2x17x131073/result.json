@@ -1,0 +1,40 @@
+{
+  "shape": [
+    2,
+    17,
+    131073
+  ],
+  "int8_mismatches": 0,
+  "scale_ok": true,
+  "scale_max_abs_diff": 0.0,
+  "scale_max_rel_diff": 0.0,
+  "scale_rtol": 0.0001,
+  "scale_atol": 0.0001,
+  "status": "finished",
+  "fingerprint": {
+    "shape": [
+      2,
+      17,
+      131073
+    ],
+    "seed": 20261017,
+    "source_sha256": "c5bbefeb9ceaf0b0019b5ea021f83b31a91e4682b019e0c605e5ceccb62dc7d6",
+    "binary_sha256": "8706d2779454089f83f5dedc67a38c1f3dc2b811062eac390a99d554455cfd62",
+    "runner_sha256": "c696ac705dd627b87942a948a2273c7fd18aca1c3cd75b250cdafc3042939bbd",
+    "golden_script_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+    "files": {
+      "input/x2Scale.bin": "584edc471b41430227c4c283975865fbf4b9295960a3fc60def5824f4eead866",
+      "input/x2.bin": "194f4ab93cbd1bd74ef23905b708402384ff2703315aeebf9739fe455df19cfb",
+      "input/x1.bin": "d4bd587e9e2cabc5153eebd8af91fa751bfbb8fc11953c119ad7af8fd6cfb6cc",
+      "input/x1Scale.bin": "93bd5297f5d7c3da25b5a9cb70f846c418713eb7a1cbd9cdb52f6ea7b112cc29",
+      "output/golden_y.bin": "a03659078db7a17fdcbcdd4d07286b1962b108c0b11044f2265936587d6b2525",
+      "output/golden_yScale.bin": "b9bd4711378929160c84eaa5478bcdf6fcfa5897f0762ee72f021b93106baf5e"
+    },
+    "environment": {
+      "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+      "CAMODEL_HOME": "",
+      "CAMODEL_PATH": "",
+      "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib"
+    }
+  }
+}
