@@ -1,0 +1,35 @@
+{
+  "shape": [
+    17,
+    513,
+    65
+  ],
+  "seed": 20261017,
+  "project_hashes": {
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "kernel.asc": "431750131478b8b569b24d0f86e7fc224187d0ec87d81cf0eb4eac60f3fc249a",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6"
+  },
+  "binary_sha256": "abe8f64141132e2c51c353d9ddc785bd05281aef73533ddd4949794f33ac53ba",
+  "runner_sha256": "cf634faa8379b018bfb8ca32802de565235b5d5f28bc54de766d1f4989ce7d61",
+  "golden_sha256": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "input_hashes": {
+    "x2Scale.bin": "1bcf0d1767d11cc0f2be532d67c3b52a36e01e5100aa8b0ed9c2ca0fc65641bf",
+    "x2.bin": "643bfd67b8235596d28c0837402b5c269bfe22d969ef9b083efe106876381b14",
+    "x1.bin": "17a8cfbff5170579588ea20337f78f828f6b4857d9acee77dabac2eb4cbdca26",
+    "x1Scale.bin": "0a5001b4ca9aba62cefc6bbad92f27d89f06947d323cc62bdda0ea4796028337"
+  },
+  "cmake_sha256": "74d03c7c457949d301dc3b47735a6d1b5fa7f192aa31b60c246e44a40ee2972a",
+  "cmake_cache_sha256": "adbb6a5752835f01083b570a072f5a3898ce4768c2359c9e106cc6a225d8e462",
+  "environment": {
+    "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+    "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib",
+    "PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/bin:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/ccec_compiler/bin:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/profiler/bin:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/ascend_system_advisor/asys:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/show_kernel_debug_data:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/msobjdump:/usr/local/cuda-12.8/bin:/usr/local/anaconda3/bin:/mnt/data_server/llm_course/zzfs_202615/.local/bin:/usr/local/cuda-12.8/bin:/usr/local/anaconda3/bin:/mnt/data_server/llm_course/zzfs_202615/miniconda3/lib/dotnet:/mnt/data_server/llm_course/zzfs_202615/miniconda3/lib/dotnet/tools:/mnt/data_server/llm_course/zzfs_202615/miniconda3/bin:/mnt/data_server/llm_course/zzfs_202615/miniconda3/condabin:/usr/local/cuda-12.8/bin:/usr/local/anaconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+    "ASCEND_SOC_VERSION": "Ascend910B1"
+  }
+}
