@@ -4,7 +4,12 @@
 
 - all-K INT8 新隔离实验入口：`optimization/candidates/int8-all-k-safe/`、`int8-all-k-128k/`、`int8-k-split-no-atomic/`，各自 `RESEARCH.md` 记录源码/构建身份与已运行的弱覆盖 boundary smoke。未正式提交、未晋升；仍需正输出/溢出有效设备测试，详见 report 对应条目。
 
-## 通用 Fast Track 状态（2026-10-17）
+## 最新正式状态（2026-10-17，Aggressive Coordinator）
+
+- 当前根及最高有效：`6ad2dbba193e507d8e11549f`，正式 15/15，score **14.66**；kernel SHA256 `b9a856aec216e11e8014a8808cc8f12be086a3dbf60831a3372c0d769a54a8a7`。完整恢复和 validate/decide 入口：`evidence/formal/fast-track-6ad2dbba/`；前根完整恢复：`evidence/formal/fast-track-6ad2d3be/source/`。
+- 同轮独立正式结果 tile **14.55**、workspace **14.52**，完整 bundle `fast-track-6ad2da51/`、`fast-track-6ad2db06/`；未合并。候选入口 `optimization/candidates/aggressive-*/`，协议/队列说明 `optimization/AGGRESSIVE_COORDINATOR_20261017.md`。本轮未完成本地设备验证，风险及下一步见 report 最新条目。以下各“当前/最新”为历史时点。
+
+## 通用 Fast Track 状态（2026-10-17，历史）
 
 - 最新有效最佳：`6ad2d3be193e507d8e0a014d`，15/15，score **14.37**；根 kernel SHA256 `782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56`。实际 editable 文件为 kernel.asc；八文件服务端工程上下文与脱敏结果见 `evidence/formal/fast-track-6ad2d3be/`。前一最佳 14.34 完整恢复入口为 `evidence/formal/fast-track-6ad2d309/`。候选主机验证通过，未完成本地设备验证；逐点 TBest 对照为 `optimization/candidates/unit-token-scale-v2/COMPARISON.md`，后文各阶段“当前”属于历史状态。
 

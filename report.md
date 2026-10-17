@@ -2,6 +2,15 @@
 
 更新时间：2026-10-17
 
+## Aggressive Coordinator 正式结果与晋升（2026-10-17）
+
+- 用户授权并行结构优化并直接 Fast Track。五路隔离研究已交付；本轮提交三项，均通过真实服务端正式 15/15，且排行榜 score 精确绑定 submission ID：tile row-job `6ad2da51193e507d8e1001ee` / **14.55**；single-element workspace bypass `6ad2db06193e507d8e10a3ef` / **14.52**；all-K INT8 `6ad2dbba193e507d8e11549f` / **14.66**。三个候选分别独立提交，未合并全部优化。
+- **晋升最高有效 14.66**：根 kernel SHA256 `b9a856aec216e11e8014a8808cc8f12be086a3dbf60831a3372c0d769a54a8a7`；恢复证据 `evidence/formal/fast-track-6ad2dbba/`。`formal_evidence.py recover/validate/decide` 通过，14.66 严格超过本轮可核验 14.55 和此前 14.37。前两结果完整恢复入口为 `fast-track-6ad2da51/`、`fast-track-6ad2db06/`。14.55 仅保留，不曾替换根；14.52 未晋升。
+- all-K 以 14.37 为基线，仅将 FP32 threshold 改为 `0xffffffffU`，保留 <=65536 的 INT32 Cube chunk/atomic 累加和死 FP32 源码；threshold 派生的分区逻辑也随之改变，不能把收益纯归因为输入转换。源码/构建/host 检查见 `optimization/candidates/aggressive-int8-all-k/`。旧根与前最高完整工程仍在 `fast-track-6ad2d3be/source/`，另存根快照 `optimization/snapshots/pre-aggressive-int8-all-k-20261017/`。
+- 本轮 CANN 9.1.0/dav-2201 编译成功；Fast Track 协议 14 项回归通过；tile/workspace 主机检查 91/112 项通过。**未完成本地设备验证**、未跑本轮 CAModel 或严格 INT32 设备全套。all-K stride/tail/atomic modulo、量化 FTZ/mask/UB 与一般边界风险尚存；15/15 不等于证明所有合法输入正确。tile 是同步 row-job 消费，不是异步 streaming；workspace 仅限 M=N=K=1，未知正式 shape 是否命中，分数差不能直接证明专项收益。
+- N-split 仍为未接入运行时的二维 ownership prototype；vector A 有已知数值反例，仅消融不可提交，B 仍为未验证稀疏索引 prototype。二者本轮未提交。后续优先补 all-K 正输出、多行多通道、overflow/chunk/device 严格验证，再研究候选组合与真正两阶段 N-split。
+- 单 Coordinator 专用队列及受保护原始回包：`/tmp/opencode/aggressive-coordinator-20261017/`。动态 editable 实际只有 kernel.asc；原始 result 返回完整八文件，恢复时逐字节匹配冻结工程 hash。`aggressive-20261017/` 只是另一 schema 的上传摘要，不能直接交给旧 validator；完整正式 bundle 如上。根替换前确认仍为 14.37、无根 diff；未覆盖并发研究。晋升变更独立提交，不夹带其他工作。
+
 ## 大 K 同身份消融完成（2026-10-17，弱数值覆盖）
 
 - `optimization/upper_bound/results/common-1x2x65536-v2/`：同输入/环境/二进制 fingerprint 完全一致，baseline/all-K INT8/no-exact cycles 为 `181708/64830/181708`；all-K 降低 `64.322%`（2.803x），workspace 从 `17563656` 降为 `16777224` 字节。仅为 A/D 联合路径诊断，未拆分转换、Cube 或 GM 阶段计时。
