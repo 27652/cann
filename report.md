@@ -2,6 +2,30 @@
 
 更新时间：2026-10-17
 
+## 独立架构正式反馈与晋升（2026-10-17 08:46 UTC）
+
+- `optimization/candidates/architecture-trials-v1/` 分别完成三条独立路线编译和
+  主机模型检查，未组合提交：内部 K-loop `local-k-safe`、单 owner scale 广播
+  `scale-owner`、有界双槽配对 `tile-fifo`。原外部 chunk 的 Iterate partial-sum
+  `local-k` 探针因 SetTensor reset/L0C 生命周期未知，不提交。
+- `local-k-safe`：`6ad3338a193e507d8e9444c6`，15/15、score **16.69**；
+  `scale-owner`：`6ad3343f193e507d8e95990c`，15/15、score **16.60**；
+  `tile-fifo`：`6ad335a8193e507d8e985b8b`，15/15、score **16.89**。全部
+  precision_ratio=1，同 ID score；对应正式证据均在 `evidence/formal/`，validate 通过。
+- FIFO 严格超过已核实 16.66，payload 可恢复、八文件服务端源码 hash 一致、decide
+  eligible=true，已晋升根 `kernel.asc`，SHA256
+  `427a35b31dbc75c3afbb8b1681c68f6c852b8f3b5620ca889c62c56f6083bef4`。
+  旧根完整保存在 `evidence/formal/tile16-persistent-6ad31941/source/kernel.asc` 及
+  `optimization/candidates/architecture-trials-v1/snapshots/kernel-before-fifo.asc`，
+  hash cdde82ec…4501ae（备份移出冻结 bundle 后旧证据 validate 再次通过）。
+- FIFO 是静态 row-job ownership + 动态 ready/free 背压，不是全局动态抢任务队列。
+  对比旧基线点 1/3 -28.15%/-16.83%，点 8 -5.34%、点 12 -10.90%，点 9 +11.87%；
+  shape 映射未知，不宣称这些时间差均由启用 FIFO 导致，重复性尚未建立。
+- 未完成这些修订的本地设备验证；保留跨核 event、ring slot、tail、K chunk、
+  DMA 可见性和 workspace 风险。大 K 保守版本只在 K<131072 范围合并内部 K-loop，
+  更大 K 沿用基线，尚未实现任意大 K 外部 chunk 的 L0C 保留。
+
+
 ## tileM=16 persistent MIX 正式晋升（2026-10-17，06:44 UTC）
 
 - 隔离候选 `optimization/candidates/mix-2d-tile16-persistent/` 仅将正式 16.07

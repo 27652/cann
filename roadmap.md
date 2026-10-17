@@ -2,6 +2,16 @@
 
 更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
+- **最新最高有效：16.89，已晋升根实现**。FIFO 提交
+  `6ad335a8193e507d8e985b8b`，15/15；根 SHA256
+  `427a35b31dbc75c3afbb8b1681c68f6c852b8f3b5620ca889c62c56f6083bef4`。
+  证据 `evidence/formal/tile-fifo-6ad335a8/`；旧根恢复入口
+  `optimization/candidates/architecture-trials-v1/snapshots/kernel-before-fifo.asc`，
+  正式旧 bundle source 仍在 `evidence/formal/tile16-persistent-6ad31941/source/kernel.asc`。
+  独立 local-k-safe 16.69、scale-owner 16.60 未晋升；详见
+  `optimization/candidates/architecture-trials-v1/RESEARCH.md`。下列旧最高状态属于历史记录。
+
+
 
 ## 最新正式状态（2026-10-17，tileM=16 persistent MIX）
 
