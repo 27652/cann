@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "scope": "host source/layout only",
+  "configurations": 80,
+  "device_validation": "not run",
+  "numerical_validation": "not run"
+}

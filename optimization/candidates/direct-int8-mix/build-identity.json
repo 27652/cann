@@ -1,0 +1,8 @@
+{
+  "binary": "/tmp/opencode/direct-int8-mix-build/quant_matmul_relu_quant_custom",
+  "sha256": "54e1cdcbdd2469717fe11d51c140411cc44f798b482349f8f67dd7d3d7a3ac99",
+  "CANN": "9.1.0",
+  "architecture": "dav-2201",
+  "build_type": "Release",
+  "device_validation": "not run"
+}
