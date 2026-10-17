@@ -2,7 +2,12 @@
 
 更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
-## 最新正式状态（2026-10-17，02:43 UTC，直接 CLI）
+## 最新正式状态（2026-10-17，03:38 UTC，单次 launch 二维 MIX）
+
+- 当前根及最高有效：`6ad2ed99193e507d8e278978`，Pass 15/15，score **16.07**；kernel SHA256 `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。完整恢复与 validate/decide 证据：`evidence/formal/mix-2d-single-launch-6ad2ed99/`；前一 14.94 版本：`evidence/formal/fast-track-6ad2e531/`，晋升前完整根快照：`optimization/snapshots/pre-mix-2d-single-launch-14.94/`。
+- 候选入口 `optimization/candidates/mix-2d-single-launch/`：一个 MIX 1:1 kernel，二维 AIC task grid、`SyncAll<false>()` 全核同步和完整行 AIV 量化；主工程/benchmark 编译成功，360 ownership + 8 K-chunk 主机检查和三个严格 INT32 CAModel smoke 通过。残余边界风险与单次测量限制见其 `RESEARCH.md` 及 report 晋升条目。后文“当前/最新”均为历史时点。
+
+## 历史正式状态（2026-10-17，02:43 UTC，直接 CLI）
 
 - 当前根及最高有效：`6ad2e0a8193e507d8e164f44`，Pass 15/15，score **14.71**；kernel SHA256 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`。证据与完整恢复：`evidence/formal/fast-track-6ad2e0a8/`；旧最佳 `fast-track-6ad2dbba/`，旧根快照 `optimization/snapshots/pre-aggressive-combined-14.66/`。
 - 组合候选 `optimization/candidates/aggressive-combined/`：全 K INT8 + 同步 row-job + 单元素免 workspace；已有编译/主机检查，本地设备验证未完成，风险见 report 最新条目。以下“当前/最新”均为历史时点。

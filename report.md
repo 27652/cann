@@ -2,6 +2,33 @@
 
 更新时间：2026-10-17
 
+## 单次 launch 二维 MIX 正式晋升（2026-10-17，03:38 UTC）
+
+- 修复“两次 launch 被拒绝”后，正式提交 `6ad2ed99193e507d8e278978`：服务端
+  `valid=true`、`Pass`、15/15、全部 `precision_ratio=1`；同一 submission ID 的
+  排行榜 score **16.07**、rank 213。相对此前最高有效 14.94 严格提高 **1.13**。
+- 完整可恢复工程及脱敏正式证据：`evidence/formal/mix-2d-single-launch-6ad2ed99/`。
+  实际 editable payload 只有 `kernel.asc`，服务端返回的完整八文件上下文逐文件匹配
+  候选；真实回包 `/tmp/opencode/mix-2d-single-launch-result.json`、榜单
+  `/tmp/opencode/mix-2d-single-launch-ranking.json`。`formal_evidence.py recover`、
+  `validate`、相对 `fast-track-6ad2e531` 的 `decide` 全部通过。
+- 已晋升根 kernel，SHA256 `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。
+  晋升前逐文件确认根工程仍与 14.94 正式源码一致，完整旧根快照保存于
+  `optimization/snapshots/pre-mix-2d-single-launch-14.94/`；旧最佳完整证据仍在
+  `evidence/formal/fast-track-6ad2e531/`。未覆盖其他未提交研究修改。
+- 新实现为单个 MIX 1:1 launch：二维 AIC producer → 全体 AIC/AIV
+  `SyncAll<false>()` → 独立完整行 VectorStage。编译、360 ownership + 8 K-chunk
+  主机检查通过；三个严格 INT32 CAModel smoke 通过，均 INT8 mismatch=0、scale
+  max abs/rel diff=0，详见候选 `RESEARCH.md` 与 `results/single-launch-smoke-v1/`。
+- 正式逐点耗时相对 14.94：1 -2.92%、2 -10.90%、3 -4.61%、4 **+53.52%**、
+  5 -30.88%、6 -18.05%、7 -54.17%、8 -0.10%、9 -19.83%、10 -10.45%、
+  11 -68.62%、12 -3.82%、13 -6.73%、14 -4.29%、15 -4.64%。这是单次官方测量，
+  不证明稳定收益或阶段归因。点 4 明显退化，但同口径官方 score 更高，按规则晋升。
+- 风险仍包括大 K chunk/atomic wrap、一般 FTZ/mask/scale 数值边界、UB lifetime、
+  服务端/本地 CANN 版本差异、多 stream 超额资源下全核同步死锁。正式 15/15 不等于
+  全输入严格设备正确性证明。下一步优先诊断点 4 退化，并测试单 kernel 下的 shape
+  分派/无全局 barrier 的完整 N 路径；不能为优化重新引入第二次 launch。
+
 ## 激进组合直接 CLI 晋升（2026-10-17，02:43 UTC）
 
 - 使用用户指定会话完成 CLI 查询验证并替换本地会话文件；不保存认证内容。组合候选保留全 K INT8，合并同步 row-job 与 M=N=K=1 免 workspace 路径。

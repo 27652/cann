@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(mix_2d_bench LANGUAGES ASC CXX)
+add_executable(bench_mix_2d ../bench.asc)
+target_compile_options(bench_mix_2d PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+target_link_libraries(bench_mix_2d PRIVATE tiling_api register platform unified_dlog dl m graph_base)

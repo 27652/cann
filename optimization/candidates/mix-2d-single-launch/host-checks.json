@@ -1,0 +1,9 @@
+{
+  "scope": "host source/layout only",
+  "status": "passed",
+  "ownership_configurations": 360,
+  "k_chunk_configurations": 8,
+  "kernel_sha256": "fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62",
+  "one_launch": "exclusive single-element or MIX path; dead historical branch not executed",
+  "device_numerics_and_barrier": "not proven by this test"
+}
