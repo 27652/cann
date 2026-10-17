@@ -38,3 +38,16 @@ These are source/host arithmetic checks only. They are not strict INT32 device c
 ## Fast Track recommendation
 
 Not eligible for the Coordinator's normal strict-result enrollment because no strict INT32 device `result.json` was generated. It may be considered for the user's direct Fast Track policy only as an explicitly unverified candidate after Coordinator review, with the above risks preserved. This worker did not enqueue or submit it.
+
+## Formal evaluation
+
+- The candidate was accepted through the concurrent Coordinator as submission
+  `6ad2dbba193e507d8e11549f` and was independently queried with the direct CLI.
+- The service result was `Pass`, with 15/15 testcases and
+  `precision_ratio=1` for every testcase.
+- A direct ranking query using the exact submission ID returned score `14.64`
+  for a different submission (`6ad2dd23193e507d8e12c972`) and explicitly
+  reported `matches_requested_submission=false`. Therefore the candidate's
+  score is **not confirmed** and it is not eligible for promotion. The raw
+  result/ranking files are retained outside the repository under
+  `/tmp/opencode/aggressive-int8-all-k-direct-{result,ranking}.json`.
