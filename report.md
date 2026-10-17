@@ -844,8 +844,8 @@ INT8 mismatch、yScale 完全一致（rtol=atol=1e-4）。实际 MDL scheduler �
 退化 +54.13% 到 +242.46%。时间单位沿用服务端 time 字段，不额外推断。
 单次结果重复性未知，shape 映射未知；候选使用单 AIV，而基准双 AIV，因此不能
 把差异全部归因于 L0C chunk。保留协议研究价值，暂不继续 chunk64 性能路线。
-榜单无记录尚不足单独证明封榜；本对比只按 score 不可用时的临时诊断记录，
-不计算替代 score、不晋升。工具 `evidence/compare_official_times.py` 已通过轻量
+用户已确认赛事封榜，因此该逐点对比符合封榜期间临时评价规则；仍只作为优化反馈，
+不计算替代 score、不晋升，也不宣称官方提分。工具 `evidence/compare_official_times.py` 已通过轻量
 单测（排序无关、差值、跨题目、缺失/重复/非正/非有限时间/失败用例拒绝）。
 
 # FIFO + UB8192 组合反馈：正式 16.85（2026-10-17）

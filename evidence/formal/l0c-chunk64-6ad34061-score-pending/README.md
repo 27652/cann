@@ -16,8 +16,9 @@ be used as a best-score baseline or promotion authority.
 
 Comparison observations: baseline result/ranking obtained 2026-10-17 09:10:55Z;
 candidate final result obtained 09:31:52Z. These are stored result retrieval
-times, not new network queries. Empty ranking does not independently establish
-that the contest is sealed. Candidate and baseline differ in AIV architecture
+times, not new network queries. The user has confirmed the contest is sealed;
+therefore this comparison is the permitted sealed-contest optimization feedback.
+Candidate and baseline differ in AIV architecture
 as well as chunk handling, so no single-variable performance attribution is made.
 
 Raw service response remains protected at
