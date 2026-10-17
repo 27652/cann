@@ -792,3 +792,23 @@ L0C 核查详见 `optimization/candidates/architecture-trials-v1/local-k/API_REV
 SetTensorA/B 确实 Reset scheduler，但 normal Reset 仅置 isFirstIter；不能据此
 断言 L0C 丢失，也不能证明复用。local-k-safe 的 16.69 是另一种单调用安全 K
 范围策略，不是原始外部 chunk L0C 累加已成立。本轮不提交原始 local-k。
+# dual-AIV ownership 修复：正式 19.45，晋升（2026-10-17）
+
+本轮发现旧 MIX 1:2 原型把已包含 sub-block 的 AIV GetBlockIdx 再乘 2，
+造成跳行；本地 dav_c220 sys_var_impl.h:55-70 提供明确实现证据。建立独立
+dual-aiv-fixed，仅修复该映射，沿用 16.66 的 Cube/Vector 架构，不叠加 FIFO。
+320 组逻辑 AIV ownership 模型通过；CANN 9.1/dav-2201 benchmark 编译成功；
+严格 INT32 CAModel 17x513x65、2x33x129、65x257x33 均零 INT8 mismatch、
+yScale abs/rel 差为 0（容差 rtol=atol=1e-4），包含零行、负 scale、tail。
+
+正式 submission `6ad33b78193e507d8ea310c4` Pass 15/15，precision_ratio 均 1；
+同 ID 榜单 score **19.45**。真实服务原始回包 `/tmp/opencode/ownership-l0c-v3-dual-result*.json`，
+动态 editable 仅 kernel.asc。恢复完整八文件工程、脱敏结果和 manifest 保存在
+`evidence/formal/dual-aiv-fixed-6ad33b78/`，validate 与相对 FIFO 16.89 的 decide 通过。
+根原先 clean 且 hash 与 FIFO 一致后才替换；新根 hash 为
+`bae4d14b3b7eaa918034a8f0bde94bfa49ce38dc2c992d9e7d7326c50ac9fc95`。
+旧 FIFO 完整恢复入口保留，因此按规则晋升 19.45。本次 commit 不含 L0C 探针。
+
+这是双 AIV 架构的独立正反馈，不能把所有逐点变化归于 Vector 吞吐，也不声称
+接近全局最优。大 K、FTZ/subnormal、一般 scale/RNE 边界和跨版本同步仍有风险。
+下一步在独立 L0C 生命周期验证或真正 A/L1 reuse 方向继续，而非盲目扩大组合。

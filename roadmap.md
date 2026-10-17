@@ -1,5 +1,16 @@
 # QuantMatmulReluQuant：文件导航与当前状态
 
+## 最新晋升：dual-AIV ownership 修复（2026-10-17）
+
+- 正式 `6ad33b78193e507d8ea310c4` Pass 15/15，同 ID score **19.45**，
+  严格超过此前 FIFO 16.89，已晋升根。kernel SHA256
+  `bae4d14b3b7eaa918034a8f0bde94bfa49ce38dc2c992d9e7d7326c50ac9fc95`。
+- 证据 `evidence/formal/dual-aiv-fixed-6ad33b78/`；独立候选及风险
+  `optimization/candidates/ownership-l0c-v3/dual-aiv-fixed/RESEARCH.md`。
+  基于 16.66 架构，不包含 FIFO；旧根恢复入口仍为 FIFO bundle 的 source。
+- 320 组 host ownership 及三个严格 INT32 CAModel smoke 通过。
+  下文较早“最高”状态仅为历史记录。
+
 ## 已核实更新：独立架构反馈（2026-10-17）
 
 - 最高已核实正式 score 为 **16.89**：CV FIFO submission
