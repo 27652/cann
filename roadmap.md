@@ -11,6 +11,8 @@
 
 ## 最新正式状态（2026-10-17，Aggressive Coordinator）
 
+- 组合候选入口：`optimization/candidates/aggressive-combined/`，合并 all-K、同步 row-job 消费和单元素 no-workspace；源码 SHA256 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`。正式 submission `6ad2dff3193e507d8e1596b6` / 15/15 / score **14.64**，完整证据 `evidence/formal/fast-track-6ad2dff3/` 验证通过；低于 14.66，未晋升。未完成本地设备验证的风险见候选 `RESEARCH.md` 和 report 对应条目。
+
 - 当前根及最高有效：`6ad2dbba193e507d8e11549f`，正式 15/15，score **14.66**；kernel SHA256 `b9a856aec216e11e8014a8808cc8f12be086a3dbf60831a3372c0d769a54a8a7`。完整恢复和 validate/decide 入口：`evidence/formal/fast-track-6ad2dbba/`；前根完整恢复：`evidence/formal/fast-track-6ad2d3be/source/`。
 - 同轮独立正式结果 tile **14.55**、workspace **14.52**，完整 bundle `fast-track-6ad2da51/`、`fast-track-6ad2db06/`；未合并。候选入口 `optimization/candidates/aggressive-*/`，协议/队列说明 `optimization/AGGRESSIVE_COORDINATOR_20261017.md`。本轮未完成本地设备验证，风险及下一步见 report 最新条目。以下各“当前/最新”为历史时点。
 

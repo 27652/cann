@@ -25,6 +25,12 @@
 - 严格 INT32 golden 比较三者均 INT8 mismatch=0、scale max abs diff=0；但输出全零、yScale=1，数值覆盖弱，不能证明正累加/chunk/atomic。no-exact 的零收益也不能外推到正输出。
 - 独立 all-K 候选 job `1792203318246-0b939ae9a4` 已冻结入队；本流程 Worker 返回 busy，未 POST、无 submission ID。不得与并发 Coordinator 的提交混同。本条不更改根实现或历史最高有效 score。
 
+## all-K INT8 直接 CLI 结果（2026-10-17，score 不可归属）
+
+- 候选 `optimization/candidates/aggressive-int8-all-k/` 实际已由并发 Coordinator 受理为 submission `6ad2dbba193e507d8e11549f`；直接 CLI `result` 查询确认服务端 `Pass`、15/15，全部 `precision_ratio=1`。
+- 随后直接 CLI `ranking --submission-id 6ad2dbba193e507d8e11549f` 返回 score `14.64`，但该榜单记录属于另一个 submission `6ad2dd23193e507d8e12c972`，并明确 `matches_requested_submission=false`。因此 `6ad2dbba...` 的官方 score 不可确认，不能与历史 14.37 比较，也不能晋升。
+- 候选实际 editable payload 的服务端返回为 `kernel.asc`；直接查询原始结果及榜单摘要保留在 `/tmp/opencode/aggressive-int8-all-k-direct-result.json` 和 `/tmp/opencode/aggressive-int8-all-k-direct-ranking.json`。当前根实现未覆盖，历史最高有效结果仍为 submission `6ad2d3be193e507d8e0a014d`、score 14.37。
+
 ## all-K INT8 隔离实验（2026-10-17，本轮未晋升）
 
 - 创建三份候选 `optimization/candidates/{int8-all-k-safe,int8-all-k-128k,int8-k-split-no-atomic}/`，未主动替换根 kernel 或冻结 op 文件。前两份以极高 FP32 threshold 绕开合法常见 K 的转换分派，并分别使用 65536/131072 chunk；FP32 类及死分支源码仍保留，不宣称已经物理删除整个 FP32 实现。同时继承原 threshold 派生的 all-M 16 行分区，因此不是仅改变数据类型的纯单变量消融。
@@ -362,3 +368,10 @@ hash；不得假设实际上传文件只有 `kernel.asc`。正式晋升仍以同
 2. 在不覆盖冻结文件的前提下，补充 INT32 matmul 语义的大 K/极值检查。
 3. 需要比较官方 score 时，等待平台限流解除后只提交已核对的 `kernel.asc`，并
    保存提交 ID、上传源码 hash、15/15 状态、score 和排行榜快照。
+## 2026-10-17 combined aggressive candidate（历史 14.64 记录）
+
+- 正式评测已完成：submission `6ad2dff3193e507d8e1596b6`，服务端 `Pass`、15/15、全部 `precision_ratio=1`；使用默认队名 `西西里 的队伍` 查询后，排行榜记录与该 submission ID 精确一致，rank `220`、官方 score **14.64**。此前无空格队名查询为空仅是搜索词不匹配。结果已恢复至 `evidence/formal/fast-track-6ad2dff3/`，`validate` 通过；相对 14.66 的 `decide` 明确为不可晋升。
+- 按“合并全部优化”的要求构造了隔离候选 `optimization/candidates/aggressive-combined/`：以已正式有效 14.66 all-K 源码为底，只合入 tile 候选的 bounded row-job producer/consumer 调度和 workspace 候选的 `(1,1,1)` no-workspace 启动路径；未合入 N-split 或已知有反例的 Vector A，也未用旧候选的 65536 阈值覆盖 all-K 逻辑。
+- 组合源码 SHA256 为 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`，CANN 9.1.0 / `dav-2201` 编译成功，二进制 SHA256 为 `834aaa1b0eee50ac0c2a326efecde91a9c861ec8505e9afd31a244a27ee2f068`。组合静态检查及两个原候选主机检查通过；未运行设备 smoke、CAModel 或严格 INT32 设备回归。
+- 历史提交前状态：host-only Coordinator job `1792204288134-6b3e22a0f2` 曾因旧队列 HTTP 401 被阻塞，随后取得上述 14.64 正式结果，未晋升。后续同源码的另一正式提交 `6ad2e0a8193e507d8e164f44` 取得 14.71 并晋升，见本文顶部；14.64 作为独立历史实验归档，不继承后续 score。
+- 组合候选风险：row-job 的 Matmul completion/消费同步、all-K 大 K stride/atomic modulo、FTZ/mask/UB 边界，以及单元素专用路径均未由设备验证。恢复与说明见候选 `RESEARCH.md`。

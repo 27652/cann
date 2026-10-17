@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "job_id": "1792204288134-6b3e22a0f2",
+  "candidate_id": "aggressive-combined-allk-rowjob-single",
+  "submission_id": "6ad2dff3193e507d8e1596b6",
+  "status": "evaluated_pass",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    }
+  ],
+  "payload_manifest": {
+    "path": "/tmp/opencode/aggressive-coordinator-20261017/results/1792204288134-6b3e22a0f2/result.manifest.json",
+    "sha256": "087928c181ad1c0c7cb04deab7769d3210a527139d714f6d84ffb8ebb208cadd",
+    "files": {
+      "kernel.asc": {
+        "sha256": "e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea",
+        "bytes": 56657
+      }
+    }
+  },
+  "result_sha256": "078a2c32a412cac3a785b59589a6908a03252ac9300953019427dc4616fef186",
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2dff3193e507d8e1596b6",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "14.64",
+    "ranking_sha256": "9730796eb42af311fda4ca527442ce921cc1b4e1a81abb1de5f334e20dd4a471"
+  },
+  "evaluated_at": 1792204960.2326934,
+  "risks": [
+    "\u672a\u5b8c\u6210\u672c\u5730\u8bbe\u5907\u9a8c\u8bc1\uff1b\u65e0\u4e25\u683c INT32 \u8bbe\u5907\u7ed3\u679c",
+    "row-job producer/consumer \u540c\u6b65\u548c Matmul completion \u8bed\u4e49\u672a\u8bbe\u5907\u9a8c\u8bc1",
+    "\u5927K stride/SetTail/atomic modulo\u3001FTZ/mask/UB \u8fb9\u754c\u98ce\u9669\u7ee7\u627f all-K \u5019\u9009",
+    "\u5355\u5143\u7d20\u8def\u5f84\u4ec5\u4e3a shape-specialized host/device \u672a\u9a8c\u8bc1\u8def\u5f84"
+  ],
+  "source_sha256": "e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea",
+  "binary_sha256": "834aaa1b0eee50ac0c2a326efecde91a9c861ec8505e9afd31a244a27ee2f068"
+}
