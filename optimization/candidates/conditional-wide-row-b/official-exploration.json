@@ -1,0 +1,160 @@
+{
+  "classification": "experimental official submission; not promoted; outside evidence/formal",
+  "submission_id": "6ad32bc0193e507d8e862049",
+  "contest": "op_challenge_hangxia_prelim",
+  "problem": "quantmatmulreluquant",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "create_time": "2026-10-17T08:03:12.922Z",
+  "status": "Pass",
+  "valid": true,
+  "passed": 15,
+  "total": 15,
+  "official_score": 16.44,
+  "score_source": "live CLI ranking response matched to exact submission_id",
+  "score_queried_at": "2026-10-17T08:04:59Z",
+  "payload_manifest": {
+    "schema_version": 1,
+    "contest": "op_challenge_hangxia_prelim",
+    "problem": "quantmatmulreluquant",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "template_files": [
+      {
+        "path": "CMakeLists.txt",
+        "editable": false
+      },
+      {
+        "path": "data_utils.h",
+        "editable": false
+      },
+      {
+        "path": "kernel.asc",
+        "editable": true
+      },
+      {
+        "path": "main.asc",
+        "editable": false
+      },
+      {
+        "path": "run.sh",
+        "editable": false
+      },
+      {
+        "path": "scripts/gen_data.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/QuantMatmulReluQuant.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/verify_result.py",
+        "editable": false
+      }
+    ],
+    "files": {
+      "kernel.asc": {
+        "sha256": "8a75175a3d7205ded119f8c0f383be8b7c1daa2735d68a249f716ecbc6db023f",
+        "bytes": 72917
+      }
+    }
+  },
+  "recovery_directory": "submit-project",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "time": 27.62,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "time": 9.59,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "time": 18,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "time": 27.73,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "time": 21.24,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "time": 61.44,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "time": 91.53,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "time": 236.09,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "time": 169.35,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "time": 442.66,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "time": 480.96,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "time": 1101.99,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "time": 1428.94,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "time": 3318.79,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "time": 7404.2,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    }
+  ],
+  "validation_limits": [
+    "CAModel smoke stopped at aclInit=500000 before kernel execution",
+    "No broad local strict device correctness claim",
+    "Official testcase shape mapping unknown"
+  ],
+  "raw_response_location": "/tmp/opencode/conditional-wide-row-b-result.json"
+}
