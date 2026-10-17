@@ -7,10 +7,32 @@ from types import SimpleNamespace
 from unittest.mock import patch, Mock
 from pathlib import Path
 
-from fast_track import digest, enroll, read_strict, worker, _formal_state, _submit_command, _result_command, _ranking_score
+from fast_track import digest, enroll, read_strict, worker, list_jobs, _formal_state, _submit_command, _result_command, _ranking_score, _submission_delay, _record_submission_cooldown
 
 
 class FastTrackTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.cooldown_path = Path(temporary.name) / 'cooldown.json'
+        setting = patch('fast_track.SUBMISSION_COOLDOWN_PATH', self.cooldown_path)
+        setting.start()
+        self.addCleanup(setting.stop)
+
+    def test_cooldown_persistence_expiry_and_invalid_timestamp(self):
+        with patch('fast_track.time.time', return_value=1000):
+            self.assertEqual(_submission_delay(), 0)
+            _record_submission_cooldown()
+            self.assertEqual(_submission_delay(), 180)
+        with patch('fast_track.time.time', return_value=1181):
+            self.assertEqual(_submission_delay(), 0)
+        with patch('fast_track.time.time', return_value=1100):
+            _record_submission_cooldown(1000)
+            self.assertEqual(_submission_delay(), 80)
+        self.cooldown_path.write_text('{"next_submit_at": null}')
+        with self.assertRaises(ValueError):
+            _submission_delay()
+
     def test_explicit_session_is_global_cli_option(self):
         session = Path('/unused/session-file')
         submit = _submit_command(Path('cli'), Path('project'), Path('result'),
@@ -258,10 +280,25 @@ else:
     sid=a[a.index('--submission-id')+1]
     out.write_text(json.dumps({'problem_id':'problem','requested_submission_id':sid,'metrics':[{'submission_id':sid,'status':'Pass','score':7.1}]}))
 ''')
-            results = worker(root, cli, base / 'results', ['--ranking-query', 'test'],
-                             evidence_root=base / 'evidence')
+            with patch('fast_track._submission_delay', return_value=0), \
+                    patch('fast_track._record_submission_cooldown'):
+                results = worker(root, cli, base / 'results', ['--ranking-query', 'test'],
+                                 evidence_root=base / 'evidence')
             self.assertEqual([r['status'] for r in results], ['evaluated_pass'] * 2)
             self.assertEqual(len(list((base / 'evidence').glob('*/evidence.json'))), 2)
+
+    def test_worker_defers_next_submission_until_cooldown_expires(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp); root = base / 'queue'
+            folder = base / 'candidate'; folder.mkdir()
+            project, strict, metadata = self._qualified(folder)
+            job = enroll(project, strict, root, 'cooldown-candidate', metadata)
+            with patch('fast_track._submission_delay', return_value=127.0):
+                result = worker(root, base / 'unused.py', base / 'results',
+                                ['--ranking-query', 'test'])
+            self.assertEqual(result, [{'status': 'cooldown', 'retry_after': 127.0}])
+            self.assertEqual(list_jobs(root)[0]['status'], 'queued')
+            self.assertFalse((base / 'results' / job['job_id']).exists())
 
     def test_tampered_snapshot_and_missing_identity_fail_closed(self):
         with tempfile.TemporaryDirectory() as temp:

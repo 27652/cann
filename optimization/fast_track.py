@@ -29,6 +29,7 @@ DEFAULT_PROJECT_FILES = (
 FORBIDDEN_PARTS = {".git", "build", "__pycache__", "gitlabcann", "cookie"}
 PENDING_STATUSES = {"waiting", "pending", "judging", "running", "processing", "queued"}
 TERMINAL_STATUSES = {"pass", "passed", "fail", "failed", "error", "complete", "completed"}
+SUBMISSION_COOLDOWN_PATH = Path('/tmp/opencode/fast-track/submission-cooldown.json')
 
 
 def digest(path: Path) -> str:
@@ -544,6 +545,9 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
     if not submit:
         return results
     while True:
+        remaining = _submission_delay()
+        if remaining > 0 and any(j['status'] == 'queued' for j in list_jobs(root)):
+            return results + [{"status": "cooldown", "retry_after": remaining}]
         job = _claim_queued(root)
         if job is None:
             _with_queue(root, lambda data: data.update(halted=False))
@@ -562,9 +566,16 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
             expected = result_dir / "expected-project.json"
             expected.write_text(json.dumps(job["files"], sort_keys=True) + "\n")
             _set_job(root, job["job_id"], result_dir=str(result_dir))
-            proc = subprocess.run(_submit_command(cli, snap / "project", result_dir / "result.json",
-                                                  expected, project_args, session), text=True,
-                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=86400)
+            _record_submission_cooldown()
+            try:
+                proc = subprocess.run(_submit_command(cli, snap / "project", result_dir / "result.json",
+                                                      expected, project_args, session), text=True,
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=86400)
+            finally:
+                # CLI writes this receipt immediately after acceptance, before
+                # polling results. This includes any internal 429 retries.
+                receipt = (result_dir / 'result.json').with_suffix('.submit.json')
+                _record_submission_cooldown(receipt.stat().st_mtime if receipt.is_file() else None)
             (result_dir / "worker.log").write_text(proc.stdout)
             if proc.returncode != 0:
                 state = {"state": "uncertain", "reason": f"submit returncode={proc.returncode}"}
@@ -593,6 +604,24 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
             return results
         _set_job(root, job["job_id"], **updates, summary_path=state.get("summary_path"))
         results.append({"job_id": job["job_id"], "status": state["state"], "error": None})
+
+
+def _submission_delay() -> float:
+    path = SUBMISSION_COOLDOWN_PATH
+    if not path.exists():
+        return 0.0
+    deadline = _json(path).get('next_submit_at')
+    if type(deadline) not in (int, float) or not (0 <= deadline < float('inf')):
+        raise ValueError('invalid submission cooldown timestamp')
+    return max(0.0, deadline - time.time())
+
+
+def _record_submission_cooldown(accepted_at=None):
+    path = SUBMISSION_COOLDOWN_PATH
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary = path.with_suffix('.tmp')
+    temporary.write_text(json.dumps({'next_submit_at': (time.time() if accepted_at is None else accepted_at) + 180}) + '\n')
+    temporary.replace(path)
 
 
 def worker(root: Path, cli: Path, output: Path, project_args: list[str], submit=True,
@@ -687,7 +716,10 @@ def main():
                         # require explicit operator reconciliation, never a loop.
                         if any(item['status'] in {'uncertain', 'awaiting_score', 'submitted', 'rejected'} for item in result):
                             return 1
-                        time.sleep(min(args.poll_interval, max(0, deadline - time.monotonic())))
+                        cooldown = next((item['retry_after'] for item in result
+                                         if item['status'] == 'cooldown'), None)
+                        delay = args.poll_interval if cooldown is None else cooldown
+                        time.sleep(min(delay, max(0, deadline - time.monotonic())))
                 else:
                     print(json.dumps(worker(args.root, args.cli, args.output, extra,
                                             evidence_root=args.evidence_root,

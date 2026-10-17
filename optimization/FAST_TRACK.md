@@ -4,6 +4,16 @@ Fast Track is the default formal-evaluation handoff for research candidates.
 The enrollment queue is enabled for all new Agent handoffs. It does not equate
 local correctness with an official result and it does not auto-promote a score.
 
+## Serial submission queue
+
+The coordinator drains qualified jobs serially and enforces a 180-second
+cooldown between POST submissions. The cooldown is persisted at
+`/tmp/opencode/fast-track/submission-cooldown.json`, so a worker restart does
+not reset the interval. `serve` sleeps until the remaining cooldown expires and
+then immediately claims the next queued candidate. A submission that has an
+unknown acceptance state still halts the queue and must be reconciled by
+submission ID; the interval does not authorize blind resubmission.
+
 ## Candidate contract
 
 An Agent must provide:
