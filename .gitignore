@@ -25,6 +25,10 @@ __pycache__/
 venv/
 env/
 
+# Local CANN environment setup and runtime compatibility links
+/env.sh
+/.runtime/
+
 # Local execution data and generated inputs/outputs
 input/
 output/

@@ -1,5 +1,40 @@
 # QuantMatmulReluQuant：文件导航与当前状态
 
+## 已核实更新：独立架构反馈（2026-10-17）
+
+- 最高已核实正式 score 为 **16.89**：CV FIFO submission
+  `6ad335a8193e507d8e985b8b`，15/15；证据
+  `evidence/formal/tile-fifo-6ad335a8/`。当前根八文件与该服务端恢复源码一致，
+  kernel SHA256 `427a35b31dbc75c3afbb8b1681c68f6c852b8f3b5620ca889c62c56f6083bef4`。
+  根由并行工作流程更新，本次核验未覆盖根文件。
+- scale-owner submission `6ad3343f193e507d8e95990c`，15/15、score **16.60**，
+  不晋升；证据 `evidence/formal/scale-owner-6ad3343f/`。
+- 新增只读针对性检查 `optimization/candidates/architecture-trials-v1/targeted_checks.py`：
+  125 组 shard/owner/workspace、150 组 FIFO ownership/reuse/drain 模型通过。
+  未新增本地设备验证。下文较早状态按历史记录阅读。
+
+- 大结构隔离实验：`optimization/candidates/structural-breakthrough-v2/`。
+  MIX 1:2 首个严格 smoke 失败，未提交；UB 生命周期/8192 列驻留通过三个严格
+  宽行 smoke，正式 `6ad3365d193e507d8e999c3a` 为 15/15、score **16.79**，
+  证据 `evidence/formal/ub-resident-8192-6ad3365d/` validate 通过。同期已核实
+  tile-FIFO `6ad335a8193e507d8e985b8b`、15/15、**16.89**，因此 UB 不晋升。
+
+- 多行 epilogue 最新正式状态：首版 Compile Error；WholeReduceMax 修订 `6ad32f9e193e507d8e8cf57c` Wrong Answer（12/15），未晋升。恢复及证据见 `evidence/formal/multi-row-v1-wrong-6ad32f9e/`；历史最高有效仍为 16.66。
+
+- 多点独立架构探索：`optimization/candidates/architecture-trials-v1/` 已有
+  local-k、scale-owner、tile-fifo 三个单变量原型并完成 benchmark 编译；
+  local-k 的 L0C 保留语义仍是阻断风险，三者均无正式 score。新增
+  `optimization/candidates/a-panel-grouped-scheduler-v1/`，仅改变 M/N tile
+  ownership 分组；420 组 host ownership 检查和 formal-template 编译通过，
+  kernel SHA256 为 `59afc75beb0afbf440615ec547447e75bff82673edaea00d586b7e99b8600679`，
+  未完成本地设备验证；正式提交 `6ad334f3193e507d8e96fa05` Pass 15/15，
+  同 ID score 16.58，不晋升；证据 `evidence/formal/a-panel-grouped-6ad334f3/`。
+
+- 多行 epilogue 隔离候选：`optimization/candidates/multi-row-epilogue-v1/`。
+  主工程及 1/2/4/8 行 benchmark 编译通过；严格 INT32 CAModel tail/零行/负 scale
+  和半整数定向检查通过，证据索引见其 `RESEARCH.md`。未测性能、未正式提交、
+  未晋升；根仍为正式 16.66 实现。
+
 更新时间：2026-10-17。本文按用途列出源码、文档、版本身份和可复核证据；自动生成的输入、输出、编译缓存与 CAModel dump 不作为源码版本依据。
 
 - **最新最高有效：16.89，已晋升根实现**。FIFO 提交
@@ -11,26 +46,75 @@
   独立 local-k-safe 16.69、scale-owner 16.60 未晋升；详见
   `optimization/candidates/architecture-trials-v1/RESEARCH.md`。下列旧最高状态属于历史记录。
 
+- Candidate A 隔离入口：`optimization/candidates/fp32-activation-cache/`。
+  基于 16.66 源码，仅为 N>4096 增加 FP32 activation cache；benchmark 和
+  formal-template 编译通过。正式提交 `6ad32d3e193e507d8e88c539`，15/15、
+  score **16.63**，未晋升；证据 `evidence/formal/fp32-activation-cache-6ad32d3e/`。
+  首次 429 中断后核对冻结 payload 并按规则等待重试。详见候选 RESEARCH.md。
 
+- A/B 条件化隔离候选：`optimization/candidates/conditional-k-plane-a/` 与
+  `optimization/candidates/conditional-wide-row-b/`。A 仅对低 MN 并行度、2--4 个
+  K chunk 启用 K-plane；B 仅对窄 M/超宽 N 启用 N-sharded epilogue。两者已完成
+  CANN 9.1/dav-2201 主工程与 benchmark 编译；B 的 ownership host 检查通过。
+  CAModel smoke 被环境 `aclInit=500000` 阻断；随后 Fast Track 串行正式提交，
+  A `6ad32b0b193e507d8e84c2f8`：15/15、score 16.60；
+  B `6ad32bc0193e507d8e862049`：15/15、score 16.44。均未晋升，
+  实验性结果/动态 payload manifest 位于各候选 `official-exploration.json`，
+  恢复源码位于 `submit-project/`；未新增 `evidence/formal/`。详见 `report.md`。
 
-## 最新正式状态（2026-10-17，tileM=16 persistent MIX）
+## 最新正式状态（2026-10-17，07:45 UTC；最高有效仍为 tileM=16 persistent MIX）
 
-- 当前根及最高有效：`6ad31941193e507d8e654e7b`，正式 15/15，score **16.66**。
-- kernel SHA256：`cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae`。
-- 正式证据及完整恢复：`evidence/formal/tile16-persistent-6ad31941/`。
-- 候选与严格 smoke：`optimization/candidates/mix-2d-tile16-persistent/`。
-- 晋升前 16.07 根快照：`optimization/snapshots/pre-tile16-persistent-16.07/`。
-- 以下“最新/当前”属于历史时点；数值与同步等残余风险见 `report.md` 晋升条目。
+- 消融入口：`optimization/candidates/wide-row-ablation/`。源码证实 baseline
+  和 wide-row 的 Cube 调度完全相同；vector-only 恢复基线 mask/row mapping，
+  正式 `6ad326cc193e507d8e7c7d4e`，15/15、score **16.57**，未晋升。
+  证据：`evidence/formal/wide-row-ablation-vector-6ad326cc/`。三组已编译，
+  本地 smoke 被 aclInit=500000 阻断；ancillary-only 后续提交
+  `6ad32855193e507d8e7f34d3`，15/15、score **16.33**，未晋升，证据为
+  `evidence/formal/wide-row-ablation-ancillary-6ad32855/`。详见该目录
+  RESEARCH.md 和 report.md 顶部。
 
-## 最新正式状态（2026-10-17，03:38 UTC，单次 launch 二维 MIX）
+- 大重构隔离入口：`optimization/candidates/wide-row-tile-cv/`。二维 Cube +
+  小 M/宽 N 的跨 AIV partial-max 与 N-sharded 最终量化；主工程/benchmark
+  编译、主机 ownership 检查通过，本地设备 smoke 未完成。直接 CLI 正式提交
+  `6ad32394193e507d8e769935`：Pass 15/15，score **16.19**，低于 16.66，
+  未晋升；正式证据与恢复源码：`evidence/formal/wide-row-tile-cv-6ad32394/`。
+  同步协议修正及风险见该目录 RESEARCH.md。
 
-- 当前根及最高有效：`6ad2ed99193e507d8e278978`，Pass 15/15，score **16.07**；kernel SHA256 `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。完整恢复与 validate/decide 证据：`evidence/formal/mix-2d-single-launch-6ad2ed99/`；前一 14.94 版本：`evidence/formal/fast-track-6ad2e531/`，晋升前完整根快照：`optimization/snapshots/pre-mix-2d-single-launch-14.94/`。
+- row-ring 独立候选已于 07:03 UTC 完成正式评测：
+  `6ad31d99193e507d8e6c5620`，Pass 15/15，score **15.71**，低于 16.66，未晋升。
+  证据与恢复源码：`evidence/formal/row-ring-pipeline-6ad31d99/`。
+
+- K-plane parallel INT8 候选已完成正式评测：submission
+  `6ad32449193e507d8e77ed6a`，Pass 15/15，score **16.32**，低于 16.66，
+  未晋升。可恢复证据与上传源码：
+  `evidence/formal/k-plane-parallel-int8-6ad32449/`；候选及 smoke 记录：
+  `optimization/candidates/k-plane-parallel-int8/`。
+
+- 社区结构检索入口：`optimization/COMMUNITY_STRUCTURAL_RESEARCH_20261017.md`。
+  补充 CUDA/Triton/CUTLASS/TileLang 检索与适配结论：
+  `optimization/COMMUNITY_RESEARCH_20261017.md`。当前根已有 vector RNE、
+  packed boundary mask 和 sparse exact correction；后续优先方向是多行
+  AIV epilogue 与保留二维 Cube 并行度的 tile CV 流水，不将第三方 CUDA
+  语义直接移植到 AscendC。
+  tileM=16 persistent MIX 候选已正式验证并晋升：submission
+  `6ad31941193e507d8e654e7b`，15/15，score **16.66**；kernel SHA256
+  `cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae`。
+  完整证据与恢复源码：`evidence/formal/tile16-persistent-6ad31941/`；晋升前
+  16.07 根快照：`optimization/snapshots/pre-tile16-persistent-16.07/`。
+
+## 历史正式状态（2026-10-17，03:38 UTC，单次 launch 二维 MIX）
+
+- 当时根及最高有效：`6ad2ed99193e507d8e278978`，Pass 15/15，score **16.07**；kernel SHA256 `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。完整恢复与 validate/decide 证据：`evidence/formal/mix-2d-single-launch-6ad2ed99/`；前一 14.94 版本：`evidence/formal/fast-track-6ad2e531/`，晋升前完整根快照：`optimization/snapshots/pre-mix-2d-single-launch-14.94/`。
 - 候选入口 `optimization/candidates/mix-2d-single-launch/`：一个 MIX 1:1 kernel，二维 AIC task grid、`SyncAll<false>()` 全核同步和完整行 AIV 量化；主工程/benchmark 编译成功，360 ownership + 8 K-chunk 主机检查和三个严格 INT32 CAModel smoke 通过。残余边界风险与单次测量限制见其 `RESEARCH.md` 及 report 晋升条目。后文“当前/最新”均为历史时点。
 
-## 历史正式状态（2026-10-17，02:43 UTC，直接 CLI）
+## 历史正式状态（2026-10-17，03:02 UTC，直接 CLI）
 
-- 当前根及最高有效：`6ad2e0a8193e507d8e164f44`，Pass 15/15，score **14.71**；kernel SHA256 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`。证据与完整恢复：`evidence/formal/fast-track-6ad2e0a8/`；旧最佳 `fast-track-6ad2dbba/`，旧根快照 `optimization/snapshots/pre-aggressive-combined-14.66/`。
+- 当前根及最高有效：`6ad2e531193e507d8e1bb641`，Pass 15/15，score **14.94**；kernel SHA256 `5cc48d36e97c00f0a3e84bfba645470fc9ec770ed8bd8603b00baf7f43d9b102`。证据与完整恢复：`evidence/formal/fast-track-6ad2e531/`；晋升前 14.71 根快照：`optimization/snapshots/pre-direct-int8-mix-14.71/`。
+- 新根为 Direct INT8 MIX：直接 AIC MatmulImpl + AIC→AIV event，保持完整 N ownership；候选目录 `optimization/candidates/direct-int8-mix/`。正式 score 严格提升 0.23；本地设备/CAModel 未运行，非正式风险见候选 RESEARCH.md。
 - 组合候选 `optimization/candidates/aggressive-combined/`：全 K INT8 + 同步 row-job + 单元素免 workspace；已有编译/主机检查，本地设备验证未完成，风险见 report 最新条目。以下“当前/最新”均为历史时点。
+
+- 二维重构候选 `optimization/candidates/pure-cube-2d-vector/` 已完成 CANN 9.1.0 / dav-2201 编译并提交为 `6ad2ea60193e507d8e231322`；服务端 Runtime Error，原因是两次 kernel launch 违反“每次迭代恰好一次 launch”规则（15/15 均失败），未晋升。失败证据及源码归档 `evidence/formal/pure-cube-2d-vector-6ad2ea60/`；候选根未覆盖当前 14.94 实现。
+- 单次 launch 修复候选 `optimization/candidates/mix-2d-single-launch/` 的提交待返回状态已结束：正式 15/15、score 16.07，晋升结果见顶部最新状态；复现/风险见其 `RESEARCH.md`，smoke 入口 `smoke.py`。
 
 - all-K INT8 新隔离实验入口：`optimization/candidates/int8-all-k-safe/`、`int8-all-k-128k/`、`int8-k-split-no-atomic/`，各自 `RESEARCH.md` 记录源码/构建身份与已运行的弱覆盖 boundary smoke。未正式提交、未晋升；仍需正输出/溢出有效设备测试，详见 report 对应条目。
 

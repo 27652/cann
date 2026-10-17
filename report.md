@@ -25,6 +25,216 @@
   DMA 可见性和 workspace 风险。大 K 保守版本只在 K<131072 范围合并内部 K-loop，
   更大 K 沿用基线，尚未实现任意大 K 外部 chunk 的 L0C 保留。
 
+## 大结构突破探索：MIX 1:2 与 UB 8192 驻留（2026-10-17）
+
+后续正式反馈：活动 POST 全部退出后，冻结 UB 候选正式提交；HTTP 429 明确等待
+75 秒后一次受控重试，获提交 `6ad3365d193e507d8e999c3a`。正式 Pass 15/15、全部
+precision_ratio=1，同 ID ranking score **16.79**，查询时间 08:49:16 UTC。实际
+editable 上传只有 kernel.asc；可恢复证据 `evidence/formal/ub-resident-8192-6ad3365d/`
+独立 validate 通过。原始回包保存在 `/tmp/opencode/ub-resident-8192-result*`。
+
+同期另一会话得到更高的 tile-FIFO **16.89**（`6ad335a8193e507d8e985b8b`），其
+bundle validate 通过；UB 对 FIFO 的 decide 明确因分数不严格提高而拒绝。根实现已被
+其他会话改为 FIFO，本会话不覆盖、不晋升、不创建晋升 commit。当前最高已核实为
+16.89，而不是下列实验初始时点的 16.66。旧 16.66 bundle 的 source 目录被其他会话
+加入额外 backup，导致其 decide 校验报 source file set 错误；未擅自删除备份，改用
+干净 FIFO bundle 比较。16.79 属于小幅正反馈，不宣称完成大突破；下一步应独立调查
+MIX 1:2 实际 block/subblock 语义，或在已有独立反馈基础上建立 FIFO+UB 二次整合候选。
+
+- 从已核实 16.66 源码建立独立候选目录
+  `optimization/candidates/structural-breakthrough-v2/`，未修改根实现、冻结
+  `op/` 或正式证据。两项变化没有组合：`dual-aiv` 尝试 MIX 1:2，把完整行工作
+  分摊到两个 Vector 子块；`ub-resident-8192` 仅改变 Vector UB buffer 生命周期
+  别名，将有效 `VECTOR_TILE_N` 从 4096 扩为 8192，以消除宽行第二遍激活计算。
+- 两者均在 CANN 9.1.0/dav-2201 编译成功，静态 ownership/hash 检查通过。
+  `dual-aiv` 严格 CAModel 首点 `17x513x65` 失败：2023 个 INT8 mismatch、
+  yScale 最大绝对差 8.2241907；已拒绝且未提交。该失败说明当前 MIX 1:2
+  子块/同步假设不成立，不能依据理论 Vector 并行度继续推进。
+- `ub-resident-8192` 在严格 INT32 golden 下通过 `2x4097x33`、`2x8192x33`、
+  `2x8201x33`，均为零 INT8 mismatch、yScale exact。结果和 fingerprint 在候选
+  目录 `results/strict-smoke-v1/`。这只是针对性正确性证据，尚无 CAModel
+  性能结论，也不构成全域设备正确性证明。
+- 发现其他候选正在串行正式 POST，因此没有并发提交；当前最高有效官方 score
+  仍为 16.66，以上候选均未晋升。下一步应在活动 POST 结束后，对 UB 候选做宽/窄
+  形状 benchmark 对照，再按冻结 payload 规则决定是否 Fast Track。
+
+## 多行 epilogue 首版重构（2026-10-17）
+
+- 隔离候选 `optimization/candidates/multi-row-epilogue-v1/` 从正式 16.66 根派生，
+  仅重构 VectorStage：2/4/8 行共驻 UB，批量 Cast/双 scale/ReLU，两级
+  `ReduceRepeat<MAX>` 行归约；量化复用原 vector RNE、packed mask 和 sparse exact
+  correction。默认四行，完整组且 `N<=4096/rows` 时启用；其余路径回退。
+  Cube、workspace、全核同步及单 launch 未变；根和冻结文件未修改。
+- 主工程及 rows=1/2/4/8 benchmark 全部编译成功。CANN 9.1 / dav-2201 严格
+  INT32 CAModel：`129x513x65` rows=1/4（负 scale、零行、group/N/K tail）和
+  `193x17x33` rows=2/4/8（半整数 RNE）全部零 INT8 mismatch，yScale 绝对及
+  相对差均为 0；记录比较容差 rtol/atol 均 1e-4。证据见候选 RESEARCH 和
+  `results/{rows4-tail-20261017,grouped-half-small-20261017,wide-fallback-20261017}/summary.json`。
+- 较大半整数诊断被外层 120 秒超时中断，遗留的本次模型进程已终止，部分日志保留；
+  未判为失败或通过。未测性能、AIV 分阶段 cycles 或 correction 密度；当前不能
+  声称加速。原 scratch 复用，仅 reduceOutBuffer 增加 96 bytes 分配。
+- 未正式提交、未获得新 score、未晋升；最高已核实仍为 16.66。下一步完成
+  host/source invariant 检查和 aligned/wide fallback 对照，提取同条件 task_cycles；
+  不将单 slot ring 混入这一可归因候选。
+
+## Candidate A：FP32 activation cache（2026-10-17）
+
+- 从可恢复的 16.66 正式源码创建隔离候选
+  `optimization/candidates/fp32-activation-cache/`。Cube 调度、M/N ownership、
+  row max、量化和单 launch 不变；仅对 N>4096 的行，在第一遍 INT32→FP32、
+  scale/ReLU 后将 FP32 activation 写入 launch-private cache，第二遍读取该
+  cache quantize，目标是避免重复 INT32 load/cast/scale/ReLU。N<=4096 保持原路径。
+- CANN 9.1/dav-2201 benchmark 和 formal-template 编译均通过；冻结八文件
+  payload，kernel SHA256 `f2a4a2bf9dde56719901731961139c668517fdcc23ad4b4406ce5f09df43c566`。
+- CLI dynamic-template preflight 通过，但首个 POST 收到明确 HTTP 429，指定等待
+  132 秒；外层 120 秒命令中断。随后核对相同赛事/题目、manifest、全部冻结
+  hash 及无本地受理 ID，按规则等待并重试同一 payload。提交
+  `6ad32d3e193e507d8e88c539` 正式 Pass 15/15、全部 precision_ratio=1；同 ID
+  官方 ranking score **16.63**、rank 212。八文件源码与脱敏证据位于
+  `evidence/formal/fp32-activation-cache-6ad32d3e/`，离线 validate 通过。
+- 逐点比较基线，点 7--15 中多数提升约 0.7%--5.9%，但点 1--6 多数变慢，
+  综合低于 16.66；不晋升。未完成本地 strict smoke，`aclInit` 500000 仍为
+  运行前环境阻断。根 kernel 与历史正式证据未修改；保留 MTE3 可见性、cache
+  workspace、tail 和生命周期风险。
+
+## 条件化 A/B 架构候选（2026-10-17）
+
+- 按架构 A/B 建立两个隔离候选，未修改根 `kernel.asc`、冻结 `op/` 或正式证据。
+  A 位于 `optimization/candidates/conditional-k-plane-a/`：从 tileM=16
+  persistent MIX 派生，仅在 K 有 2--4 个 65536 chunk 且普通 MN tile 数相对可用
+  Cube 核至少 2 倍欠填时启用独立 K-plane；其他形状回到单 INT32 plane。这样不把
+  已知 K-plane 的大 M/N 回归扩散到默认路径。
+- B 位于 `optimization/candidates/conditional-wide-row-b/`：从 baseline-compatible
+  vector-only ablation 派生，保留基线 Cube、mask 和完整行路径；仅在 `M<=16`、
+  `N>=16384` 且每个分片至少约 2048 列时启用 N-sharded partial-max/quantize。
+  partial max 使用 32-byte 对齐槽，发布和读取均走 DMA，避免沿用标量 GM 可见性假设。
+- 两个主工程和两个 benchmark 均以 CANN 9.1.0 / dav-2201 编译成功；B 的 24 组
+  N ownership/barrier host 检查通过。针对性 CAModel smoke 均未进入 kernel，首个
+  case 在 `aclInit(nullptr): 500000` 失败（A: `2x33x65537`；B: `2x16384x33`），
+  因此没有严格正确性或 task-cycle 结论。结果目录和 fingerprint 保留在各候选下。
+- 后续按用户要求采用 Fast Track，跳过耗时的 CAModel，串行正式提交。A：
+  `6ad32b0b193e507d8e84c2f8`，正式 Pass 15/15、valid=true，精确同 ID 排行榜
+  score **16.60**（2026-10-17 08:01:10 UTC 查询）；B：
+  `6ad32bc0193e507d8e862049`，正式 Pass 15/15、valid=true，同 ID score **16.44**。
+  B 提交遇明确 429，客户端按服务端提示等待 21 秒后一次重试获受理，无并发提交。
+- 动态模板实际仅 `kernel.asc` 可编辑/上传，其他七文件是本地项目上下文，不能称为
+  八文件上传 payload。A kernel SHA256：
+  `614678fd246c6ea2df2d05a9c8dd585668a4d218934be31d22c5c92eaa27102e`；
+  完整动态 manifest、B hash、15 项脱敏结果及同 ID score 查询时间保存在各候选的
+  `official-exploration.json`，恢复副本位于各自 `submit-project/`。
+- 两者均低于历史最高有效 **16.66**，不晋升、不改根实现。按用户允许的实验记录方式，
+  不新增 `evidence/formal/` 条目；原始回包留在 `/tmp/opencode/conditional-*-result.json`
+  等受控路径，脱敏可持久化记录留在候选目录。上述检查核对了真实 CLI 结果、15/15、
+  score 归属和实际上传 hash；未运行 `formal_evidence.py`，不是完整 formal 证据晋升。
+- 本地设备 smoke 仍未完成；官方通过不能证明所有合法输入严格正确，也不能确认分派
+  在哪些正式 shape 上触发。保留 K-plane INT32 合并、UB、同步、partial max、DMA
+  可见性与 tail 风险。当前不合并 A/B；下一步应基于逐点真实时间和可核实 shape
+  做单变量优化，必要时再用 CAModel 诊断，而非将其设为每次正式提交前置条件。
+
+## wide-row 可归因消融（2026-10-17，07:45 UTC）
+
+- 源码核对纠错：16.66 与 16.19 的 Cube producer、tiling generator、tile
+  大小及 block count 计算完全一致；不存在独立 Cube 调度变化。旧记录称
+  mask eligibility 已恢复基线也不准确：16.19 使用更窄范围，并改变了非
+  sharding 路径的整行 ownership。冻结正式源码未修改。
+- 新隔离入口 `optimization/candidates/wide-row-ablation/`：baseline 精确复制
+  16.66，vector-only 只保留 N-sharding 及必要同步/workspace、恢复基线 mask
+  和 floor row mapping；ancillary-only 关闭 sharding、保留其余附带差异。
+  三组 benchmark 编译通过、Cube 身份断言及 24 ownership 配置通过。
+- 严格 CAModel smoke 在 baseline 首点 `2x8192x65` 的 aclInit 返回 500000，
+  未进入 kernel、无设备数值结果；不是 mismatch。按 Fast Track 直接 CLI
+  提交 vector-only：`6ad326cc193e507d8e7c7d4e`，正式 Pass 15/15、全部
+  precision_ratio=1，同 ID 官方 score **16.57**，低于 16.66，不晋升。
+  证据与恢复源码 `evidence/formal/wide-row-ablation-vector-6ad326cc/`，离线
+  validate 通过。本地设备验证未完成，同步/partial max/cache/数值风险保留。
+- 逐点相对 16.66：点 1 从 29.34 降至 22.73 us（-22.53%），点 3 从 18.66
+  降至 16.95 us（-9.16%）；其余点全部变慢。shape 映射未知，单次正式结果
+  不能证明收益可重复或归因于 sharding 激活。与 16.19 相比恢复至 16.57，
+  但 mask 与 row mapping 的效果尚不能拆开归因。
+- ancillary-only CLI 明确 429、等待 127 秒时被外层 120 秒 timeout 中断；随后
+  按用户要求受控重试成功：`6ad32855193e507d8e7f34d3`，正式 Pass 15/15、
+  全部 precision_ratio=1，同 ID 官方 score **16.33**、rank 211；证据与恢复
+  源码 `evidence/formal/wide-row-ablation-ancillary-6ad32855/`，validate 通过。
+  低于 16.66 和 vector-only 16.57，不晋升。相对基线仅点 2 改善 1.69%
+  （9.45→9.29 us），点 1 退化 32.55%，点 3--15 均退化。ancillary-only
+  仍混合 mask 和 row mapping 两个因素，不能单独归因。
+  根和冻结文件均未修改，未晋升/commit；下一步应离线分别拆分 mask 与 row
+  ownership，而不是继续提交当前混合变量。
+
+## K-plane parallel INT8 候选正式评测（2026-10-17，07:32 UTC）
+
+- 按用户要求通过 `gitlabcann/cannjudge_cli.py` 提交冻结候选
+  `optimization/candidates/k-plane-parallel-int8/`。提交前以
+  `--expected-project` 校验源码 hash；动态模板实际确认 editable payload
+  只有 `kernel.asc`，SHA256 为
+  `c5bbefeb9ceaf0b0019b5ea021f83b31a91e4682b019e0c605e5ceccb62dc7d6`。
+  服务端明确返回 HTTP 429 后提示等待 57 秒，随后对同一冻结 payload
+  重试并成功受理；无不明状态 POST 的重复提交。payload manifest 位于
+  `/tmp/opencode/k-plane-parallel-int8-result.manifest.json`。
+- submission `6ad32449193e507d8e77ed6a`：状态 Pass，15/15 全部 Pass，
+  每项 `precision_ratio=1`。同一 submission ID 的排行榜记录为 rank 213、
+  官方 score **16.32**，查询时间 `2026-10-17T07:32:04Z`。受保护的原始
+  回包在 `/tmp/opencode/k-plane-parallel-int8-result.json` 及
+  `.ranking.json`；脱敏证据与八文件恢复源码在
+  `evidence/formal/k-plane-parallel-int8-6ad32449/`，离线 validate 通过。
+- `formal_evidence.py decide` 相对 tileM=16 persistent 最佳
+  `6ad31941193e507d8e654e7b` / 16.66 返回 score 未严格提升；不晋升、不覆盖
+  根 `kernel.asc`，最高有效官方成绩仍为 **16.66**。
+- 逐点时间相对 16.66 bundle：点 2 改善 0.11%，点 3--15 慢 3.28%--7.15%；
+  testcase shape 映射未知。独立 plane workspace 与 Vector 合并流量抵消 Cube
+  并行收益是合理解释但仍属假设。严格 simulator 已通过
+  `2x33x65537`、`2x17x131073`（INT8 mismatch=0、yScale exact）；更大
+  `17x257x131073` 未完成，不算通过或失败。保留 workspace、tail、INT32 wrap
+  和大 M/N 调度风险。
+
+## 大重构优先：wide-row tile/CV 隔离候选（2026-10-17）
+
+- 用户要求优先大重构。新增 `optimization/candidates/wide-row-tile-cv/`，
+  从已有 n-shard 实验派生：保留二维 persistent Cube，针对 M<=16、N>=8192
+  并行激活/partial max，并将最终量化也沿 N 分片。仍只有一次 MIX launch，
+  保留 INT32 K-chunk、量化 exact correction；未覆盖根或冻结 op 文件。
+- 修正早先同步判断：AIC 的附加 barrier 是配对 AIV 分支的 barrier，而非
+  可直接删除的多余调用。当前 wide-row 路径双方各两次 SyncAll；每个 shard
+  独立合并 immutable partial max，省去 yScale 发布后的额外全局 barrier。
+- 主工程及 benchmark 在 CANN 9.1/dav-2201 编译通过；24 项 N ownership
+  主机检查通过，不构成设备同步/数值证明。kernel SHA256
+  `a10a49eade1023836c32193cd6f0f70da251b3a53d941cac385bea50c26d8af8`。
+- 严格 smoke 尚未启动：canonical CAModel lease 被另一个 k-plane benchmark
+  占用；按用户要求终止该无正式 score 的未提交诊断进程并释放 lease，未与其
+  并发运行。随后直接使用 CLI 提交冻结的八文件 payload：submission
+  `6ad32394193e507d8e769935`，服务端 `Pass`、15/15 且全部
+  `precision_ratio=1`；同一 submission ID 的排行榜 score **16.19**、rank
+  213。该结果低于已核实最佳 16.66，不晋升、不覆盖根。脱敏正式证据及源码
+  恢复副本位于 `evidence/formal/wide-row-tile-cv-6ad32394/`，离线校验通过；
+  本地 CAModel smoke 仍未完成，设备同步、数值和性能风险仍未消除。
+
+## 社区实现补充检索（2026-10-17）
+
+- 新增 `optimization/COMMUNITY_RESEARCH_20261017.md`，记录 TileLang Ascend
+  INT8 Cube+Vector fusion、vLLM dynamic scaled quant、Triton fused softmax/
+  persistent matmul、CUTLASS EVT/GEMM+reduction、TensorRT-LLM quantization
+  的来源、许可证/版本核对限制和本题语义差异。
+- 重要更正：当前根已经有 vector RNE、packed boundary mask 和 sparse exact
+  correction；因此“把全元素 scalar quant 替换成 vector quant”不是未做的
+  优化。新的优先假设是 ops-nn 风格多行 AIV reduction/broadcast，以及保留
+  二维 Cube ownership 的 tile-level CV 流水。尚未基于这些资料修改根或取得
+  新的设备/官方性能证据。
+
+## row-ring pipeline CLI 正式结果（2026-10-17，07:03 UTC）
+
+- 用户明确要求提交隔离 row-ring 候选。冻结工程：
+  `optimization/candidates/row-ring-pipeline/submit-project/`；kernel SHA256
+  `0ce41f1d47b2844b5d69108c5f3745a1087c844ff8af3c264b008276cb20efa1`。
+  CLI 动态模板确认实际 editable payload 仅 `kernel.asc`，完整工程 hash 已预检。
+- submission `6ad31d99193e507d8e6c5620`：服务端 `valid=true`、`Pass`、15/15，
+  全部 `precision_ratio=1`；同 ID 排行榜 score **15.71**、rank 212。
+  真实 CLI 原始结果与排名保存在 `/tmp/opencode/row-ring-pipeline-submit.json`
+  和对应 `.ranking.json`；脱敏证据与八文件源码恢复副本保存在
+  `evidence/formal/row-ring-pipeline-6ad31d99/`，离线 validate 通过。
+- 15.71 低于已核实最佳 16.66（`6ad31941193e507d8e654e7b`），不晋升、
+  不覆盖根 kernel。此前三组严格 INT32 smoke 与四组 benchmark 均通过，
+  但这些本地诊断不能替代官方 score；仍保留跨核 ordering、tail、K-chunk、
+  UB lifetime 和未覆盖边界风险。本轮没有执行晋升 Git commit。
 
 ## tileM=16 persistent MIX 正式晋升（2026-10-17，06:44 UTC）
 
@@ -51,6 +261,33 @@
   mask、UB lifetime、全核同步和多 stream 资源风险。后续可研究更深的 CV ring/在线
   epilogue，但不得将本轮 tile 粒度消融误称为已实现的 partial-max 流水。
 
+## 社区结构研究与 tile16 隔离消融（2026-10-17）
+
+- 检索并阅读 CATLASS W8A8 per-token/per-channel epilogue、双 slot CV workspace、
+  FullLoadA、Split-K/small-matmul 模板，以及 ops-nn DynamicQuant 多行归约与
+  asc-devkit MDL/UnitFlag 示例。固定 revision、语义差异、适用条件及风险见
+  `optimization/COMMUNITY_STRUCTURAL_RESEARCH_20261017.md`。
+- 本题需要全行 max 后才能得到 yScale。partial max 本身不能消除所有完整中间
+  矩阵；CV ring 方案仍需 FP32 激活暂存或重算。完整行组 UB 驻留可避免该暂存，
+  但仅适合 UB 可容纳且 M 并行度充足的形状。未把这些设计写成已完成实现。
+- 新隔离候选 `optimization/candidates/mix-2d-tile16-persistent/`：仅将最高有效
+  16.07 源码的 tileM=64 改为 16，SHA256
+  `cdde82ec40d96b91624cb80dafc3cf5fc547a2168e3a294c5bc40de4044501ae`。
+  主工程及 simulator benchmark 编译通过；主机 360 ownership + 8 K-chunk 通过。
+  三组严格 INT32 CAModel smoke（17×513×65、65×257×33、2×1025×32）全部
+  INT8 mismatch=0、scale max abs/rel diff=0，rtol=atol=1e-4，含零行/负 scale；
+  完整 fingerprints/日志见该候选 `results/single-launch-smoke-v1/`。
+- 旧诊断 current/tile16 snapshots 与根/候选已逐字节匹配。已有小形状配对收益
+  仅为 CAModel task_cycles，不是正式 score；不能据此归因官方点 12–15（shape
+  未知）。追加大形状运行 `tile16-followup-large-v1` 在 baseline aclInit=500000
+  失败，未启动 kernel；添加 simulator 库路径后换新 run ID
+  `tile16-followup-large-sim-v1` 串行重跑，仍在 aclInit=500000 失败。旧诊断二进制
+  缺少新 smoke 二进制的显式 CAModel runtime 链接，但尚不能证明这就是根因。
+  两次都未运行 current/tile16，未取得新的配对性能；停止复用旧二进制，后续须先
+  显式 simulator 模式重建。新候选已通过的 smoke 使用不同的、新构建的二进制。
+- 在正式提交前，本候选尚未晋升；随后 CLI submission
+  `6ad31941193e507d8e654e7b` 以 15/15、score 16.66 完成验证并按顶部条目晋升。
+  大 K、subnormal/FTZ、一般 mask/量化边界与同步并发风险未因正式通过而消除。
 
 ## 单次 launch 二维 MIX 正式晋升（2026-10-17，03:38 UTC）
 
@@ -78,6 +315,62 @@
   服务端/本地 CANN 版本差异、多 stream 超额资源下全核同步死锁。正式 15/15 不等于
   全输入严格设备正确性证明。下一步优先诊断点 4 退化，并测试单 kernel 下的 shape
   分派/无全局 barrier 的完整 N 路径；不能为优化重新引入第二次 launch。
+
+## Direct INT8 MIX 正式晋升（2026-10-17，03:02 UTC）
+
+- 使用用户指定会话文件 `/tmp/opencode/cookie`，对冻结候选 `optimization/candidates/direct-int8-mix/` 重新执行 CLI；动态模板确认实际 editable payload 仅 `kernel.asc`。
+- submission `6ad2e531193e507d8e1bb641`：服务端 `Pass`、15/15、全部 `precision_ratio=1`；同一 submission ID 的排行榜记录 `rank=221`、score **14.94**，`matches_requested_submission=true`。
+- `evidence/formal/fast-track-6ad2e531/` 已由实际 result/ranking 和完整八文件 payload 恢复；`formal_evidence.py validate` 与相对 `evidence/formal/fast-track-6ad2e0a8/` 的 `decide` 均通过。
+- 逐点时间相对 14.71：1 +10.25%、2 -17.83%、3 +16.31%、4 -8.67%、5 -4.77%、6 -4.25%、7 -3.66%、8 -5.35%、9 -3.39%、10 -3.41%、11 -2.45%、12 -3.03%、13 -2.23%、14 -1.07%、15 +0.72%；官方 score 仍严格提升 0.23，故按门槛晋升。
+- 晋升前根快照：`optimization/snapshots/pre-direct-int8-mix-14.71/kernel.asc`；新根 kernel SHA256 `5cc48d36e97c00f0a3e84bfba645470fc9ec770ed8bd8603b00baf7f43d9b102`。本地设备/CAModel 未运行，直接 MatmulImpl、event 5、atomic/tail、FTZ/UB 风险仍见候选 `RESEARCH.md`；正式 15/15 不等于全输入设备证明。
+
+## Pure Cube 2D + independent Vector submission failure（2026-10-17，03:24 UTC）
+
+- 按用户要求直接提交隔离候选 `optimization/candidates/pure-cube-2d-vector/`。
+  本地 CANN 9.1.0 / dav-2201 编译成功；候选 kernel SHA256
+  `a3dc9c94b2570cfad682a7ae1b2bca6ecb784ceb7c22d1613e976c497ccaae29`。
+  动态模板确认实际上传文件只有 `kernel.asc`，提交前 manifest 位于
+  `/tmp/opencode/pure-cube-2d-vector-result.manifest.json`。
+- 服务端受理 submission `6ad2ea60193e507d8e231322`，但结果为 `Runtime Error`，
+  15/15 均未通过且没有官方 score。每个 testcase 的原始错误相同：
+  `Profiling rule violated: each iteration must launch exactly 1 kernel. Expected
+  75 launches, got 150.` 这直接否定了“两阶段 Cube→Vector launch”在本题提交协议下的可用性；
+  不是可归因的性能结果，也不是数值错误证据。
+- 服务端返回的完整八文件上下文已逐文件核对：上传的 `kernel.asc` 与候选 hash
+  一致，非 editable 文件与 14.94 正式工程上下文一致。脱敏失败归档及可恢复源码位于
+  `evidence/formal/pure-cube-2d-vector-6ad2ea60/`；原始结果位于受保护的
+  `/tmp/opencode/pure-cube-2d-vector-result.json`。该归档不是 `formal_evidence.py`
+  的 Pass evidence bundle，不应运行 validate/decide 晋升。
+- 候选不晋升、不重复提交同一 payload，当前最高有效官方结果仍为 submission
+  `6ad2e531193e507d8e1bb641`、15/15、score **14.94**。根 `kernel.asc` 未改动。
+- 后续架构约束已更新：任何正式候选必须在每次迭代只启动一个 kernel；若继续研究二维
+  ownership，必须合并到单 kernel 内并解决 row-max 归约，不能保留第二次 kernel launch。
+
+## 二维重构单次 launch 修复（2026-10-17，历史提交中状态；已在顶部记录晋升）
+
+- 用户要求修复后再次提交。隔离候选 `optimization/candidates/mix-2d-single-launch/`
+  保留二维 AIC tile producer，将两次 kernel launch 合为一个 `MIX_AIC_1_1` launch；
+  所有 AIC/AIV 共同进入硬件 `SyncAll<false>()`，完成后才执行独立完整行 VectorStage。
+  不使用隐藏 launch、不改评测脚本、不改根。单元素 fast path 仍是互斥的一次 launch。
+- 本地 CANN 9.1.0 / dav-2201 主工程和 benchmark 编译成功；kernel SHA256
+  `fade9cbe23d05ffd5b636015b2c59c4e4f9bf63987bd3b4c370624d545ff9f62`。
+  `host_checks.py` 通过 360 个 ownership 配置与 8 个 K chunk 配置；运行 block 数
+  限制不超过 availableCoreNum 及平台 AIC/AIV 数。全核同步的多 stream 超额资源死锁风险、
+  服务端 CANN 9.0 语义、FTZ/mask/UB、大 K atomic 与一般边界风险均在 RESEARCH.md 明示。
+- 主机 lease 下串行 CAModel 严格 INT32 smoke：17x513x65、65x257x33、2x1025x32，
+  含零行/负 scale，均 INT8 mismatch=0、scale max abs/rel diff=0；使用 rtol=atol=1e-4。
+  覆盖 M/N/K tail 和 N-split，但不等于全输入或大 K 设备证明，未测配对性能。
+  fingerprints/日志入口 `optimization/candidates/mix-2d-single-launch/results/single-launch-smoke-v1/`。
+- 已发起正式 CLI 提交（编译和主机检查完成，smoke 当时运行中），回包路径
+  `/tmp/opencode/mix-2d-single-launch-result.json`；本条记录时后台命令尚无完成通知，
+  submission_id/15/15/score 未取得，不晋升、不重复 POST。根仍为正式 14.94。
+
+## Direct INT8 MIX 候选（2026-10-17，CLI 未受理）
+
+- 针对 TBest 逐点差距（当前 14.71 结果多数点仍明显高于 TBest），查阅公开 AscendC `GroupedMatmulQuantMixCore` 与 Triton-Ascend CV fusion 资料，选择直接 AIC `MatmulImpl` + 文档化 AIC→AIV event 的结构候选；保持完整 N ownership、原 VectorStage、K<=65536 chunk/atomic 语义，不接入未完成的 N-split。
+- 隔离候选：`optimization/candidates/direct-int8-mix/`，基线为可恢复的正式 14.71 bundle `evidence/formal/fast-track-6ad2e0a8/source/`。kernel SHA256 `5cc48d36e97c00f0a3e84bfba645470fc9ec770ed8bd8603b00baf7f43d9b102`；CANN 9.1.0 / dav-2201 Release 编译成功，二进制和八文件 manifest 见候选目录。
+- `host_checks.py` 通过 80 项 M ownership/K chunk/source invariant 检查；本地设备、CAModel 和完整严格 INT32 设备回归未运行，残余风险写入候选 `RESEARCH.md`。
+- 已实际调用 `gitlabcann/cannjudge_cli.py submit`，动态模板预检确认 editable 仅 `kernel.asc`；POST 前服务端返回 HTTP 401“登录状态已失效”，没有 submission ID、15/15、score 或可归属正式证据。按 fail-closed 规则不重复 POST，不晋升、不覆盖根；需用户重新认证后再提交该冻结 payload。
 
 ## 激进组合直接 CLI 晋升（2026-10-17，02:43 UTC）
 
@@ -452,3 +745,50 @@ hash；不得假设实际上传文件只有 `kernel.asc`。正式晋升仍以同
 - 组合源码 SHA256 为 `e763bfe2fe3682de621febc73b7889539f6a1d686188eb8a27bb619755ac81ea`，CANN 9.1.0 / `dav-2201` 编译成功，二进制 SHA256 为 `834aaa1b0eee50ac0c2a326efecde91a9c861ec8505e9afd31a244a27ee2f068`。组合静态检查及两个原候选主机检查通过；未运行设备 smoke、CAModel 或严格 INT32 设备回归。
 - 历史提交前状态：host-only Coordinator job `1792204288134-6b3e22a0f2` 曾因旧队列 HTTP 401 被阻塞，随后取得上述 14.64 正式结果，未晋升。后续同源码的另一正式提交 `6ad2e0a8193e507d8e164f44` 取得 14.71 并晋升，见本文顶部；14.64 作为独立历史实验归档，不继承后续 score。
 - 组合候选风险：row-job 的 Matmul completion/消费同步、all-K 大 K stride/atomic modulo、FTZ/mask/UB 边界，以及单元素专用路径均未由设备验证。恢复与说明见候选 `RESEARCH.md`。
+
+## 多行候选正式反馈（2026-10-17）
+
+- 已使用 `/tmp/opencode/cookie`，由受控 CLI 自行读取认证；动态 editable 清单为 `kernel.asc`。
+- 首次提交 `6ad32e78193e507d8e8b06a6`：Compile Error，服务端缺少本地 9.1 的 `ReduceRepeat<ReduceType::MAX>` API。证据及完整恢复工程：`evidence/formal/multi-row-v1-compile-6ad32e78/`。
+- 新修订仅将两次调用改为 `WholeReduceMax`（本地头文件确认其转调相同内部实现），五个构建目标编译成功、3584 组主机布局检查通过；未对新修订重新运行 CAModel。kernel SHA256 `54ab681272f6b223e216d0deea14de8aa151c6626358ec80a4160eb24e4f46e5`。
+- 新提交 `6ad32f9e193e507d8e8cf57c`：Wrong Answer，12/15 通过；按正式结果顺序 case 1/3/8 失败，precision_ratio 分别 0、0.5339366515837104、0.019049067815879006；其余 12 点为 1。同 ID 榜单 score 0，不是有效成绩。证据及服务端完整返回工程：`evidence/formal/multi-row-v1-wrong-6ad32f9e/`。
+- 失败机制尚未定位：可能涉及 reduction 布局、同步或组内 activation 生命周期；不能仅凭错误分布断定 stride 错误。正式 case shape 未知。新修订本地 smoke 未重跑，不能继承旧修订设备验证状态。
+- 两次均未晋升，根未修改；历史最高有效仍为 16.66。停止提交当前失败 payload，下一步做最小逐行 reduction 消融以隔离批量激活与归约布局，不再等待完整 CAModel 性能回归。原始 API 回包位于 `/tmp/opencode/multi-row-{v1,v2}-formal-result*.json`，持久目录只保留脱敏字段和源码。
+
+## 多点独立架构探索与 A-panel 调度反馈（2026-10-17）
+
+按用户要求将先多点独立探索、再整合写入 AGENTS.md，随后规则明确允许独立候选各自 Fast Track。既有 architecture-trials-v1 有 local-k、scale-owner、tile-fifo 编译原型；本轮未覆盖其源码或共享提交目录。local-k 仍有 SetTensor 重置后 L0C 保留语义风险，不具备直接提交条件。
+
+另建 `optimization/candidates/a-panel-grouped-scheduler-v1/`，唯一突破假设是同核连续处理同一 A 行块的四个 N tiles，测试局部性，不宣称显式 L1 驻留。保持 Cube 数值主体、K chunk、量化与 exact correction、workspace、SyncAll、单 launch 不变。完整冻结 payload 的 kernel SHA256 为 `59afc75beb0afbf440615ec547447e75bff82673edaea00d586b7e99b8600679`。420 组 ownership 模型及完整模板 CANN 9.1/dav-2201 编译通过；未完成本地设备验证，保留 tile tail/负载不均/缓存行为及基线数值边界风险。
+
+独立正式提交 `6ad334f3193e507d8e96fa05`：Pass 15/15，同 ID 排行榜 score **16.58**，低于 16.66，未晋升。受理前仅按两次明确 HTTP 429 指示等待 6/180 秒，payload 不变。证据与服务端工程恢复副本在 `evidence/formal/a-panel-grouped-6ad334f3/`；真实原始回包 `/tmp/opencode/a-panel-grouped-v1-result*.json`。结果只否定该 ownership 分组候选的官方收益，不否定显式 L1 A-reuse 架构。根与冻结 op 文件未由本轮修改。下一步单独验证 scale-owner/FIFO，或设计显式 L1 A 缓存；不组合尚未验证的突破点。
+# 核验补记：scale-owner / CV FIFO（2026-10-17）
+
+本轮开始前两个冻结 payload 已经由其他流程提交，因此本轮没有重复 POST。
+scale-owner `6ad3343f193e507d8e95990c` 正式 Pass 15/15，同 ID 榜单
+score **16.60**；CV FIFO `6ad335a8193e507d8e985b8b` 正式 Pass 15/15，
+本轮重新从服务端查询结果及同 ID 榜单确认 score **16.89**。
+两个现有脱敏证据 bundle `evidence/formal/scale-owner-6ad3343f/`、
+`evidence/formal/tile-fifo-6ad335a8/` 均通过 formal_evidence.py validate。
+FIFO 的 decide 相对已核实 local-k-safe 16.69 返回 eligible。
+
+针对性只读检查 `optimization/candidates/architecture-trials-v1/targeted_checks.py`
+通过 125 组 shard 唯一 owner、N 尾片覆盖、workspace/metadata 分隔及 barrier
+源码模型，以及 150 组 FIFO 行唯一所有权、两槽复用和最终 ACK drain 模型。
+该结果不证明设备事件语义；本轮未执行 CAModel、无新 task_cycles 或阶段耗时。
+两份冻结工程的全部 hash 与候选源码一致。既有 benchmark 编译证据保留。
+
+并行变更：本轮开始根 hash 为旧 16.66 的 cdde82ec…；核验中另一进程将根改为
+FIFO 的 427a35b3… 并创建证据 bundle。当前八个根工程文件与 FIFO 恢复源码完全
+一致。本轮没有覆盖该并行变更，也没有把其归为本轮独立执行的晋升。FIFO 是
+最高已核实有效版本 16.89；根对齐完成，但晋升 commit 尚需串行确认，不能把
+并行工作树和其他研究修改一起提交。旧 16.66 源码及备份均保留。
+
+FIFO 相对旧 16.66 的单次官方点耗时变化：case 1/3/12 分别减少约
+28.15%/16.83%/10.90%，case 9 增加约 11.87%；shape 映射未知，不能据此
+声称大 shape 一致受益或分离出流水阶段收益。最终评价仍以官方 16.89 为准。
+
+L0C 核查详见 `optimization/candidates/architecture-trials-v1/local-k/API_REVIEW.md`。
+SetTensorA/B 确实 Reset scheduler，但 normal Reset 仅置 isFirstIter；不能据此
+断言 L0C 丢失，也不能证明复用。local-k-safe 的 16.69 是另一种单调用安全 K
+范围策略，不是原始外部 chunk L0C 累加已成立。本轮不提交原始 local-k。
