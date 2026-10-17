@@ -1,0 +1,130 @@
+{
+  "baseline_submission_id": "6ad33b78193e507d8ea310c4",
+  "candidate_submission_id": "6ad34061193e507d8eaf555b",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "interpretation": "Timing feedback only; not an official score or promotion decision. Positive delta means slower. Shape mapping and repeatability unknown.",
+  "time_unit": "server time field; not independently inferred",
+  "faster_cases": 1,
+  "slower_cases": 14,
+  "equal_cases": 0,
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "baseline_time": 18.41,
+      "candidate_time": 31.03,
+      "delta_time": 12.620000000000001,
+      "relative_change_percent": 68.54970124932103
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "baseline_time": 9.36,
+      "candidate_time": 9.04,
+      "delta_time": -0.3200000000000003,
+      "relative_change_percent": -3.4188034188034178
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "baseline_time": 12.36,
+      "candidate_time": 19.05,
+      "delta_time": 6.690000000000001,
+      "relative_change_percent": 54.12621359223302
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "baseline_time": 20.75,
+      "candidate_time": 35.14,
+      "delta_time": 14.39,
+      "relative_change_percent": 69.34939759036145
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "baseline_time": 17.66,
+      "candidate_time": 32.34,
+      "delta_time": 14.680000000000003,
+      "relative_change_percent": 83.12570781426956
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "baseline_time": 38.9,
+      "candidate_time": 95.53,
+      "delta_time": 56.63,
+      "relative_change_percent": 145.57840616966584
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "baseline_time": 61.65,
+      "candidate_time": 131.16,
+      "delta_time": 69.50999999999999,
+      "relative_change_percent": 112.7493917274939
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "baseline_time": 136.64,
+      "candidate_time": 343.59,
+      "delta_time": 206.95,
+      "relative_change_percent": 151.4563817330211
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "baseline_time": 103.41,
+      "candidate_time": 314.46,
+      "delta_time": 211.04999999999998,
+      "relative_change_percent": 204.0905134899913
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "baseline_time": 266.85,
+      "candidate_time": 887.59,
+      "delta_time": 620.74,
+      "relative_change_percent": 232.61757541690088
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "baseline_time": 327.58,
+      "candidate_time": 763.08,
+      "delta_time": 435.50000000000006,
+      "relative_change_percent": 132.94462421393249
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "baseline_time": 661.18,
+      "candidate_time": 2264.31,
+      "delta_time": 1603.13,
+      "relative_change_percent": 242.46498684170726
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "baseline_time": 873.24,
+      "candidate_time": 2349.48,
+      "delta_time": 1476.24,
+      "relative_change_percent": 169.0531812560121
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "baseline_time": 1931.74,
+      "candidate_time": 5835,
+      "delta_time": 3903.26,
+      "relative_change_percent": 202.05928334040814
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "baseline_time": 4600.98,
+      "candidate_time": 13160.27,
+      "delta_time": 8559.29,
+      "relative_change_percent": 186.03188885846063
+    }
+  ],
+  "sources": {
+    "baseline": {
+      "path": "evidence/formal/dual-aiv-fixed-6ad33b78/evidence.json",
+      "sha256": "0b6a0fca927418df92f60889033d9090dac41d78081a768d56f7b77468357197",
+      "observed_at": "2026-10-17T09:10:55Z"
+    },
+    "candidate": {
+      "path": "evidence/formal/l0c-chunk64-6ad34061-score-pending/pending-result.json",
+      "sha256": "bba05105500f3a93af8d904e6cb501ac5fbd10be7d603a405928d068c391db36",
+      "observed_at": "2026-10-17T09:31:52Z"
+    }
+  }
+}

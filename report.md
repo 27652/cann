@@ -835,6 +835,19 @@ INT8 mismatch、yScale 完全一致（rtol=atol=1e-4）。实际 MDL scheduler �
 `evidence/formal/l0c-chunk64-6ad34061-score-pending/`；该候选不晋升、不替换
 19.45 根版本。后续只有取得同 submission ID 的官方 score 后，才可与 19.45 比较。
 
+依据更新的 AGENTS.md，新增逐 testcase ID 官方耗时反馈：
+`evidence/formal/l0c-chunk64-6ad34061-score-pending/time-comparison.json` 保存全部
+15 点的基准时间、新时间、绝对差及相对变化。基准 `6ad33b78193e507d8ea310c4`
+来自已验证 19.45 bundle（原查询 09:10:55Z）；候选 `6ad34061193e507d8eaf555b`
+来自真实最终回包脱敏副本（09:31:52Z），均为 2026-10-17 UTC。
+14 点更慢，仅 testcase 后缀 adc7 从 9.36 到 9.04（-0.32，-3.42%）；其余点
+退化 +54.13% 到 +242.46%。时间单位沿用服务端 time 字段，不额外推断。
+单次结果重复性未知，shape 映射未知；候选使用单 AIV，而基准双 AIV，因此不能
+把差异全部归因于 L0C chunk。保留协议研究价值，暂不继续 chunk64 性能路线。
+榜单无记录尚不足单独证明封榜；本对比只按 score 不可用时的临时诊断记录，
+不计算替代 score、不晋升。工具 `evidence/compare_official_times.py` 已通过轻量
+单测（排序无关、差值、跨题目、缺失/重复/非正/非有限时间/失败用例拒绝）。
+
 # FIFO + UB8192 组合反馈：正式 16.85（2026-10-17）
 
 以已核实的 FIFO `6ad335a8193e507d8e985b8b` 和独立 UB-resident-8192
