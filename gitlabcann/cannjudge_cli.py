@@ -19,6 +19,7 @@ import http.cookies
 import json
 import os
 import pathlib
+import re
 import sys
 import time
 import urllib.error
@@ -38,6 +39,38 @@ class ApiError(RuntimeError):
     def __init__(self, status: int, message: str, payload=None):
         super().__init__(f"HTTP {status}: {message}")
         self.status, self.payload = status, payload
+
+
+def retry_after_seconds(error: ApiError) -> int | None:
+    """Extract an explicit server retry delay; never guess a delay."""
+    if error.status != 429:
+        return None
+    if isinstance(error.payload, dict):
+        for entry in (error.payload, error.payload.get("data")):
+            if isinstance(entry, dict) and any(entry.get(key) for key in
+                    ("submissionId", "submission_id", "_id", "id")):
+                return None
+    text = str(error)
+    if isinstance(error.payload, dict):
+        text += " " + " ".join(str(error.payload.get(key, ""))
+                                 for key in ("message", "msg", "error", "detail", "retry_after"))
+    match = re.search(r"(?:请在\s*)?(\d+)\s*秒后\s*(?:再提交|重试)|"
+                      r"(?:retry\s+after|retry[_ -]?after|try again in)\s*[:：]?\s*(\d+)\s*(?:seconds?|secs?)?",
+                      text, re.IGNORECASE)
+    return int(next(x for x in match.groups() if x is not None)) if match else None
+
+
+def submit_with_rate_limit_retry(client, payload):
+    """Only an explicit POST 429 rejection can be retried (at most twice)."""
+    for attempt in range(3):
+        try:
+            return client.request("/api/submissions/submit", "POST", payload)
+        except ApiError as exc:
+            delay = retry_after_seconds(exc)
+            if delay is None or attempt == 2:
+                raise
+            print(f"服务端限流，按明确提示等待 {delay} 秒后重试（{attempt + 1}/2）", file=sys.stderr)
+            time.sleep(delay)
 
 
 class Client:
@@ -326,7 +359,7 @@ def submit(client: Client, args):
         "tiling_h": "", "tiling_key_h": "", "host_cpp": "", "kernel_cpp": "",
     }
     print(f"提交 {len(files)} 个文件到：{problem.get('title') or args.problem}")
-    response = client.request("/api/submissions/submit", "POST", payload)
+    response = submit_with_rate_limit_retry(client, payload)
     data = response.get("data", response) if isinstance(response, dict) else response
     submission_id = str(data.get("submissionId") or data.get("_id") or data.get("id") or "")
     if not submission_id:

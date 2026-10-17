@@ -64,7 +64,9 @@ The worker submits qualified snapshots serially and reconciles each submission
 before proceeding to the next candidate. It uses the
 existing CLI session mechanism; it never reads, logs, copies, or accepts a
 Cookie value as an argument. The underlying CLI uses its default local session;
-the worker does not currently support changing the session path. A `submitted` queue state means only that the request
+`worker`, `serve` and `reconcile` also accept `--session /path/to/session-file`.
+Only the path is passed to the reviewed CLI for submit, result and ranking
+requests; the worker does not read or copy the credential contents. A `submitted` queue state means only that the request
 was accepted by the CLI. The resulting service response and submission-bound
 score must still be verified with the formal evidence workflow before any
 promotion decision. `uncertain` jobs remain auditable and are not retried
@@ -72,10 +74,23 @@ automatically, avoiding duplicate submissions after a timeout.
 
 This worker has a process lock preventing concurrent submitters. A timeout,
 unknown service response, missing submission ID, or missing submission-bound
-score halts the queue and requires `reconcile`; it never retries a POST. A
+score halts the queue and requires `reconcile`; it never retries an uncertain POST. A
 verified terminal result is archived under the configured evidence root with
 the uploaded-file manifest and recoverable source files. Promotion remains a
 separate Coordinator decision requiring the AGENTS.md evidence gates.
+
+### Explicit rate-limit retry
+
+The shared `gitlabcann/cannjudge_cli.py` handles submission POST rate limits,
+so both direct submissions and Fast Track use the same policy without nested
+retry loops. Only HTTP 429 with an explicit, parseable server wait in seconds
+and no submission-ID indication is retried: wait that duration, then resend
+the identical frozen in-memory payload, at most twice per CLI invocation.
+Fast Track keeps its worker lock throughout the wait; CLI messages are retained
+in `worker.log`. No delay is guessed. Missing delay, exhausted retries, auth
+failure, network timeout or unknown acceptance still fails closed. Interrupted
+jobs are not automatically reposted. This is a refusal-specific exception,
+not permission to retry accepted submissions or override `uncertain` states.
 
 ## Continuous operation and Coordinator integration
 

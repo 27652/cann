@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "job_id": "1792199099715-f519856f91",
+  "candidate_id": "cuda-epilogue-direct-cast-v1",
+  "submission_id": "6ad2cdc8193e507d8e04ca9c",
+  "status": "evaluated_pass",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1
+    }
+  ],
+  "payload_manifest": {
+    "path": "/tmp/opencode/cuda-epilogue-fast-track/results/1792199099715-f519856f91/result.manifest.json",
+    "sha256": "91c91eb96de11bf5cddac4a72e0bd807959de7e9d26b5ebfffdf4c428d287317",
+    "files": {
+      "kernel.asc": {
+        "sha256": "12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818",
+        "bytes": 50114
+      }
+    }
+  },
+  "result_sha256": "b699e5cfd3c1d620417debcc08df7203dfdf6cc613e36f0a03c29de59da87d1a",
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2cdc8193e507d8e04ca9c",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "11.63",
+    "ranking_sha256": "4e5b2854ebc36e15fdee20af31d77dd22f06ee6e45f54c1185e6f67945b05c8e"
+  },
+  "evaluated_at": 1792200197.8702085,
+  "risks": [
+    "Only targeted half_boundary and random case03 device smoke completed; full strict suite unrun.",
+    "Inherited historical K>=65536 FP32 matmul branch is not proven strict INT32 for all inputs.",
+    "Formal server template currently exposes kernel.asc only; contest flags ongoing/submit_enabled false contradict recent accepted submissions."
+  ],
+  "source_sha256": "12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818",
+  "binary_sha256": "a5249cce9d5e2b1c1db03d952afe9f2f626c3e13268aa292047097d8e6d6e8f5"
+}

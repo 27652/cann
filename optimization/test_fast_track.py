@@ -7,10 +7,24 @@ from types import SimpleNamespace
 from unittest.mock import patch, Mock
 from pathlib import Path
 
-from fast_track import digest, enroll, read_strict, worker, _formal_state, _submit_command
+from fast_track import digest, enroll, read_strict, worker, _formal_state, _submit_command, _result_command, _ranking_score
 
 
 class FastTrackTests(unittest.TestCase):
+    def test_explicit_session_is_global_cli_option(self):
+        session = Path('/unused/session-file')
+        submit = _submit_command(Path('cli'), Path('project'), Path('result'),
+                                 Path('expected'), [], session)
+        result = _result_command(Path('cli'), 'submission', Path('result'), session)
+        for command, action in ((submit, 'submit'), (result, 'result')):
+            self.assertEqual(command[:5], ['python3', 'cli', '--session', str(session), action])
+        with tempfile.TemporaryDirectory() as temp:
+            with patch('fast_track._submission_id', return_value='submission'), \
+                 patch('fast_track.subprocess.run', return_value=SimpleNamespace(returncode=1)) as run:
+                _ranking_score(Path('cli'), {}, Path(temp), {'problem_id': 'problem'}, 'team', session)
+                self.assertEqual(run.call_args.args[0][:5],
+                                 ['python3', 'cli', '--session', str(session), 'ranking'])
+
     def test_real_cli_rejects_changed_payload_before_post(self):
         spec = importlib.util.spec_from_file_location('fast_track_cli_test',
             Path(__file__).resolve().parents[1] / 'gitlabcann/cannjudge_cli.py')

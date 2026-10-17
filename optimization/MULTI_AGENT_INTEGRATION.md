@@ -1,5 +1,33 @@
 # Three-Agent integration — 2026-10-16
 
+## Completed matched measurements — 2026-10-17
+
+All six pair tasks reached `passed`, return code 0, through the shared queue.
+Coordinator's `compare_scheduled_pair.py` accepted source/binary identity,
+common input/golden/script/environment fingerprints and strict INT32 checks.
+Both sides of every pair have zero INT8 mismatches, accepted scale, and passing
+FP32 diagnostics. These are local single-case diagnostics, not official scores.
+
+| Candidate | Case | Baseline task_cycles | Candidate task_cycles | Change | Baseline / candidate total_ticks |
+|---|---|---:|---:|---:|---:|
+| quant | `1x1144x1 / half_boundary` | 207223 | 117037 | -43.521% | 207581 / 117374 |
+| shape | Case12 `1024x256x64 / random` | 3369038 | 3370081 | +0.031% | 3369512 / 3370450 |
+| cache | `2x4097x32 / random` | 819869 | 815554 | -0.526% | 820296 / 816010 |
+
+Pair task IDs, source/binary hashes and full fingerprints are preserved under
+`/tmp/opencode/multi-agent-integration-5574de4/{quant,shape,cache}-pair-validated.json`
+and the queue's immutable snapshots/results. Cache compares identical revised
+source with `QUANT_CACHE_TWO_TILES=0/1`; it does not isolate resident-tail versus
+the old cache-enabled implementation. ASC discovery was repaired by sourcing
+the validated CANN environment, without overwriting other worktrees' binaries.
+
+The original three submissions scored 7.26 (quant), 7.27 (shape), and 7.26
+(cache), below the original verified 11.67 baseline; none was promoted.
+Later independent research has newer formal results; consult `report.md` rather
+than interpreting this historical integration baseline as the current best.
+At final queue inspection no tasks remained queued/running and no model or
+Coordinator process remained; no empty Worker was restarted.
+
 ## Pinned baseline
 
 - Git HEAD shared by all research worktrees:

@@ -4,6 +4,8 @@
 
 ## 通用 Fast Track 状态（2026-10-17）
 
+- 最新有效最佳：`6ad2d3be193e507d8e0a014d`，15/15，score **14.37**；根 kernel SHA256 `782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56`。实际 editable 文件为 kernel.asc；八文件服务端工程上下文与脱敏结果见 `evidence/formal/fast-track-6ad2d3be/`。前一最佳 14.34 完整恢复入口为 `evidence/formal/fast-track-6ad2d309/`。候选主机验证通过，未完成本地设备验证；逐点 TBest 对照为 `optimization/candidates/unit-token-scale-v2/COMPARISON.md`，后文各阶段“当前”属于历史状态。
+
 - 服务端核查仍返回赛事 `ongoing=false`、`submit_enabled=false`，截止时间为 2026-10-17T10:00:00Z；该元数据与实际成功受理行为不一致，不能单独作为关闭证明。Shape、Cache、Scale Resident 及历史-mask+scale-resident 组合均已完成正式提交。
 - 审计 staging：`/tmp/opencode/cannjudge-fast-track-audit-20261017/`。Shape、Cache、Scale Resident 的正式 8 文件工程均编译成功，优化逻辑均存在于对应上传的 `kernel.asc`；Scale Resident 使用独立 enabled staging 将默认宏设为 1。
 - Shape 为 `6ad2c277193e507d8efb568a` / 15/15 / score 7.27，Cache 为 `6ad2c3a4193e507d8efc3550` / 15/15 / score 7.26，Scale Resident 为 `6ad2c647193e507d8efe5cf7` / 15/15 / score 7.29；新组合 `6ad2c82d193e507d8effe4e2` / 15/15 / score 11.76，已严格超过历史最佳 `6ad2872c193e507d8ed198c9` / 11.67。组合证据、hash、验证和风险见 `report.md`。
@@ -20,9 +22,17 @@
 
 ## 当前状态
 
-- CUDA direct-cast 独立候选：`/tmp/opencode/cuda-epilogue-candidate/kernel.asc`，SHA256 `12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818`；已完成编译、严格 INT32 主机检查及两个针对性 CAModel smoke，完整设备回归未运行。Fast Track job `1792199099715-f519856f91` 因 HTTP 401 停在 `uncertain`，没有 `submission_id` 或官方 score，未晋升；快照和日志位于 `/tmp/opencode/cuda-epilogue-fast-track/`，详见 `report.md`。
+- 三 Agent 的六项配对 CAModel 任务已全部 passed，并经 `compare_scheduled_pair.py` 验收：quant cycles -43.521%、shape +0.031%、cache -0.526%，均为各自单 case 诊断；完整证据索引见 `optimization/MULTI_AGENT_INTEGRATION.md` 与 `report.md`。
+- 后续核查发现 `evidence/formal/fast-track-6ad2d309/`（15/15、score 14.34）离线 valid、相对 14.02 eligible。但根源码在核查期间被并发研究修改为 `782b573...`，本会话未覆盖或晋升；下列根 hash/14.02 状态为此前时点记录，最新工作根与正式最佳不得混同。详见 `report.md` 的并发工作区保护条目。
+- 最新正式有效结果为 submission `6ad2d3be193e507d8e0a014d`，15/15、score **14.37**；`evidence/formal/fast-track-6ad2d3be/` validate/decide 通过，完整上传文件 hash 与当前工作树一致，当前根 `kernel.asc` 为 `782b573...`。14.34 bundle 保留为前一候选，不覆盖最新结果。
 
-- Fast Track 已接入新启动 Coordinator 的默认正式评测队列：`optimization/fast_track.py`、`optimization/FAST_TRACK.md`、`optimization/multi_agent_worker.py`。Agent 显式 enroll 后由 Coordinator 串行提交、按 submission ID 对账并归档脱敏摘要；异常不重试 POST，正式晋升仍需独立证据门禁。20 项相关回归通过；基础设施测试未进行真实网络提交。已有运行进程未重启，未安装常驻服务。
+- 14.02 基线派生候选 `optimization/candidates/row-parallel-all-16/` 已正式晋升：submission `6ad2d309193e507d8e0959e9`、15/15、同提交 score **14.34**，正式证据 `evidence/formal/fast-track-6ad2d309/`。kernel SHA256 `0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`；本地设备 smoke 因 aclInit ret=500000 未完成。错误编码的 host-only strict 记录已隔离，job `1792201151308-7d43d82ba8` 标记 invalid_validation、队列 halted，禁止用其提交；审计与风险见 `report.md`。
+
+- 当前最高有效版本：`6ad2d309193e507d8e0959e9`，Pass 15/15，score **14.34**；`row-parallel-all-16` 候选已晋升，证据 `evidence/formal/fast-track-6ad2d309/`，源码/研究记录 `optimization/candidates/row-parallel-all-16/`，晋升前根快照 `optimization/snapshots/pre-row-parallel-all-16/kernel.asc`。未完成本地设备验证；继承 ownership/tiler、同步和大 K 数值风险，详见 `report.md`。
+
+- CUDA direct-cast 候选源码 SHA256 `12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818`；编译、主机检查和两个严格 CAModel smoke 通过，完整设备回归未运行。Fast Track job `1792199099715-f519856f91` 在显式会话重试后正式提交为 `6ad2cdc8193e507d8e04ca9c`，15/15、同提交 score 11.63，未晋升。恢复源码和脱敏摘要：`evidence/formal/fast-track/6ad2cdc8193e507d8e04ca9c/`；通用校验器与该归档 schema 不兼容，详见 `report.md`。
+
+- Fast Track 已接入新启动 Coordinator 的默认正式评测队列：`optimization/fast_track.py`、`optimization/FAST_TRACK.md`、`optimization/multi_agent_worker.py`。Agent 显式 enroll 后由 Coordinator 串行提交、按 submission ID 对账并归档脱敏摘要；CLI 仅对明确 HTTP 429 等待提示自动重试未受理 POST，其他异常仍 fail-closed。新增限流测试及既有 Fast Track 回归通过；已有运行进程未重启，未安装常驻服务。
 
 - 双 Worker host-only 并发兼容性入口：`optimization/experiment_dual_worker.py`；同队列/跨队列两个场景各 12 项任务通过且无执行重叠，证据 `/tmp/opencode/dual-worker-host-v1rlwl6b/summary.json`。未运行真实 CAModel 双实例；详见 `report.md`。
 
@@ -30,7 +40,8 @@
 - 后续三路 baseline/candidate 均已独立编译并提交配对任务，结果待完成；cache/shape 的“尚无二进制”仅适用于首次交接。配对终态/严格正确性/共同 fingerprint 核验入口为 `optimization/compare_scheduled_pair.py`，任务与构建证据索引见 `report.md` 及各 worktree 候选的 `RESEARCH.md`。
 
 - 当前工作实现为根 `kernel.asc`，SHA256 为
-  `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`。
+`0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`。
+- `optimization/candidates/row-parallel-16/` 已由首次 HTTP 429 后的明确等待重试获得正式 submission `6ad2cf40193e507d8e061327`、score 14.02 并晋升；分析与逐点对照见 `optimization/TBEST_ANALYSIS_20261017.md`，完整证据见 `evidence/formal/fast-track-6ad2cf40/`。
 - `optimization/candidates/unit-token-scale/kernel.asc` 为跳过 unit token scale 乘法的
   未编译、未正式验证候选，未晋升；优化前快照位于
    `optimization/snapshots/pre-unit-token-scale/kernel.asc`；根现已晋升正式 mask+scale-resident 组合，晋升前根备份为 `optimization/snapshots/pre-historical-mask-scale-resident/kernel.asc`。
@@ -56,9 +67,9 @@
 6. **复现测试**：使用 `optimization/benchmark.py`；单点示例入口为根 `main.asc`。
 7. **外部实现参考**：看 `reference/README.md`，再按 AscendC → DynamicQuant → CUDA epilogue 顺序阅读。
 
-### 当前状态（避免混淆）
+### 历史状态说明（以下为先前 RNE-distance 阶段，当前身份见上文）
 
-- 根 `kernel.asc` 当前恢复为正式组合 payload：`QUANT_MASK_FAST_PATH=1` 与 `QUANT_SCALE_RESIDENT=1`；源码 SHA256 为 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`，与 `evidence/formal/fast-track-6ad2c82/` 一致。
+- 当时根 `kernel.asc` 为 RNE-distance mask 正式 payload，保留 `QUANT_MASK_FAST_PATH=1` 与 `QUANT_SCALE_RESIDENT=1`；SHA256 为 `007b6fb9ba6f55d5033f644fcc6cc6c975666ea9dd7d1c4d08bca9e38b674aab`，与 `evidence/formal/fast-track-6ad2cb6b/` 一致。晋升前 11.76 根快照为 `optimization/snapshots/pre-rint-distance-mask/kernel.asc`。
 - `op/kernel_v3.asc` 是开启 boundary-mask 快路径时的冻结快照；用户外部评测曾 15/15 通过，但这不是所有 FP32 输入的正确性证明。
 - `op/kernel.asc` 是历史对照基线，`op/kernel_v2.asc` 是早期候选快照，均保留不动。
 - `bench_vector` 仅消融量化精确校正；**仍包含矩阵乘等整个算子阶段**，不是已完成的独立纯 Vector 微基准，也不是可提交的正确实现。

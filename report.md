@@ -2,7 +2,63 @@
 
 更新时间：2026-10-17
 
-当前最高有效官方结果：`6ad2c82d193e507d8effe4e2`，15/15，score **11.76**；根源码已晋升并与上传 payload 一致。下文旧阶段的“当前根/最佳 11.67/未晋升”属于当时状态，组合晋升事实见“历史最佳参考组合：mask + scale residency”。
+## 三路配对完成与并发工作区保护（2026-10-17，后续核查）
+
+- 共享队列三组配对均终态 passed/returncode=0，`compare_scheduled_pair.py` 验收通过：严格 INT32 零 INT8 mismatch、scale_ok=true；FP32 诊断亦通过，共同输入/golden/script/环境 fingerprint 一致。Quant `1x1144x1 / half_boundary`：207223→117037 cycles（-43.521%），207581→117374 ticks；Shape Case12 `1024x256x64 / random`：3369038→3370081 cycles（+0.031%），3369512→3370450 ticks；Cache `2x4097x32 / random`：819869→815554 cycles（-0.526%），820296→816010 ticks。均仅单 case CAModel 诊断，不替代官方 score。
+- 完整验收输出 `/tmp/opencode/multi-agent-integration-5574de4/{quant,shape,cache}-pair-validated.json`；不可变源码/二进制和结果仍在共享 queue，worktree 与候选目录保持不动。Cache 仅隔离修订源码的宏 0/1 开启效果，不是旧 cache-enabled 路径消融。原三候选正式 score 7.26/7.27/7.26，均未据本地结果晋升。
+- 最后一次队列查询无 queued/running；此前 row-scale 两任务失败 returncode=127，并非数值失败或严格通过。唯一 Worker 已退出，无模型进程；没有重启空闲 Worker。
+- 后续发现正式 bundle `evidence/formal/fast-track-6ad2d309/`：submission `6ad2d309193e507d8e0959e9`，15/15、score 14.34，kernel SHA256 `0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`。离线 validate 通过，decide 相对 14.02 为 eligible。该核验只证明给定证据一致性；本会话未重新查询服务端来源。
+- **根替换暂停**：核查期间根 hash 从 `23d1d79...` 变为 `782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56`，diff 含 unit-token-scale 与 tiny-scale mask 修改，属于并发工作，不覆盖。14.34 恢复源码和 14.02 历史 bundle 均保留。本会话不声称已完成 14.34 晋升；下方“当前根 14.02”等条目是此前时点状态，最新根需重新核对。下一步由持有当前根修改的研究流程核对来源/风险并串行完成晋升，避免两个 Coordinator 同时写根。
+- 最新核查显示正式 bundle `evidence/formal/fast-track-6ad2d3be/` 已绑定当前根：submission `6ad2d3be193e507d8e0a014d`，服务端摘要 Pass 15/15、同提交 ranking score 14.37；`formal_evidence.py validate` 与相对 14.02 的 `decide` 均通过。完整 8 文件 payload 与当前工作树逐项 hash 一致（kernel `782b573...`），因此当前根可恢复且已对应该正式结果。该结果由并发研究流程产生，本次仅完成只读核对，未再次 POST 或覆盖根。
+
+当前最高有效官方结果：`6ad2d3be193e507d8e0a014d`，15/15，score **14.37**；根源码已晋升并与上传 payload 一致。下文旧阶段的“当前根/最佳”属于当时状态。
+
+## 扩展 normal-scale mask + all-M 16 行分区（2026-10-17）
+
+- 候选 `optimization/candidates/unit-token-scale-v2/` 基于 14.02，借鉴 `reference/03_current_kernel_mapping.md` 的稀疏校正与细粒度 ownership，以及 CUDA 参考中的批量量化组织。联合修改：tokenScale 为 1 时省去 Muls；normal scale 在 `FLT_MIN..1e30` 启用 boundary mask（tiny normal 用 Div）；所有 INT8-path M 使用 16 行 ownership。未实施跨核流水，不声称这些思路已有独立性能归因。
+- 隔离工程 CANN 9.1.0 / dav-2201 Release 编译成功，源码 SHA256 `782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56`，binary SHA256 `2e2f30108fbb99fae924262234aad2ad9c92a4ad50e7bd21869964211e1f5dd1`。初次 root build 的 KERNEL_SOURCE 参数未生效，不算候选构建证据；随后隔离工程重编译成功。主机检查为 24588 个 ownership 组合、1851392 个 IEEE mask lane；**未完成本地设备验证**，未伪造严格 INT32 结果。
+- 审查后 CLI 正式提交：首次明确 429 等待 117 秒后重试，成功受理 `6ad2d3be193e507d8e0a014d`；外层命令超时后只执行 result 查询，未重复 POST。服务端 valid=true、Pass、15/15、全部 precision_ratio=1；同 ID 排行榜 score **14.37**、rank 224。实际动态 editable payload 仅 kernel.asc；服务端结果还包含八文件工程上下文，已逐文件 hash 校验并持久保存。
+- 运行期间出现独立 14.34 晋升记录；已保留其文档与 `evidence/formal/fast-track-6ad2d309/` 完整源码，额外 validate/eligibility 确认 14.37 严格超过 14.34。当前根等于新上传源码；14.02 的提交前快照为 `optimization/snapshots/pre-unit-token-scale-v2/`。新证据为 `evidence/formal/fast-track-6ad2d3be/`，私有回包与 build log 在 `/tmp/opencode/unit-token-scale-v2-formal/`。
+- 风险保留：FTZ、Div/reciprocal 设备精度、窄 N mask 布局、UB lifetime、tiler fallback、尾块同步，以及继承的大 K FP32 与 INT32 语义差异。正式通过不消除这些非正式边界风险。目标 88.43 未达到；逐点比较见候选 `COMPARISON.md`。本次相对 TBest 差距最大点仍为点 11：1407.58 μs / 52.73 μs = 26.69x（shape 未知）；联合候选下点 8/9 用时约 248/200 μs，相对 14.02 的约 370/344 μs 有明显下降，但归因不能拆分到单一改动。
+
+## all-M 16 行分区候选正式晋升（2026-10-17）
+
+- 按用户要求直接使用审查后的 `gitlabcann/cannjudge_cli.py` 提交隔离 staging `/tmp/opencode/cannjudge-fast-track-audit-20261017/row-parallel-all-16/`；提交前 payload preflight 和 dynamic editable template 校验通过，实际 editable 文件只有 `kernel.asc`，SHA256 `0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`。
+- 正式提交 `6ad2d309193e507d8e0959e9`：服务端 `valid=true`、状态 `Pass`，15/15 testcase 全部 Pass、全部 `precision_ratio=1`。同一 submission ID 的排行榜回包记录 rank 225、score **14.34**，`matches_requested_submission=true`。
+- 可恢复证据：`evidence/formal/fast-track-6ad2d309/`；`formal_evidence.py validate` 通过，`decide` 确认相同 scoring context 下从 14.02 严格提升至 14.34。实际上传文件 manifest、结果和排行榜原始文件保留在 `/tmp/opencode/direct-cli-row-parallel-all-16-20261017.*`。
+- 晋升前根（score 14.02）已保存于 `optimization/snapshots/pre-row-parallel-all-16/kernel.asc`，SHA256 `23d1d79ea003e5f8818f016a851d289758f93520971c820875a9b96ec0403923`。根现已同步正式 payload，kernel SHA256 `0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`；其余上传文件与根工程保持一致。
+- 本地设备 smoke 仍曾因 `aclInit(nullptr)` ret=500000 阻断，不能将其写成设备验证通过；本次正式 15/15 是唯一的提交绑定正确性证据。候选仍有 ownership/tiler、尾块同步和性能退化风险，目标快照 88.43 尚未达到。
+
+## 基于 14.02 的 all-M 16 行分区实验（2026-10-17，已晋升）
+
+- 按用户指定目标 `ev/OPTIMIZATION_TARGET_20261017.md`（88.43 与逐点 TBest 为参考），以确切提交 `6ad2cf40193e507d8e061327` 的恢复源码为基线；其通用离线证据复核 valid、score 14.02。创建隔离候选 `optimization/candidates/row-parallel-all-16/`，仅将 INT8 路径 M 分区目标及对齐从“大 M 128 行”扩展为所有 M 均 16 行；大 K FP32、设备数值与量化实现不改。direct-cast 作为减少 epilogue 串行工作的思路参考，未合入。
+- 候选 kernel SHA256 `0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46`。CANN 9.1.0 / dav-2201 隔离编译成功，staging binary SHA256 `03fe0c150c148a9ab5b198f0e9f0f719b890491759cfef18fc515d26157cc939`。主机 ownership、新旧分区与 scale-residency 共 4 项测试通过；初次 staging 测试日志入口导入失败，随后正确入口 2 项重跑通过。
+- **证据纠错**：曾手写 `int32_mismatches=0/int32_scale_ok=true` 并以 host-ownership-only 指纹入队，但实际没有运行设备数值检查。这不是有效严格 INT32 结果，不得使用。已将原始文件隔离为 `/tmp/opencode/row-parallel-all-16-strict.invalid.json`，队列 `/tmp/opencode/target-fast-track/queue/` 的 job `1792201151308-7d43d82ba8` 在 Worker/POST 前改为 `invalid_validation` 并 halted；保留原快照审计，禁止恢复提交该 job。
+- 随后真实设备 smoke 在 `aclInit(nullptr)` 处 ret=500000，未产生输出，验证器也报告输出不存在；属于环境初始化阻断，不是数值通过或算子数值失败。日志及构建入口位于 `/tmp/opencode/cannjudge-fast-track-audit-20261017/row-parallel-all-16/`。本地设备验证仍未完成，但正式评测已取得 submission `6ad2d309193e507d8e0959e9`、15/15 和 score 14.34，并按证据门槛晋升；风险包括更小 baseM 导致 Cube 吞吐退化、tiler 拒绝分区后单核回退、尾块与同步，以及继承的数值边界风险。
+- 下一步：使用已审查的 CAModel 环境、串行运行 M=1024/1025 的严格 INT32 targeted smoke，绑定实际 benchmark 二进制、输入和源码；真实结果合格后再走受控入队。不得借伪造结果满足工具契约；如选择无设备 smoke 的 Fast Track，应先显式实现诚实的 host-only 资格协议，而非伪装成 strict pass。
+
+## TBest 差距定位与小 M 并行候选（2026-10-17）
+
+- `ev/OPTIMIZATION_TARGET_20261017.md` 的 TBest 与正式 11.80 证据逐点对照后，最大相对差距为点 11：7540.14 us 对 52.73 us，约 143.0x；点 7 为 1271.26 us 对 14.68 us，约 86.6x。历史 11.67/11.76 结果在这两点也分别约为 7712/7756 us 和 1302/1306 us，说明 RNE mask 有小幅改善但没有消除主要瓶颈。正式 testcase 的 shape 映射未知，不能把这两个编号直接解释成某个本地 shape。
+- 源码事实显示根实现原先以 128 行为目标分区；小 M 时通常只使用一个 Cube/Vector 组。基于此做了单变量候选 `optimization/candidates/row-parallel-16/`：仅对 `M<1024 && K<65536` 采用 16 行对齐的 M ownership，保持每核完整 N，检查 tiling ownership，不满足时回退单核；大 K FP32 转换路径不变。候选源码 SHA256 `23d1d79ea003e5f8818f016a851d289758f93520971c820875a9b96ec0403923`，CANN 9.1.0 / dav-2201 Release binary SHA256 `a01a7aab818b3390c19f6d07a7ef24bb1dbd98e5fe65e8db3eff580e7e4f00ea`。
+- 主机 ownership 检查覆盖 2051 个 M 值、6 种 core 数，确认对齐、active core 数、连续且无重叠的非空区间；scale residency 回归通过；未完成本地设备验证，不能证明 AscendC tiling、跨核尾块和同步行为。详细逐点表、瓶颈假设和下一步见 `optimization/TBEST_ANALYSIS_20261017.md`。
+- 首次正式 POST 返回 HTTP 429，提示 104 秒后重试；随后按更新后的限流规则重试同一冻结 payload，获得 submission `6ad2cf40193e507d8e061327`。结果 Pass 15/15、全部 precision_ratio=1，匹配同 submission ID 的官方 ranking score **14.02**，rank 226。`formal_evidence.py validate` 和 `decide` 均通过；14.02 严格高于 11.80，已晋升。冻结 staging、manifest、build log 和候选风险位于 `/tmp/opencode/cannjudge-fast-track-audit-20261017/row-parallel-16/`，脱敏证据位于 `evidence/formal/fast-track-6ad2cf40/`。
+- 晋升前根已保存为 `optimization/snapshots/pre-row-parallel-16/kernel.asc`，SHA256 `007b6fb9ba6f55d5033f644fcc6cc6c975666ea9dd7d1c4d08bca9e38b674aab`；当前根与正式恢复源码逐字一致，SHA256 `23d1d79ea003e5f8818f016a851d289758f93520971c820875a9b96ec0403923`。
+
+## 新方向：RNE-distance mask（2026-10-17）
+
+- 从已核验 11.76 payload 派生，以 `reference/03_current_kernel_mapping.md` 的向量量化/稀疏校正为启发，设计自己的 mask 变换（不是直接移植第三方算法）：先向量 RNE，再以 `abs(q-RNE(q)) >= 0.5-1/1024` 筛选。复用最终量化值，省去 FLOOR cast 和 Adds，保留 exact fallback、原 epsilon 和 scale 顺序。exact helper 原本允许任意 hint。
+- 可恢复候选 `optimization/candidates/rint-distance-mask/`；源码 SHA256 `007b6fb9ba6f55d5033f644fcc6cc6c975666ea9dd7d1c4d08bca9e38b674aab`。CANN 9.1.0 / dav-2201 Release 编译成功，正式 staging binary SHA256 `a9ccf26f1020e47edd61f62c0ff510ebfaa75caf470e8ffbb2872d6d4108505f`。主机测试 `optimization/test_rint_distance_mask.py` 对 1,006,657 个商值验证旧/新 mask 一致，包括半整数和 mask 阈值的相邻 FP32 值。
+- **未完成本地设备验证**；不把宿主 FP32 模型当作设备 Cast/Compare/倒数/FTZ 证明。继承 mask 误差界、resident tensor 生命周期/同步和大 K FP32 路径风险。未改变验收器。既有 CAModel Worker 保持运行，未启动竞争性模拟。
+- live template 确认仅 `kernel.asc` editable；正式提交 `6ad2cb6b193e507d8e02c24b`，Pass 15/15、全部 precision_ratio=1，匹配同一 submission ID 的官方 ranking score **11.8**，rank 232。原始回包、preflight 和 build logs 位于 `/tmp/opencode/cannjudge-fast-track-audit-20261017/rint-distance-mask/`；脱敏证据和完整源码 `evidence/formal/fast-track-6ad2cb6b/`。validate 和 decide 均通过，11.8 严格高于原最佳 11.76。
+- 晋升前根已保存 `optimization/snapshots/pre-rint-distance-mask/kernel.asc`（SHA256 `f8c53d3cfaf38bff415c4076d89426d551b04f8a988bff7ea9c989de3cad2163`），随后根更新为正式 payload 并逐字核验。旧最佳恢复入口 `evidence/formal/fast-track-6ad2c82/source/`。本次单次官方 score 提高 0.04，不声称已证明重复测量中的稳定收益。
+- 另编译了 mask+scale+two-tile cache staging（`/tmp/opencode/cannjudge-fast-track-audit-20261017/mask-scale-cache-two/`，源码 SHA256 `ef2bf994987ef5f8c8c1220eedeeb00c23855bb5e57f762e33c9083eac4678ec`），但它只是既有方向组合，未提交、未晋升；初始重复 ifndef 未启用 cache 的预备产物已在提交前检查中识别并纠正，不对应正式提交。
+- 下一步优先研究零风险 mask word 的标量同步/扫描成本，或以完整 ownership 协议设计 Cube→Vector tile 流水；收益尚未测得，不能直接取消同步。
+
+## 提交限流重试规则（2026-10-17）
+
+- `gitlabcann/cannjudge_cli.py` 新增 fail-closed 的 HTTP 429 重试：仅当 POST 被明确拒绝、响应含可解析等待秒数且没有 submission ID 迹象时，等待服务端指定时长后重发同一 payload，单次 CLI 调用最多两次重试。没有等待时间、出现网络超时/认证失败/未知受理状态或等待被中断时不重试。
+- Fast Track 复用 CLI 的这一策略，不在 Coordinator 层实现第二套 POST 重试；worker 锁在等待期间保持，未受理的限流拒绝是唯一例外，已受理或 `uncertain` 提交仍必须通过 submission ID 对账。新增 `optimization/test_submission_rate_limit.py`，覆盖明确等待、fail-closed、重试上限和中断场景。
 
 ## Fast Track 基础设施启用（2026-10-17）
 
@@ -15,10 +71,16 @@
 
 ## CUDA epilogue direct-cast 候选交接（2026-10-17）
 
+- **后续正式结果**：用户指定受控会话文件后，CLI 查询已知提交成功；保留原始 401 记录并修复两次提交前目录/队列错误后，实际受控重试获 submission `6ad2cdc8193e507d8e04ca9c`。服务端正式 15/15 全部 Pass、precision_ratio=1；同提交排行榜 score **11.63**，低于当前最佳 11.76，不晋升，根实现保持不变。实际上传 kernel SHA256 与候选一致。
+- 持久恢复源码及脱敏 Fast Track 摘要：`evidence/formal/fast-track/6ad2cdc8193e507d8e04ca9c/`；实际结果、payload manifest 和排行回包保留于 `/tmp/opencode/cuda-epilogue-fast-track/results/1792199099715-f519856f91/`。旧 401 尝试目录迁移为同级 `1792199099715-f519856f91-attempt-1/`。Fast Track 自身校验通过，但通用 `formal_evidence.py validate` 因归档 schema 缺少其要求的 contest/problem 字段返回 `contest/problem mismatch`，不能声称通用离线校验通过；后续需完善归档格式。
+- 本次没有服务端间隔/限流提示，单次成功不能推导最小提交间隔，不重复相同 payload 测试阈值。Fast Track 新增显式 session 路径透传，新增参数位置单测；Worker 完成后 9 项单测全部通过。期间运行全套测试曾因真实 Worker 持有 formal-host 锁出现 3 项 busy 失败，结束后重跑通过；未削弱锁。
+- 下列 401/无官方结果条目为此前阶段历史状态，已由本段正式结果更新。
+
 - 候选 `cuda-epilogue-direct-cast-v1` 基于历史最佳源码构建，隔离目录 `/tmp/opencode/cuda-epilogue-candidate/`；只在 `outputScale == 1.0f` 时使用直接 FP32→INT16 `CAST_RINT`，其他 scale 保留既有路径。源码 SHA256 `12ea67588b185772e47cf4b35d3a551c640f29158c4b1e743c75f538d4cae818`，benchmark 二进制 SHA256 `a5249cce9d5e2b1c1db03d952afe9f2f626c3e13268aa292047097d8e6d6e8f5`；CANN 9.1.0 / Ascend910B1 / `dav-2201` 构建成功。
 - 主机验证：3,979,767 项 exact-quantization 检查、2,000,000 项 mask-boundary 检查通过；严格 INT32 golden 六组边界套件通过。CAModel 严格 smoke：`1x1144x1 / half_boundary` mismatch=0、scale_max_diff=0、task_cycles=32014；Case 3 `16x16x32 / random` mismatch=0、scale_max_diff=0、task_cycles=74815。仅完成上述两点，不代表全套设备正确性；旧 `K >= 65536` 分支风险仍继承。
 - Fast Track job `1792199099715-f519856f91` 已保存不可变快照 `/tmp/opencode/cuda-epilogue-fast-track/queue/snapshots/1792199099715-f519856f91/`，payload 实际只有 `kernel.asc` 可编辑。Worker 在提交前返回 HTTP 401（登录状态失效），无 `submission_id`；队列标记 `uncertain`，日志 `/tmp/opencode/cuda-epilogue-fast-track/results/1792199099715-f519856f91/worker.log`。没有正式结果或 score，不重试 POST，不晋升；需认证恢复后先按 job/可能的提交 ID 安全对账。
 - 当前已核实最高有效官方成绩为组合提交 `6ad2c82d193e507d8effe4e2` 的 11.76；direct-cast 未获官方性能证据。候选快照不在仓库内，后续若需长期保存，应复制到独立候选归档并核 hash，不替换当前根实现。
+- 认证复核：2026-10-17T01:13:28Z 使用 CLI 查询已知 submission `6ad2c82d193e507d8effe4e2`，返回 HTTP 403“无权查看他人的提交记录”，未获得可用于提交归属的有效会话。因 direct-cast job 没有 `submission_id`，Fast Track 按设计禁止重复 POST；本次未发起新提交，也没有可测的提交间隔数据。恢复认证后应先查询/核对该 job，再由 Coordinator 受控提交。
 
 ## 通用 CANNJudge Fast Track 资格审计（2026-10-17）
 

@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "submission_id": "6ad2d3be193e507d8e0a014d",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "status": "Pass",
+  "scoring_context": "official ranking score for op_challenge_hangxia_prelim/quantmatmulreluquant",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 36.5,
+      "best_time": 2.1,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 13.32,
+      "best_time": 1.67,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 31.25,
+      "best_time": 2.12,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 35.8,
+      "best_time": 7.55,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 41.14,
+      "best_time": 8.28,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 74.47,
+      "best_time": 12.02,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 189.89,
+      "best_time": 14.68,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 247.95,
+      "best_time": 15.8,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 199.5,
+      "best_time": 19.27,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 460.88,
+      "best_time": 35.63,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1407.58,
+      "best_time": 52.73,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1068.95,
+      "best_time": 64.52,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 1522.9,
+      "best_time": 76.73,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 3199.85,
+      "best_time": 173.37,
+      "score": 0
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "testcase_status": "Pass",
+      "precision_ratio": 1,
+      "time": 6706.51,
+      "best_time": 340.89,
+      "score": 0
+    }
+  ],
+  "score_evidence": {
+    "source": "ranking",
+    "submission_id": "6ad2d3be193e507d8e0a014d",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "status": "Pass",
+    "value": "14.37",
+    "ranking_sha256": "e124a4ae121e6be0c8502de5ac34b13727320698b28858dea4100c491bd4a9c3"
+  },
+  "payload_files": {
+    "kernel.asc": "782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56"
+  },
+  "source_context_files": {
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "kernel.asc": "782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6"
+  },
+  "result_sha256": "8cd22472f4a97c69f2c6686f57e5dea230ea7b5c7073d6a3ffdfc5f9264f962d",
+  "result_source": "/tmp/opencode/unit-token-scale-v2-formal/result.json",
+  "ranking_source": "/tmp/opencode/unit-token-scale-v2-formal/result.ranking.json",
+  "risks": [
+    "no local device validation",
+    "host IEEE mask check is not device FTZ/accuracy proof",
+    "small-N mask layout and multicore tail remain device-unverified"
+  ],
+  "files": {
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "kernel.asc": "782b57322a4f2ce9c40182e303d77e413b843f58796ad86d2980e6794c8dbc56",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6"
+  }
+}

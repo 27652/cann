@@ -345,7 +345,7 @@ def archive(job: dict, result_dir: Path, state: dict, destination: Path):
 
 
 def _ranking_score(cli: Path, job: dict, result_dir: Path, manifest: dict,
-                   ranking_query: str) -> dict:
+                   ranking_query: str, session: Path | None = None) -> dict:
     sid = _submission_id(job, result_dir)
     problem_id = manifest.get("problem_id")
     if not sid or not problem_id:
@@ -353,6 +353,8 @@ def _ranking_score(cli: Path, job: dict, result_dir: Path, manifest: dict,
     output = result_dir / "result.ranking.json"
     command = ["python3", str(cli), "ranking", "--problem-id", str(problem_id),
                "--submission-id", sid, "--output", str(output)]
+    if session:
+        command[2:2] = ["--session", str(session)]
     if ranking_query:
         command += ["--query", ranking_query]
     try:
@@ -384,14 +386,15 @@ def _ranking_score(cli: Path, job: dict, result_dir: Path, manifest: dict,
                                "value": str(score), "ranking_sha256": digest(output)}}
 
 
-def _apply_result(job: dict, result_dir: Path, cli: Path, ranking_query: str) -> dict:
+def _apply_result(job: dict, result_dir: Path, cli: Path, ranking_query: str,
+                  session: Path | None = None) -> dict:
     expected = _submission_id(job, result_dir)
     state = _formal_state(result_dir / "result.json", expected)
     if state["state"] in {"submitted", "uncertain"}:
         return state
     manifest = _manifest_ok(job, result_dir)
     if state["state"] == "evaluated_pass":
-        score = _ranking_score(cli, job, result_dir, _json(result_dir / "result.manifest.json"), ranking_query)
+        score = _ranking_score(cli, job, result_dir, _json(result_dir / "result.manifest.json"), ranking_query, session)
         if score["state"] != "evaluated_pass":
             return score
         state.update(score)
@@ -421,13 +424,17 @@ def _claim_queued(root: Path) -> dict | None:
     return _with_queue(root, claim)
 
 
-def _result_command(cli: Path, submission_id: str, result: Path) -> list[str]:
-    return ["python3", str(cli), "result", submission_id, "--output", str(result),
+def _result_command(cli: Path, submission_id: str, result: Path,
+                    session: Path | None = None) -> list[str]:
+    prefix = ["python3", str(cli)]
+    if session:
+        prefix += ["--session", str(session)]
+    return prefix + ["result", submission_id, "--output", str(result),
             "--wait", "30", "--timeout", "1800"]
 
 
 def _submit_command(cli: Path, project: Path, result: Path, expected: Path,
-                    project_args: list[str]) -> list[str]:
+                    project_args: list[str], session: Path | None = None) -> list[str]:
     filtered = []
     skip = False
     for value in project_args:
@@ -438,13 +445,16 @@ def _submit_command(cli: Path, project: Path, result: Path, expected: Path,
             skip = True
             continue
         filtered.append(value)
-    return ["python3", str(cli), "submit", str(project), "--output", str(result),
+    prefix = ["python3", str(cli)]
+    if session:
+        prefix += ["--session", str(session)]
+    return prefix + ["submit", str(project), "--output", str(result),
             "--expected-project", str(expected), "--wait", "30", "--timeout", "1800",
-            *filtered]
+             *filtered]
 
 
 def _reconcile_one(root: Path, cli: Path, job: dict, result_dir: Path,
-                   ranking_query: str) -> dict:
+                   ranking_query: str, session: Path | None = None) -> dict:
     sid = _submission_id(job, result_dir)
     if not sid:
         return {"state": "uncertain", "reason": "no submission ID; resubmission is forbidden"}
@@ -452,7 +462,7 @@ def _reconcile_one(root: Path, cli: Path, job: dict, result_dir: Path,
     state = _formal_state(result, sid)
     if state["state"] == "submitted" or not result.is_file():
         try:
-            proc = subprocess.run(_result_command(cli, sid, result), text=True,
+            proc = subprocess.run(_result_command(cli, sid, result, session), text=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                   timeout=86400)
             (result_dir / "reconcile.log").write_text(proc.stdout)
@@ -467,20 +477,21 @@ def _reconcile_one(root: Path, cli: Path, job: dict, result_dir: Path,
 
 
 def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
-            ranking_query: str | None, submit=True, evidence_root=None) -> list[dict]:
+            ranking_query: str | None, submit=True, evidence_root=None,
+            session: Path | None = None) -> list[dict]:
     results = []
     # Reconcile all outstanding jobs before considering a new POST.
     for job in list_jobs(root):
         if job["status"] not in {"running", "submitted", "uncertain", "awaiting_score"}:
             continue
         result_dir = Path(job.get("result_dir", ""))
-        state = _reconcile_one(root, cli, job, result_dir, ranking_query) if result_dir.is_dir() else {
+        state = _reconcile_one(root, cli, job, result_dir, ranking_query, session) if result_dir.is_dir() else {
             "state": "uncertain", "reason": "missing result directory"}
         if state["state"] in {"evaluated_pass", "evaluated_fail"}:
             try:
                 if state.get('submission_id'):
                     job['submission_id'] = state['submission_id']
-                state = {**state, **_apply_result(job, result_dir, cli, ranking_query)}
+                state = {**state, **_apply_result(job, result_dir, cli, ranking_query, session)}
                 if evidence_root and state['state'] in {'evaluated_pass', 'evaluated_fail'}:
                     archive(job, result_dir, state, evidence_root)
             except (ValueError, OSError, json.JSONDecodeError) as exc:
@@ -510,7 +521,7 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
             expected.write_text(json.dumps(job["files"], sort_keys=True) + "\n")
             _set_job(root, job["job_id"], result_dir=str(result_dir))
             proc = subprocess.run(_submit_command(cli, snap / "project", result_dir / "result.json",
-                                                  expected, project_args), text=True,
+                                                  expected, project_args, session), text=True,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=86400)
             (result_dir / "worker.log").write_text(proc.stdout)
             if proc.returncode != 0:
@@ -521,7 +532,7 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
                     sid = state.get('submission_id')
                     _set_job(root, job["job_id"], submission_id=sid)
                     job['submission_id'] = sid
-                    state = {**state, **_apply_result(job, result_dir, cli, ranking_query)}
+                    state = {**state, **_apply_result(job, result_dir, cli, ranking_query, session)}
                     if evidence_root and state['state'] in {'evaluated_pass', 'evaluated_fail'}:
                         archive(job, result_dir, state, evidence_root)
                 elif state["state"] == "submitted":
@@ -543,7 +554,7 @@ def _worker(root: Path, cli: Path, output: Path, project_args: list[str],
 
 
 def worker(root: Path, cli: Path, output: Path, project_args: list[str], submit=True,
-           evidence_root=None) -> list[dict]:
+            evidence_root=None, session: Path | None = None) -> list[dict]:
     """Drain terminal jobs and submit qualified candidates serially."""
     root, cli, output = root.resolve(), cli.resolve(), output.resolve()
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -562,7 +573,7 @@ def worker(root: Path, cli: Path, output: Path, project_args: list[str], submit=
             return [{'status': 'busy'}]
         with host_guard:
             return _worker(root, cli, output, project_args, ranking_query, submit=submit,
-                           evidence_root=evidence_root)
+                           evidence_root=evidence_root, session=session)
     finally:
         fcntl.flock(guard, fcntl.LOCK_UN)
         guard.close()
@@ -585,6 +596,8 @@ def main():
         w.add_argument("--contest")
         w.add_argument("--problem")
         w.add_argument("--ranking-query", required=True)
+        w.add_argument("--session", type=Path,
+                       help="受控 CLI 会话文件；内容不会被读取、打印或写入日志")
         w.add_argument('--evidence-root', type=Path, default=Path('evidence/formal/fast-track'))
         if name == 'serve':
             w.add_argument('--max-seconds', type=float, default=3600)
@@ -593,6 +606,8 @@ def main():
     r.add_argument("--cli", type=Path, default=Path("gitlabcann/cannjudge_cli.py"))
     r.add_argument("--output", type=Path, default=Path("/tmp/opencode/fast-track/results"))
     r.add_argument('--ranking-query', required=True)
+    r.add_argument('--session', type=Path,
+                   help="受控 CLI 会话文件；内容不会被读取、打印或写入日志")
     r.add_argument('--evidence-root', type=Path, default=Path('evidence/formal/fast-track'))
     args = parser.parse_args()
     try:
@@ -606,7 +621,8 @@ def main():
             if args.action == "reconcile":
                 print(json.dumps(worker(args.root, args.cli, args.output,
                                         ['--ranking-query', args.ranking_query], submit=False,
-                                        evidence_root=args.evidence_root), indent=2))
+                                        evidence_root=args.evidence_root,
+                                        session=args.session), indent=2))
             else:
                 extra = []
                 for key in ("contest", "problem", "ranking_query"):
@@ -619,7 +635,8 @@ def main():
                     deadline = time.monotonic() + args.max_seconds
                     while time.monotonic() < deadline:
                         result = worker(args.root, args.cli, args.output, extra,
-                                        evidence_root=args.evidence_root)
+                                        evidence_root=args.evidence_root,
+                                        session=args.session)
                         print(json.dumps(result), flush=True)
                         # Unknown acceptance, expired sessions and missing score
                         # require explicit operator reconciliation, never a loop.
@@ -628,7 +645,8 @@ def main():
                         time.sleep(min(args.poll_interval, max(0, deadline - time.monotonic())))
                 else:
                     print(json.dumps(worker(args.root, args.cli, args.output, extra,
-                                            evidence_root=args.evidence_root), indent=2))
+                                            evidence_root=args.evidence_root,
+                                            session=args.session), indent=2))
         return 0
     except (ValueError, OSError, json.JSONDecodeError, subprocess.SubprocessError) as exc:
         print(json.dumps({"ok": False, "error": str(exc)}))

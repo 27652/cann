@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "contest": "op_challenge_hangxia_prelim",
+  "problem": "quantmatmulreluquant",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "template_files": [
+    {
+      "path": "CMakeLists.txt",
+      "editable": false
+    },
+    {
+      "path": "data_utils.h",
+      "editable": false
+    },
+    {
+      "path": "kernel.asc",
+      "editable": true
+    },
+    {
+      "path": "main.asc",
+      "editable": false
+    },
+    {
+      "path": "run.sh",
+      "editable": false
+    },
+    {
+      "path": "scripts/gen_data.py",
+      "editable": false
+    },
+    {
+      "path": "scripts/QuantMatmulReluQuant.py",
+      "editable": false
+    },
+    {
+      "path": "scripts/verify_result.py",
+      "editable": false
+    }
+  ],
+  "files": {
+    "kernel.asc": {
+      "sha256": "0cc3bc53431a46e63700e71f7a4568ee297c552ec5281a4e57f186ed60cb0e46",
+      "bytes": 51152
+    }
+  }
+}
