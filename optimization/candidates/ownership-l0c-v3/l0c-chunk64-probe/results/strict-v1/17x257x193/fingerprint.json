@@ -1,0 +1,23 @@
+{
+  "shape": [
+    17,
+    257,
+    193
+  ],
+  "seed": 20261017,
+  "source": "aad5a0bc77b96e58f14b99b20b6d6dc7c743fb1eece982ec15877b77343da718",
+  "binary": "3e9b887ac8a6f5e71f69b078c416303d2b7f5ca4f56870e7a517d6d6d6ef1599",
+  "runner": "d1cc0f7f1400719c0bb9b0f30f5b4030d048b073394363bd80ed3c90077d6e8e",
+  "golden": "0ebb528686cfee08f7415f4d2a0bc13d0f42d169907b78713bc5f2a813357bec",
+  "input": {
+    "x2Scale.bin": "50945429fa96cd799137ea12fcee9d1fdc671a05ec123ca29ab71063ff7a6b79",
+    "x2.bin": "812d35b64fd5686c26f78bf84833fb98bbd58741b1109a91fd7e3b9cb3b089d8",
+    "x1.bin": "dfd334fa099ae40340dc730bcc5391926a8c2cb9b79794d312970024f6b90f93",
+    "x1Scale.bin": "dfb2e9e221e016902091356ebccfd63c24f4f2cf51993c44682967161e4ccfb0"
+  },
+  "environment": {
+    "ASCEND_HOME_PATH": "/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0",
+    "LD_LIBRARY_PATH": "/mnt/data_server/llm_course/zzfs_202615/test/cann/simu/main/.runtime/Ascend910B1:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/tools/simulator/Ascend910B1/lib:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/opskernel:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/lib64/plugin/nnengine:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/x86_64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8/lib64:/mnt/data_server/llm_course/zzfs_202615/Ascend/cann-9.1.0/devlib",
+    "ASCEND_SOC_VERSION": "Ascend910B1"
+  }
+}

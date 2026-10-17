@@ -792,7 +792,7 @@ L0C 核查详见 `optimization/candidates/architecture-trials-v1/local-k/API_REV
 SetTensorA/B 确实 Reset scheduler，但 normal Reset 仅置 isFirstIter；不能据此
 断言 L0C 丢失，也不能证明复用。local-k-safe 的 16.69 是另一种单调用安全 K
 范围策略，不是原始外部 chunk L0C 累加已成立。本轮不提交原始 local-k。
-# dual-AIV ownership 修复：正式 19.45，晋升（2026-10-17）
+## dual-AIV ownership 修复：正式 19.45，晋升（2026-10-17）
 
 本轮发现旧 MIX 1:2 原型把已包含 sub-block 的 AIV GetBlockIdx 再乘 2，
 造成跳行；本地 dav_c220 sys_var_impl.h:55-70 提供明确实现证据。建立独立
@@ -812,3 +812,34 @@ yScale abs/rel 差为 0（容差 rtol=atol=1e-4），包含零行、负 scale、
 这是双 AIV 架构的独立正反馈，不能把所有逐点变化归于 Vector 吞吐，也不声称
 接近全局最优。大 K、FTZ/subnormal、一般 scale/RNE 边界和跨版本同步仍有风险。
 下一步在独立 L0C 生命周期验证或真正 A/L1 reuse 方向继续，而非盲目扩大组合。
+
+### 独立 L0C 诊断进展（同日）
+
+`optimization/candidates/ownership-l0c-v3/l0c-chunk64-probe/` 强制 K=64 chunk，
+以小形状执行 SetTensor/SetSingleShape reset、Iterate partial-sum、最终 GetTensorC。
+CANN 9.1/dav-2201 编译成功，严格 INT32 CAModel 2x33x129、17x257x193 均零
+INT8 mismatch、yScale 完全一致（rtol=atol=1e-4）。实际 MDL scheduler 的 reset
+及 CO1 allocate/free 路径已做头文件追踪，见同目录上层 RESEARCH.md。
+这是局部协议证据，不是原始大 K、性能或所有 policy 的证明；未正式提交、未晋升。
+原始大 K 设备测试尚未运行；后续应先以原始 chunk 阈值做小 M/N 的大 K 诊断。
+
+# FIFO + UB8192 组合反馈：正式 16.85（2026-10-17）
+
+以已核实的 FIFO `6ad335a8193e507d8e985b8b` 和独立 UB-resident-8192
+`6ad3365d193e507d8e999c3a` 为父版本，建立了不继承父 score 的组合候选
+`optimization/candidates/structural-v3/fifo-ub8192/`。组合只移入已验证的
+`VECTOR_TILE_N=8192`、UB scratch 生命周期重用，保留 FIFO 的调度与
+`M>=1024 && N<=4096` 分派；没有根据 testcase 编号猜测 shape。
+
+组合正式提交 `6ad33c2d193e507d8ea490bc`：服务端 `Pass`、15/15，全部
+`precision_ratio=1`；同 submission ID 排行榜 score **16.85**。上传仅为
+`kernel.asc`，SHA256 为 `656fdcaa873485cc2a7a6fbed57a64411c979f93f13c466c9d5ca6c2a9ac3580`。
+原始服务回包和排行榜快照保留在受保护的 `/tmp/opencode/fifo-ub8192-result*.json`，
+脱敏、可恢复 bundle 为 `evidence/formal/fifo-ub8192-6ad33c2d/`；
+`formal_evidence.py validate` 通过，针对历史最高有效 dual-AIV 19.45 的
+`decide` 正确拒绝晋升。
+
+结论：组合相对 FIFO 16.89 回退 0.04，说明两项局部优化不能简单叠加，
+不覆盖当前根，也不修改历史最高有效版本。dual-AIV 修正版的 19.45 是本轮
+真正的重大结构反馈；本组合只作为独立失败/消融证据保存。未取得新的高于
+19.45 的正式 score。
