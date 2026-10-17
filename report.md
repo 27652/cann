@@ -823,6 +823,18 @@ INT8 mismatch、yScale 完全一致（rtol=atol=1e-4）。实际 MDL scheduler �
 这是局部协议证据，不是原始大 K、性能或所有 policy 的证明；未正式提交、未晋升。
 原始大 K 设备测试尚未运行；后续应先以原始 chunk 阈值做小 M/N 的大 K 诊断。
 
+### L0C chunk 候选正式反馈（2026-10-17）
+
+独立 `l0c-chunk64-probe` 已提交 `6ad34061193e507d8eaf555b`。服务端返回
+`status=Pass`、`valid=true`，正式 15/15 且全部 `precision_ratio=1`；实际每项
+时间已保留在受保护原始回包 `/tmp/opencode/ownership-l0c-v3-l0c-result.json`。
+队名、用户 ID 和提交 ID 三种榜单查询均未返回该记录，因此 score **不可确认**。
+返回对象中的 `theory_score=0` 不作为官方 score 使用，也不满足晋升条件。
+
+脱敏待确认材料、8 文件源码恢复副本和 payload hash 已保存于
+`evidence/formal/l0c-chunk64-6ad34061-score-pending/`；该候选不晋升、不替换
+19.45 根版本。后续只有取得同 submission ID 的官方 score 后，才可与 19.45 比较。
+
 # FIFO + UB8192 组合反馈：正式 16.85（2026-10-17）
 
 以已核实的 FIFO `6ad335a8193e507d8e985b8b` 和独立 UB-resident-8192

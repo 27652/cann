@@ -1,0 +1,159 @@
+{
+  "submission_id": "6ad34061193e507d8eaf555b",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "contest_id": "6a9a94b9bf41025d6012d4dd",
+  "status": "Pass",
+  "valid": true,
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "time": 31.03,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "time": 9.04,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "time": 19.05,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "time": 35.14,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "time": 32.34,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "time": 95.53,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "time": 131.16,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "time": 343.59,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "time": 314.46,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "time": 887.59,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "time": 763.08,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "time": 2264.31,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "time": 2349.48,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "time": 5835,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "time": 13160.27,
+      "precision_ratio": 1,
+      "testcase_status": "Pass",
+      "score": 0,
+      "type": "default",
+      "best_time": null
+    }
+  ],
+  "score": null,
+  "score_status": "unconfirmed: ranking lookups returned no matching user record",
+  "evidence_status": "formal testcase pass; NOT verified scored result; not eligible for promotion",
+  "files": {
+    "data_utils.h": "1bdaae93c09b65e2615691a39bfd611122c09668d90e21809c52516f443bfd84",
+    "CMakeLists.txt": "bd56cfc79d09470cee2723299ce8e5554f3c0fd8ad318700c9a177a1e033dd0d",
+    "main.asc": "b3214315ab088077ae5f4ab1f80b7fe7024569a490a92294fbaaad6110d39035",
+    "kernel.asc": "aad5a0bc77b96e58f14b99b20b6d6dc7c743fb1eece982ec15877b77343da718",
+    "run.sh": "44d086766beccc2cf113e1936566a829f83d896557d5e1900127783931212032",
+    "scripts/verify_result.py": "41c5e8a7bb0fb2d0de3b0a2d730341f294822f79da8260219bef4ea30498cb17",
+    "scripts/gen_data.py": "71dfe07a6a7ba11a75d061ac920801b88ecdbe9c2f3df009169a33fbae954bd1",
+    "scripts/QuantMatmulReluQuant.py": "d3a2e66bc093e861a9fdd8eff35a62c02f4e6481b5ff07879bd58d82c2ead6d6"
+  },
+  "recorded_at": "2026-10-17T09:35:33.530876+00:00",
+  "raw_result_path": "/tmp/opencode/ownership-l0c-v3-l0c-result.json"
+}
