@@ -1,0 +1,160 @@
+{
+  "classification": "experimental official submission; not promoted; outside evidence/formal",
+  "submission_id": "6ad32b0b193e507d8e84c2f8",
+  "contest": "op_challenge_hangxia_prelim",
+  "problem": "quantmatmulreluquant",
+  "problem_id": "6a9a9ec4bf41025d6014adbe",
+  "create_time": "2026-10-17T08:00:11.750Z",
+  "status": "Pass",
+  "valid": true,
+  "passed": 15,
+  "total": 15,
+  "official_score": 16.6,
+  "score_source": "live CLI ranking response matched to exact submission_id",
+  "score_queried_at": "2026-10-17T08:01:10Z",
+  "payload_manifest": {
+    "schema_version": 1,
+    "contest": "op_challenge_hangxia_prelim",
+    "problem": "quantmatmulreluquant",
+    "problem_id": "6a9a9ec4bf41025d6014adbe",
+    "template_files": [
+      {
+        "path": "CMakeLists.txt",
+        "editable": false
+      },
+      {
+        "path": "data_utils.h",
+        "editable": false
+      },
+      {
+        "path": "kernel.asc",
+        "editable": true
+      },
+      {
+        "path": "main.asc",
+        "editable": false
+      },
+      {
+        "path": "run.sh",
+        "editable": false
+      },
+      {
+        "path": "scripts/gen_data.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/QuantMatmulReluQuant.py",
+        "editable": false
+      },
+      {
+        "path": "scripts/verify_result.py",
+        "editable": false
+      }
+    ],
+    "files": {
+      "kernel.asc": {
+        "sha256": "614678fd246c6ea2df2d05a9c8dd585668a4d218934be31d22c5c92eaa27102e",
+        "bytes": 70241
+      }
+    }
+  },
+  "recovery_directory": "submit-project",
+  "testcases": [
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc3",
+      "time": 21.68,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adc7",
+      "time": 9.37,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcb",
+      "time": 16.14,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adcf",
+      "time": 28,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add3",
+      "time": 21.12,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014add7",
+      "time": 61.77,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addb",
+      "time": 90.3,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014addf",
+      "time": 238.76,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade3",
+      "time": 169.12,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014ade7",
+      "time": 437.97,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adeb",
+      "time": 475.45,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adef",
+      "time": 1091.31,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf3",
+      "time": 1414.96,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adf7",
+      "time": 3276.83,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    },
+    {
+      "testcase_id": "6a9a9ec4bf41025d6014adfb",
+      "time": 7340.48,
+      "precision_ratio": 1,
+      "testcase_status": "Pass"
+    }
+  ],
+  "validation_limits": [
+    "CAModel smoke stopped at aclInit=500000 before kernel execution",
+    "No broad local strict device correctness claim",
+    "Official testcase shape mapping unknown"
+  ],
+  "raw_response_location": "/tmp/opencode/conditional-k-plane-a-result.json"
+}
